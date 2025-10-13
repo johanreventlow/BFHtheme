@@ -1,0 +1,16 @@
+# R session files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# R package build artifacts
+*.tar.gz
+*.Rcheck/
+.Rbuildignore
+
+# System files
+.DS_Store
+
+# Output files
+*.pdf
