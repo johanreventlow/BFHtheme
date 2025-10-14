@@ -47,21 +47,44 @@ add_bfh_logo <- function(plot,
     stop("logo_path must be a non-empty character string", call. = FALSE)
   }
 
-  # Security: Check for path traversal patterns
-  if (grepl("\\.\\.", logo_path) || grepl("^~", logo_path)) {
-    stop("Path traversal patterns (.., ~) not allowed in logo_path", call. = FALSE)
-  }
-
-  # Normalize path and verify it exists
+  # Normalize path (allowing shortcuts like ~ or ..) and ensure it resolves
   normalized_path <- tryCatch(
-    normalizePath(logo_path, mustWork = FALSE),
+    normalizePath(logo_path, winslash = "/", mustWork = TRUE),
+    error = function(e) {
+      expanded <- tryCatch(path.expand(logo_path), error = function(...) logo_path)
+      if (!file.exists(expanded)) {
+        stop("Logo file not found: ", basename(logo_path), call. = FALSE)
+      }
+      stop("Invalid file path: ", logo_path, call. = FALSE)
+    }
+  )
+
+  # Re-normalize the resolved path to ensure stability and guard against tampering
+  normalized_verification <- tryCatch(
+    normalizePath(normalized_path, winslash = "/", mustWork = TRUE),
     error = function(e) {
       stop("Invalid file path: ", logo_path, call. = FALSE)
     }
   )
 
-  if (!file.exists(normalized_path)) {
-    stop("Logo file not found: ", basename(logo_path), call. = FALSE)
+  if (!identical(normalized_path, normalized_verification)) {
+    stop("Invalid file path: ", logo_path, call. = FALSE)
+  }
+
+  # Optional root restriction (set via options(BFHtheme.logo_root = "/path"))
+  allowed_root <- getOption("BFHtheme.logo_root")
+  if (!is.null(allowed_root)) {
+    normalized_root <- tryCatch(
+      normalizePath(allowed_root, winslash = "/", mustWork = TRUE),
+      error = function(e) {
+        stop("Invalid BFHtheme.logo_root option: ", e$message, call. = FALSE)
+      }
+    )
+
+    root_prefix <- paste0(normalized_root, "/")
+    if (!identical(normalized_path, normalized_root) && !startsWith(normalized_path, root_prefix)) {
+      stop("Logo file must reside within the allowed root directory", call. = FALSE)
+    }
   }
 
   # Verify file is readable and has content
