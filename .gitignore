@@ -14,3 +14,7 @@
 
 # Output files
 *.pdf
+# Build artifacts
+*.Rcheck/
+*.tar.gz
+*.tgz
