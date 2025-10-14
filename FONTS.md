@@ -6,8 +6,8 @@ BFHtheme pakken understøtter intelligent font-valg med automatisk fallback.
 
 Pakken prøver følgende skrifttyper i prioriteret rækkefølge:
 
-1. **Mari Office** (Primær) - BFH's officielle skrifttype
-2. **Mari** (Alternativ) - Alternativt navn
+1. **Mari** (Primær) - BFH's officielle skrifttype
+2. **Mari Office** (Alternativ) - Alternativt navn
 3. **Roboto** (Fallback) - Open source Google font
 4. **Arial** (Backup) - Universal fallback
 5. **sans** (System) - System default
@@ -52,19 +52,19 @@ Output:
 ```
 === BFH Font Availability ===
 
-Mari Office    : ✓ Available
 Mari           : ✗ Not found
+Mari Office    : ✓ Available
 Roboto         : ✓ Available
 Arial          : ✓ Available
 
-Recommended font: Mari Office
+Recommended font: Mari
 ```
 
 ## Mari Office Font
 
 **For BFH Medarbejdere:**
 
-Mari/Mari Office er BFH's officielle corporate font og er pre-installeret på alle medarbejder-computere. Ingen handling nødvendig - pakken vil automatisk bruge den.
+Mari Office/Mari er BFH's officielle corporate font og er pre-installeret på alle medarbejder-computere. Ingen handling nødvendig - pakken vil automatisk bruge den.
 
 **For Eksterne Brugere:**
 

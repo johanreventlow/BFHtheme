@@ -18,7 +18,22 @@ test_that("get_bfh_font returns a font when check_installed is TRUE", {
   expect_type(result, "character")
   expect_length(result, 1)
   # Should return one of the fallback fonts
-  expect_true(result %in% c("Mari", "Roboto", "Arial", "sans"))
+  expect_true(result %in% c("Mari", "Mari Office", "Roboto", "Arial", "sans"))
+})
+
+test_that("get_bfh_font prefers Mari when available", {
+  suppressMessages(clear_bfh_font_cache())
+
+  fake_fonts <- data.frame(family = c("Mari", "Mari Office", "Roboto"))
+
+  with_mocked_bindings(
+    requireNamespace = function(pkg, quietly = TRUE) pkg == "systemfonts",
+    `systemfonts::system_fonts` = function() fake_fonts,
+    {
+      result <- get_bfh_font(check_installed = TRUE, silent = TRUE, force_refresh = TRUE)
+      expect_equal(result, "Mari")
+    }
+  )
 })
 
 test_that("get_bfh_font silent parameter works", {
@@ -51,7 +66,7 @@ test_that("check_bfh_fonts returns logical vector", {
 test_that("check_bfh_fonts has named elements", {
   result <- suppressMessages(check_bfh_fonts())
   expect_named(result)
-  expected_names <- c("Mari Office", "Mari", "Roboto", "Arial")
+  expected_names <- c("Mari", "Mari Office", "Roboto", "Arial")
   expect_equal(names(result), expected_names)
 })
 
