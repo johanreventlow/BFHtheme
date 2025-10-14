@@ -80,8 +80,7 @@ theme_bfh <- function(base_size = 12,
     plot.background = ggplot2::element_rect(fill = "white", color = NA),
     plot.margin = ggplot2::margin(base_size, base_size, base_size, base_size),
 
-    # Panel
-    # panel.grid.major = ggplot2::element_line(color = "grey90", linewidth = 0.5),
+    # Panel - grid lines removed for cleaner appearance
     panel.grid.major = ggplot2::element_blank(),
     panel.grid.minor = ggplot2::element_blank(),
     panel.background = ggplot2::element_rect(fill = "white", color = NA),
