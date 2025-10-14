@@ -144,19 +144,3 @@ scale_color_bfh_discrete <- function(palette = "main", reverse = FALSE, ...) {
 #' @rdname scale_fill_bfh_discrete
 #' @export
 scale_colour_bfh_discrete <- scale_color_bfh_discrete
-
-#' @keywords internal
-validate_palette_argument <- function(palette) {
-  if (!is.character(palette) || length(palette) != 1 || !nzchar(palette)) {
-    stop("palette must be a single character string", call. = FALSE)
-  }
-  palette
-}
-
-#' @keywords internal
-validate_logical_argument <- function(value, name) {
-  if (!is.logical(value) || length(value) != 1 || is.na(value)) {
-    stop(sprintf("%s must be a single logical value (TRUE or FALSE)", name), call. = FALSE)
-  }
-  value
-}
