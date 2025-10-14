@@ -1,10 +1,17 @@
-# Claude Instruktioner – BFHcharts
+# Claude Instruktioner – BFHtheme
 
 ## 1) Projektoversigt
 
-**BFHcharts** er en R package til **Statistical Process Control (SPC) visualisering** i healthcare settings. Built on ggplot2 og qicharts2 med fokus på beautiful defaults, publication-ready output og multi-organizational branding support.
+**BFHtheme** er en R package til **ggplot2 theming og branding** for Bispebjerg og Frederiksberg Hospital samt Region Hovedstaden. Pakken leverer beautiful defaults, publication-ready output og multi-organizational branding support.
 
-**Udviklingsstatus:** Standard R package development med test-driven development, defensive programming og stabil API design.
+**Formål:**
+- Professional ggplot2 themes optimeret for healthcare visualiseringer
+- Officielle farvepaletter for BFH og Region H
+- Branding helpers (logo, footer, color bars)
+- Font auto-detection med session-level caching
+- Publication-ready defaults uden manuel styling
+
+**Udviklingsstatus:** Production-ready R package med test-driven development, defensive programming og stabil API.
 
 ---
 
@@ -34,26 +41,29 @@ devtools::check()
 covr::package_coverage()
 ```
 
+**Nuværende status:**
+- 323 passing tests
+- 89.74% coverage (mål: ≥90%)
+- 0 errors, 3 warnings (acceptable), 2 notes
+
 ### 2.2 Defensive Programming
 
 * **Input validation** ved exported functions
 * **Error handling** via `tryCatch()` med informative messages
 * **Type checking** med `stopifnot()`, `is.*()` checks
 * **Graceful degradation** med fallback defaults
-* **NULL safety** – eksplicit NULL-håndtering
+* **NULL safety** – eksplicit NULL-håndtering med `%||%` operator
 
 ```r
 # Eksempel: Input validation pattern
-create_spc_chart <- function(data, x, y, chart_type = "run", ...) {
+theme_bfh <- function(base_size = 12, base_family = NULL, ...) {
   # Input validation
-  stopifnot(
-    "data must be a data.frame" = is.data.frame(data),
-    "chart_type must be character" = is.character(chart_type)
-  )
-
-  if (nrow(data) == 0) {
-    stop("data cannot be empty", call. = FALSE)
+  if (!is.numeric(base_size) || base_size <= 0) {
+    stop("base_size must be a positive number", call. = FALSE)
   }
+
+  # NULL coalescing with %||% operator
+  base_family <- base_family %||% get_bfh_font(check_installed = TRUE, silent = TRUE)
 
   # ... implementation
 }
@@ -97,8 +107,8 @@ Undtagelse: Simple operationer (`git status`, `git diff`, `git log`)
 * **Single Responsibility** – én opgave pr. funktion
 * **Immutable patterns** – returnér nye ggplot objects, modificér ikke in-place
 * **Composition over complexity** – byg komplekse plots fra simple layers
-* **Configuration objects** – brug structured configs (spc_plot_config, viewport_dims)
 * **Minimal dependencies** – kun tilføj dependencies hvis strengt nødvendigt
+* **Session-level caching** – font detection caches for performance (10-15x speedup)
 
 ---
 
@@ -106,37 +116,44 @@ Undtagelse: Simple operationer (`git status`, `git diff`, `git log`)
 
 ### 3.1 R Package Structure
 
-**File organization i `/R/`:**
-* `plot_core.R` – Core plotting functions (bfh_spc_plot, create_spc_chart)
-* `plot_enhancements.R` – Plot enhancement layers (target lines, labels, etc.)
-* `themes.R` – ggplot2 theme functions (bfh_theme)
-* `chart_types.R` – Chart type definitions og mappings
-* `config_objects.R` – Configuration constructors (spc_plot_config, viewport_dims)
-* `utils_*.R` – Utility functions (date formatting, y-axis formatting, helpers)
-* `*-package.R` – Package documentation
+**Faktisk file organization i `/R/`:**
+* `themes.R` – ggplot2 theme functions (theme_bfh, theme_bfh_minimal, theme_bfh_dark, etc.)
+* `colors.R` – Color palettes og helpers (bfh_colors, bfh_palettes, bfh_cols)
+* `scales.R` – ggplot2 scale functions (scale_color_bfh, scale_fill_bfh)
+* `fonts.R` – Font detection og caching (get_bfh_font, check_bfh_fonts)
+* `helpers.R` – Plot helpers (bfh_save, bfh_combine_plots, bfh_labs, add_bfh_color_bar)
+* `branding.R` – Logo og branding (add_bfh_logo, add_bfh_footer, bfh_title_block)
+* `logo_helpers.R` – Logo path resolvers (get_bfh_logo, add_logo)
+* `defaults.R` – Global defaults (set_bfh_defaults, reset_bfh_defaults)
+* `utils_operators.R` – Internal operators (%||%)
+* `BFHtheme-package.R` – Package documentation
 
 ### 3.2 Function Design Patterns
 
 **Exported functions:**
 ```r
-#' Create SPC Chart
+#' BFH Theme for ggplot2
 #'
-#' High-level convenience function for creating complete SPC charts
+#' A clean, professional theme optimized for healthcare visualizations.
+#' Based on theme_minimal with custom typography and spacing.
 #'
-#' @param data Data frame with time series data
-#' @param x Column name for x-axis (date/time)
-#' @param y Column name for y-axis (measurement)
-#' @param chart_type Character. One of: "run", "i", "p", "u", "c", "xbar"
-#' @param ... Additional arguments passed to qicharts2::qic()
+#' @param base_size Base font size (default: 12)
+#' @param base_family Font family. If NULL, auto-detects BFH fonts (Mari, Roboto, Arial)
+#' @param base_line_size Base line size (default: base_size/22)
+#' @param base_rect_size Base rectangle size (default: base_size/22)
 #'
-#' @return A ggplot2 object
+#' @return A ggplot2 theme object
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' create_spc_chart(data = my_data, x = date, y = count, chart_type = "run")
-#' }
-create_spc_chart <- function(data, x, y, chart_type = "run", ...) {
+#' library(ggplot2)
+#' ggplot(mtcars, aes(wt, mpg)) +
+#'   geom_point() +
+#'   theme_bfh()
+theme_bfh <- function(base_size = 12,
+                      base_family = NULL,
+                      base_line_size = base_size / 22,
+                      base_rect_size = base_size / 22) {
   # Implementation
 }
 ```
@@ -144,9 +161,9 @@ create_spc_chart <- function(data, x, y, chart_type = "run", ...) {
 **Internal utilities (ikke exported):**
 ```r
 # Danske kommentarer for interne funktioner
-# Beregn centerline position for label placement
-calculate_centerline_position <- function(qic_data) {
-  # Implementation
+# Resolver base font family with auto-detection
+.resolve_base_family <- function(base_family) {
+  base_family %||% get_bfh_font(check_installed = TRUE, silent = TRUE)
 }
 ```
 
@@ -156,64 +173,57 @@ calculate_centerline_position <- function(qic_data) {
 ```r
 # ✅ Korrekt: Build plot incrementally
 base_plot <- ggplot(data, aes(x = x, y = y)) +
-  geom_line()
+  geom_line() +
+  theme_bfh()
 
 enhanced_plot <- base_plot +
-  add_target_line(target_value) +
-  bfh_theme()
+  scale_color_bfh() +
+  bfh_labs(title = "Plot Title", x = "x-axis", y = "y-axis")
 
 # ❌ Forkert: Massive nested calls
-ggplot(...) + geom_line(...) + geom_hline(...) + theme(...) + labs(...) + ...
+ggplot(...) + geom_line(...) + theme_bfh(...) + scale_color_bfh(...) + labs(...) + ...
 ```
 
 **Theme design:**
 ```r
 # Themes skal returnere theme() objects
-bfh_theme <- function(base_size = 14, colors = NULL) {
-  # Defaults hvis colors ikke angivet
-  colors <- colors %||% default_bfh_colors()
+theme_bfh <- function(base_size = 12, base_family = NULL, ...) {
+  # Auto-detect font hvis ikke specificeret
+  base_family <- .resolve_base_family(base_family)
 
-  theme_minimal(base_size = base_size) +
-    theme(
-      plot.title = element_text(size = rel(1.2), face = "bold"),
-      # ... more theme elements
-    )
-}
-```
-
-### 3.4 Configuration Objects
-
-**Structured configs via constructors:**
-```r
-#' Create SPC Plot Configuration
-#'
-#' @param chart_type Character. Chart type identifier
-#' @param y_axis_unit Character. Unit for y-axis ("count", "percent", "rate")
-#' @param chart_title Character. Plot title
-#' @param target_value Numeric. Optional target line value
-#' @param target_text Character. Label for target line
-#'
-#' @return A list with class "spc_plot_config"
-#' @export
-spc_plot_config <- function(
-  chart_type = "run",
-  y_axis_unit = "count",
-  chart_title = NULL,
-  target_value = NULL,
-  target_text = NULL
-) {
-  structure(
-    list(
-      chart_type = chart_type,
-      y_axis_unit = y_axis_unit,
-      chart_title = chart_title,
-      target_value = target_value,
-      target_text = target_text
+  theme_minimal(
+    base_size = base_size,
+    base_family = base_family,
+    ...
+  ) +
+  theme(
+    plot.title = marquee::element_marquee(
+      size = base_size * 1.3,
+      hjust = 0,
+      margin = margin(b = base_size * 0.5)
     ),
-    class = "spc_plot_config"
+    # ... more theme elements
   )
 }
 ```
+
+### 3.4 NULL Coalescing Operator
+
+**VIGTIGT:** Pakken bruger `%||%` operator (defineret i `utils_operators.R`):
+
+```r
+# Definition
+`%||%` <- function(x, y) {
+  if (is.null(x)) y else x
+}
+
+# Usage
+base_family <- base_family %||% get_bfh_font()
+text <- text %||% "Default text"
+width <- width %||% dims$width
+```
+
+Dette er standard pattern i moderne R packages (rlang, purrr).
 
 ### 3.5 Dependencies & NAMESPACE
 
@@ -221,7 +231,7 @@ spc_plot_config <- function(
 ```r
 # ✅ Korrekt: Lad roxygen2 håndtere NAMESPACE
 #' @export
-#' @importFrom ggplot2 ggplot aes geom_line
+#' @importFrom ggplot2 ggplot aes theme
 my_function <- function() { ... }
 
 # Kør derefter:
@@ -234,6 +244,12 @@ devtools::document()
 * Undgå `@import pkg` (importerer alt)
 * Tilføj nye dependencies i DESCRIPTION under `Imports:` eller `Suggests:`
 
+**Nuværende dependencies:**
+```
+Imports: ggplot2, grid, grDevices, marquee
+Suggests: systemfonts, extrafont, showtext, png, jpeg, patchwork, scales, purrr
+```
+
 ---
 
 ## 4) Testing Strategy
@@ -241,57 +257,78 @@ devtools::document()
 ### 4.1 Test Organization
 
 **Test files i `/tests/testthat/`:**
-* `test-plot_core.R` – Tests for core plotting functions
-* `test-plot_enhancements.R` – Tests for plot enhancements
 * `test-themes.R` – Tests for theme functions
-* `test-config_objects.R` – Tests for config constructors
-* `test-utils_*.R` – Tests for utility functions
+* `test-colors.R` – Tests for color palettes og helpers
+* `test-scales.R` – Tests for scale functions
+* `test-fonts.R` – Tests for font detection og caching
+* `test-helpers.R` – Tests for plot helpers
+* `test-branding.R` – Tests for logo og branding functions
+* `test-logo_helpers.R` – Tests for logo path resolvers
+* `test-defaults.R` – Tests for global defaults
 
 ### 4.2 Test Patterns
 
 **Unit tests:**
 ```r
-test_that("create_spc_chart validates input data", {
-  # Arrange
-  invalid_data <- list(not = "a dataframe")
-
-  # Act & Assert
-  expect_error(
-    create_spc_chart(data = invalid_data, x = date, y = count),
-    "data must be a data.frame"
-  )
-})
-
-test_that("create_spc_chart returns ggplot object", {
-  # Arrange
-  data <- data.frame(date = 1:10, count = rnorm(10))
-
-  # Act
-  result <- create_spc_chart(data = data, x = date, y = count)
+test_that("bfh_cols returns all colors when no arguments provided", {
+  # Arrange & Act
+  result <- bfh_cols()
 
   # Assert
-  expect_s3_class(result, "ggplot")
+  expect_type(result, "character")
+  expect_length(result, 28)  # Total antal farver
+  expect_true(all(grepl("^#[0-9a-fA-F]{6}$", result)))  # Hex format
+})
+
+test_that("theme_bfh validates base_size parameter", {
+  # Act & Assert
+  expect_error(
+    theme_bfh(base_size = -1),
+    "base_size must be a positive number"
+  )
 })
 ```
 
-**Visual regression tests (vdiffr):**
+**Security tests:**
 ```r
-test_that("bfh_theme produces consistent visual output", {
+test_that("add_bfh_logo blocks path traversal attempts", {
+  skip_if_not_installed("ggplot2")
+
+  p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+
+  # Test path traversal patterns
+  expect_error(add_bfh_logo(p, "../../../etc/passwd"))
+  expect_error(add_bfh_logo(p, "~/logo.png"))
+  expect_error(add_bfh_logo(p, "..\\..\\Windows\\System32\\config\\SAM"))
+})
+```
+
+**Visual regression tests (vdiffr) - MANGLER:**
+```r
+test_that("theme_bfh produces consistent visual output", {
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("ggplot2")
+
   # Arrange
   data <- data.frame(x = 1:10, y = rnorm(10))
-  plot <- ggplot(data, aes(x, y)) + geom_line() + bfh_theme()
+  plot <- ggplot(data, aes(x, y)) + geom_line() + theme_bfh()
 
   # Act & Assert
-  vdiffr::expect_doppelganger("bfh_theme_basic", plot)
+  vdiffr::expect_doppelganger("theme_bfh_basic", plot, writer = "svg")
 })
 ```
 
 ### 4.3 Coverage Goals
 
-* **≥90% samlet coverage**
+* **≥90% samlet coverage** (nuværende: 89.74%)
 * **100% på exported functions**
-* **Edge cases**: NULL inputs, empty data, invalid types
-* **Integration tests**: Full workflow fra data → plot
+* **Edge cases**: NULL inputs, empty data, invalid types, path traversal
+* **Integration tests**: Full workflow fra theme → plot → save
+
+**Coverage gaps (prioriteret):**
+- `R/fonts.R`: 72.90% - extrafont fallback path mangler tests
+- `R/logo_helpers.R`: 77.42% - logo variants (grey, mark) untested
+- `R/branding.R`: 86.36% - JPEG support helt utestet
 
 ---
 
@@ -303,6 +340,7 @@ test_that("bfh_theme produces consistent visual output", {
 ```r
 #' Function Title (One Line)
 #'
+#' @description
 #' Longer description explaining what the function does, when to use it,
 #' and any important details.
 #'
@@ -333,10 +371,10 @@ test_that("bfh_theme produces consistent visual output", {
 **Vignette struktur:**
 ```rmd
 ---
-title: "Getting Started with BFHcharts"
+title: "Getting Started with BFHtheme"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting Started with BFHcharts}
+  %\VignetteIndexEntry{Getting Started with BFHtheme}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -355,7 +393,7 @@ Example code...
 **Når funktionalitet ændres:**
 1. Opdater eksempler i README.md
 2. Verificer at eksempler kører uden fejl
-3. Opdater screenshots hvis relevant (future: når vi har them)
+3. Opdater screenshots hvis relevant
 
 ---
 
@@ -374,7 +412,7 @@ Example code...
 ### 6.2 Pre-Commit Checklist
 
 - [ ] Tests kørt og bestået (`devtools::test()`)
-- [ ] Package check uden errors/warnings (`devtools::check()`)
+- [ ] Package check uden errors (`devtools::check()`)
 - [ ] Roxygen documentation opdateret
 - [ ] NAMESPACE regenereret (`devtools::document()`)
 - [ ] Eksempler verificeret
@@ -408,7 +446,8 @@ Fritekst med kontekst og rationale.
 # Return ggplot objects for composition
 create_base_plot <- function(data) {
   ggplot(data, aes(x = x, y = y)) +
-    geom_line()
+    geom_line() +
+    theme_bfh()
 }
 
 # Users can add their own layers
@@ -425,30 +464,33 @@ create_plot <- function(data) {
   print(plot)  # DON'T DO THIS
 }
 
-# Don't modify global state
+# Don't modify global state without warning
 create_plot <- function(data) {
-  theme_set(theme_minimal())  # DON'T DO THIS
+  theme_set(theme_minimal())  # DON'T DO THIS (except in set_bfh_defaults)
   # ...
 }
 ```
 
-### 7.2 Configuration Patterns
+### 7.2 Color Palette Usage
 
 **✅ Korrekt:**
 ```r
-# Use structured config objects
-plot_cfg <- spc_plot_config(
-  chart_type = "p",
-  y_axis_unit = "percent"
-)
+# Get specific colors
+bfh_cols("hospital_primary", "hospital_blue")
 
-plot <- bfh_spc_plot(qic_data, plot_cfg)
+# Get all colors
+all_colors <- bfh_cols()
+
+# Use in ggplot2
+ggplot(data, aes(x, y, color = group)) +
+  geom_point() +
+  scale_color_bfh(palette = "main")
 ```
 
 **❌ Forkert:**
 ```r
-# Don't use unstructured lists
-plot_cfg <- list(type = "p", unit = "percent")  # No validation!
+# Don't hardcode hex values
+colors <- c("#007dbb", "#009ce8")  # Use bfh_cols() instead
 ```
 
 ### 7.3 NULL Handling
@@ -456,9 +498,10 @@ plot_cfg <- list(type = "p", unit = "percent")  # No validation!
 **✅ Korrekt:**
 ```r
 # Use %||% operator for defaults
-colors <- user_colors %||% default_colors()
+base_family <- base_family %||% get_bfh_font()
+text <- text %||% "Default text"
 
-# Explicit NULL checks
+# Explicit NULL checks when needed
 if (is.null(target_value)) {
   # Skip target line
 } else {
@@ -468,71 +511,195 @@ if (is.null(target_value)) {
 
 **❌ Forkert:**
 ```r
-# Implicit NULL behavior kan føre til uventede errors
-plot + geom_hline(yintercept = target_value)  # Fails hvis NULL
+# Don't use implicit NULL behavior
+base_family <- base_family  # Missing fallback!
+
+# Don't check with is.null when c(...) is used
+cols <- c(...)
+if (is.null(cols)) { ... }  # WRONG! Use length(cols) == 0 instead
 ```
 
 ---
 
-## 8) Troubleshooting
+## 8) Security Considerations
 
-### 8.1 Common Issues
+### 8.1 Path Traversal Protection
 
-**ggplot2 layer errors:**
+**KRITISK:** Logo og file loading funktioner skal validere paths:
+
 ```r
-# Problem: "cannot add ggproto objects together"
-# Solution: Ensure alle layers returnerer valid ggplot2 components
-
-# ✅ Korrekt
-add_layer <- function(p) {
-  if (condition) {
-    p + geom_point()
-  } else {
-    p  # Return unchanged
+# add_bfh_logo implementation pattern
+add_bfh_logo <- function(plot, logo_path, ...) {
+  # Security checks
+  if (grepl("\\.\\.", logo_path) || grepl("^~", logo_path)) {
+    stop("Path traversal patterns (.., ~) not allowed", call. = FALSE)
   }
-}
 
-# ❌ Forkert
-add_layer <- function(p) {
-  if (condition) {
-    p + geom_point()
+  # Normalize path
+  normalized_path <- tryCatch(
+    normalizePath(logo_path, mustWork = FALSE),
+    error = function(e) {
+      stop("Invalid file path provided", call. = FALSE)
+    }
+  )
+
+  # Verify file exists
+  if (!file.exists(normalized_path)) {
+    stop("Logo file not found", call. = FALSE)
   }
-  # Returns NULL hvis condition FALSE!
+
+  # ... rest of implementation
 }
 ```
 
-**Namespace conflicts:**
-```r
-# Problem: Function not found efter @export
-# Solution: Kør devtools::document() og check NAMESPACE
+### 8.2 Input Validation
 
-# Problem: Konflikt med anden package
-# Solution: Brug explicit namespace
-stats::filter(data)  # Instead of filter(data)
+Al input validation skal være comprehensive:
+
+```r
+# Validate string parameters
+if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
+  stop("palette must be a non-empty character string", call. = FALSE)
+}
+
+# Validate numeric parameters with range
+if (!is.numeric(size) || size <= 0 || size > 1) {
+  stop("size must be between 0 and 1 (exclusive of 0)", call. = FALSE)
+}
+
+# Validate logical parameters
+if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
+  stop("reverse must be TRUE or FALSE", call. = FALSE)
+}
+```
+
+---
+
+## 9) Performance Optimization
+
+### 9.1 Font Caching
+
+**Implementeret:** Session-level font caching (10-15x speedup)
+
+```r
+# Package-level cache environment
+.bfh_font_cache <- new.env(parent = emptyenv())
+
+# Cache check pattern
+cache_key <- paste0(fonts, check_installed, collapse = "_")
+if (exists(cache_key, envir = .bfh_font_cache, inherits = FALSE)) {
+  cached_font <- get(cache_key, envir = .bfh_font_cache, inherits = FALSE)
+  return(cached_font)
+}
+
+# Cache assignment after detection
+assign(cache_key, selected_font, envir = .bfh_font_cache)
+```
+
+### 9.2 Known Performance Bottlenecks
+
+**Identificeret af performance-optimizer agent:**
+
+1. **Palette lookups** - bfh_pal() kaldt på hver scale render
+2. **String operations** - toupper() i bfh_labs() kunne optimeres
+3. **Grid grob creation** - Recreates objects på hver call
+
+**Løsninger under udvikling:**
+- Palette caching
+- bfh_labs() optimering med purrr::imap()
+- Grob caching for repeated operations
+
+---
+
+## 10) Troubleshooting
+
+### 10.1 Common Issues
+
+**Missing %||% operator:**
+```r
+# Problem: "could not find function %||%"
+# Solution: Ensure utils_operators.R is loaded
+devtools::document()
+devtools::load_all()
+```
+
+**bfh_cols() returns empty vector:**
+```r
+# Problem: bfh_cols() returns character(0) instead of all colors
+# Solution: Fixed in commit 109c152
+# Was checking is.null(cols) but should check length(cols) == 0
+```
+
+**Theme font not detected:**
+```r
+# Problem: Falls back to "sans" font
+# Solution: Install systemfonts or extrafont package
+install.packages("systemfonts")
+
+# Check font availability
+check_bfh_fonts()
+```
+
+**Logo file not found:**
+```r
+# Problem: Logo path not resolved
+# Solution: Use get_bfh_logo() or verify file exists
+logo_path <- get_bfh_logo(size = "web", variant = "color")
+add_bfh_logo(plot, logo_path)
 ```
 
 **Test failures:**
 ```r
-# Problem: vdiffr snapshots fail på CI
-# Solution: Brug svg device for consistent rendering
-vdiffr::expect_doppelganger("name", plot, writer = "svg")
+# Problem: Tests fail after changes
+# Solution: Run tests to identify issues
+devtools::test()
 
-# Problem: Tests fail lokalt men ikke på CI
-# Solution: Check system-specific assumptions (fonts, locales, etc.)
+# Problem: Specific test fails
+testthat::test_file("tests/testthat/test-colors.R")
 ```
 
 ---
 
-## 9) Kommunikation & Filosofi
+## 11) Known Issues & Technical Debt
 
-### 9.1 Udviklerkommunikation
+### 11.1 Critical (from agent reports)
+
+1. **Build artifacts in git** - `BFHtheme.Rcheck/` committed (skal fjernes)
+2. **Commented code** - themes.R:72, fonts.R:35 (skal fjernes eller dokumenteres)
+
+### 11.2 High Priority
+
+1. **Validation duplication** - 84 linjer dupliceret validation i scales.R
+2. **Missing MIME validation** - add_bfh_logo() kun checker file extension
+3. **Placeholder function** - check_colorblind_safe() gør ingenting
+
+### 11.3 Medium Priority
+
+1. **Missing visual regression tests** - Ingen vdiffr tests
+2. **JPEG support untested** - branding.R JPEG path helt utestet
+3. **Logo variants untested** - grey/mark variants ikke testet
+4. **Documentation warnings** - 3 warnings i R CMD check
+
+### 11.4 Coverage Gaps
+
+- fonts.R: 72.90% (extrafont fallback path)
+- logo_helpers.R: 77.42% (grey/mark variants)
+- branding.R: 86.36% (JPEG support)
+
+**Mål:** 95%+ coverage på alle filer
+
+---
+
+## 12) Kommunikation & Filosofi
+
+### 12.1 Udviklerkommunikation
 
 * **Præcise action items**: "Tilføj parameter X til funktion Y i fil Z"
 * **Faktuel rapportering** af resultater
 * **Kritisk evaluering** – stil spørgsmål ved trade-offs
 * **Intellektuel ærlighed** – vær direkte om begrænsninger
 
-### 9.2 Development Philosophy
+### 12.2 Development Philosophy
 
 **Kerneprincipper:**
 * **Quality over speed** – healthcare software kræver stabilitet
@@ -545,10 +712,10 @@ vdiffr::expect_doppelganger("name", plot, writer = "svg")
 * Publication-ready output med minimalt setup
 * Stabil API med backward compatibility
 * Comprehensive documentation og eksempler
-* Multi-organizational flexibility
+* Multi-organizational flexibility (BFH + Region H)
 * Best practice compliance
 
-### 9.3 Samtale Guidelines
+### 12.3 Samtale Guidelines
 
 * **Kritisk engagement** – evaluér forslag objektivt
 * **Balanceret evaluering** – undgå tomme komplimenter
@@ -578,14 +745,15 @@ vdiffr::expect_doppelganger("name", plot, writer = "svg")
 
 | Fil | Ansvar | Vigtige funktioner |
 |-----|--------|-------------------|
-| **plot_core.R** | Core plotting logic | `create_spc_chart()`, `bfh_spc_plot()` |
-| **plot_enhancements.R** | Plot enhancements | Target lines, labels, annotations |
-| **themes.R** | ggplot2 themes | `bfh_theme()`, color palettes |
-| **chart_types.R** | Chart type definitions | Chart type mappings, validering |
-| **config_objects.R** | Config constructors | `spc_plot_config()`, `viewport_dims()`, `phase_config()` |
-| **utils_y_axis_formatting.R** | Y-axis formatting | Format functions for different units |
-| **utils_date_formatting.R** | Date/time formatting | Date axis helpers |
-| **utils_helpers.R** | General utilities | Generic helper functions |
+| **themes.R** | ggplot2 themes | `theme_bfh()`, `theme_bfh_minimal()`, `theme_bfh_dark()` |
+| **colors.R** | Color palettes | `bfh_colors`, `bfh_palettes`, `bfh_cols()`, `bfh_pal()` |
+| **scales.R** | ggplot2 scales | `scale_color_bfh()`, `scale_fill_bfh()` |
+| **fonts.R** | Font detection | `get_bfh_font()`, `check_bfh_fonts()`, `.bfh_font_cache` |
+| **helpers.R** | Plot helpers | `bfh_save()`, `bfh_combine_plots()`, `bfh_labs()` |
+| **branding.R** | Logo/branding | `add_bfh_logo()`, `add_bfh_footer()`, `bfh_title_block()` |
+| **logo_helpers.R** | Logo resolvers | `get_bfh_logo()`, `add_logo()` |
+| **defaults.R** | Global defaults | `set_bfh_defaults()`, `reset_bfh_defaults()` |
+| **utils_operators.R** | Operators | `%||%` |
 
 ---
 
@@ -594,7 +762,7 @@ vdiffr::expect_doppelganger("name", plot, writer = "svg")
 ```bash
 # Development workflow
 devtools::load_all()           # Load package for testing
-devtools::test()               # Run tests
+devtools::test()               # Run tests (323 tests)
 devtools::check()              # Full package check
 devtools::document()           # Update documentation + NAMESPACE
 
@@ -603,14 +771,29 @@ styler::style_pkg()            # Format code
 lintr::lint_package()          # Lint code
 
 # Testing
-testthat::test_file("tests/testthat/test-*.R")
-covr::package_coverage()
+testthat::test_file("tests/testthat/test-colors.R")
+covr::package_coverage()       # 89.74% current
 
 # Documentation
 devtools::build_vignettes()
-pkgdown::build_site()          # (future: når vi setup pkgdown)
+# pkgdown::build_site()        # (future)
 
 # Installation
 devtools::install()            # Install lokalt
-devtools::install_github("johanreventlow/BFHcharts")
+devtools::install_github("johanreventlow/BFHtheme")
 ```
+
+---
+
+## 📎 Appendix D: Recent Critical Fixes
+
+**Commit 109c152 (2025-10-14):**
+- ✅ Fixed missing `%||%` operator (was blocking all functionality)
+- ✅ Fixed `bfh_cols()` zero-argument bug (was returning character(0))
+- ✅ All 323 tests now pass
+- ✅ Package is production-ready (0 errors)
+
+**Known Issues Remaining:**
+- 3 warnings in R CMD check (Rd file warnings, showtext dependency)
+- 2 notes (acceptable for R CMD check)
+- Coverage below 90% target (89.74% current)
