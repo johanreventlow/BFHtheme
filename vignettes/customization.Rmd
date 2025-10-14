@@ -1,0 +1,397 @@
+---
+title: "Advanced Customization"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Advanced Customization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Introduction
+
+This vignette covers advanced customization options for BFHtheme, including theme modifications, custom color palettes, and specialized plot enhancements.
+
+```{r load, message=FALSE}
+library(BFHtheme)
+library(ggplot2)
+```
+
+## Theme Customization
+
+### Modifying Base Theme Parameters
+
+All theme functions accept parameters for customization:
+
+```{r theme-params}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  labs(title = "Custom Base Size") +
+  theme_bfh(
+    base_size = 14,           # Larger text
+    base_family = "Arial",    # Specific font
+    base_line_size = 0.6,     # Thicker lines
+    base_rect_size = 0.6      # Thicker rectangles
+  )
+```
+
+### Overriding Theme Elements
+
+BFH themes can be extended with additional ggplot2 theme elements:
+
+```{r theme-override}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  labs(title = "Custom Theme Elements") +
+  theme_bfh() +
+  theme(
+    plot.title = element_text(color = bfh_cols("hospital_blue"), size = 18),
+    axis.title.x = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "grey90", linewidth = 0.3)
+  )
+```
+
+### Legend Customization
+
+Position and style the legend:
+
+```{r legend-custom}
+ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  labs(
+    title = "Custom Legend Position",
+    color = "Cylinders"
+  ) +
+  scale_color_bfh() +
+  theme_bfh() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.box = "horizontal"
+  )
+```
+
+## Color Palette Customization
+
+### Using Different Palettes
+
+Select from available palettes:
+
+```{r palettes}
+p <- ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
+  geom_bar() +
+  labs(title = "Hospital Blues Palette") +
+  theme_bfh()
+
+p + scale_fill_bfh(palette = "hospital_blues")
+```
+
+### Reversing Palettes
+
+Reverse the color order:
+
+```{r reverse-palette}
+ggplot(mtcars, aes(x = wt, y = mpg, color = hp)) +
+  geom_point(size = 3) +
+  labs(title = "Reversed Color Scale") +
+  scale_color_bfh_continuous(palette = "blues", reverse = TRUE) +
+  theme_bfh()
+```
+
+### Creating Custom Palettes
+
+Access the color interpolation function directly:
+
+```{r custom-palette}
+# Create a custom palette with specific colors
+custom_colors <- c(
+  bfh_cols("hospital_primary"),
+  bfh_cols("hospital_grey"),
+  bfh_cols("regionh_primary")
+)
+
+ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
+  geom_bar() +
+  labs(title = "Custom Color Selection") +
+  scale_fill_manual(values = custom_colors) +
+  theme_bfh()
+```
+
+### Working with Color Functions
+
+Use the palette function for continuous scales:
+
+```{r palette-function}
+# Generate color ramp
+blues_pal <- bfh_pal("hospital_blues")
+
+# Use in continuous scale
+ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
+  geom_tile() +
+  scale_fill_gradientn(colors = blues_pal(100)) +
+  theme_bfh()
+```
+
+## Plot Enhancements
+
+### Adding BFH Branding
+
+Add footer with organization information:
+
+```{r footer, eval=FALSE}
+p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  theme_bfh()
+
+add_bfh_footer(
+  p,
+  text = "Bispebjerg og Frederiksberg Hospital - 2024",
+  color = bfh_cols("hospital_primary")
+)
+```
+
+### Color Bar Annotations
+
+Add colored bars for visual emphasis:
+
+```{r color-bar, eval=FALSE}
+p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  labs(title = "Vehicle Analysis") +
+  theme_bfh()
+
+add_bfh_color_bar(
+  p,
+  position = "top",
+  color = bfh_cols("hospital_primary"),
+  size = 0.02
+)
+```
+
+### Multi-Panel Figures
+
+Combine multiple plots with shared legend:
+
+```{r multi-panel, eval=FALSE}
+library(patchwork)
+
+p1 <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point() +
+  labs(title = "Weight vs MPG") +
+  scale_color_bfh() +
+  theme_bfh()
+
+p2 <- ggplot(mtcars, aes(hp, mpg, color = factor(cyl))) +
+  geom_point() +
+  labs(title = "Horsepower vs MPG") +
+  scale_color_bfh() +
+  theme_bfh()
+
+# Combine with shared legend
+p1 + p2 + plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+```
+
+Alternatively, use the built-in helper:
+
+```{r combine-plots, eval=FALSE}
+plots <- list(p1, p2)
+bfh_combine_plots(plots, ncol = 2, legend_position = "bottom")
+```
+
+## Axis Customization
+
+### Formatting Axes
+
+Customize axis appearance:
+
+```{r axis-format}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  labs(
+    title = "Custom Axis Formatting",
+    x = "Vehicle Weight (1000 lbs)",
+    y = "Fuel Efficiency (MPG)"
+  ) +
+  scale_y_continuous(
+    breaks = seq(10, 35, 5),
+    limits = c(10, 35)
+  ) +
+  theme_bfh()
+```
+
+### Date Axes
+
+For time series data:
+
+```{r date-axis, eval=FALSE}
+library(lubridate)
+
+date_data <- data.frame(
+  date = seq(as.Date("2024-01-01"), by = "month", length.out = 12),
+  value = cumsum(rnorm(12, 10, 3))
+)
+
+ggplot(date_data, aes(x = date, y = value)) +
+  geom_line(color = bfh_cols("hospital_primary"), linewidth = 1) +
+  labs(
+    title = "Monthly Trends",
+    x = "Month",
+    y = "Value"
+  ) +
+  scale_x_date(
+    date_breaks = "2 months",
+    date_labels = "%b %Y"
+  ) +
+  theme_bfh()
+```
+
+## Text and Labels
+
+### Uppercase Labels
+
+Automatically convert labels to uppercase following BFH style:
+
+```{r uppercase-labels}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  bfh_labs(
+    title = "Fuel efficiency analysis",      # Title unchanged
+    subtitle = "Motor trend data",            # Converted to uppercase
+    x = "weight (1000 lbs)",                  # Converted to uppercase
+    y = "miles per gallon",                   # Converted to uppercase
+    caption = "Source: Motor Trend, 1974"     # Converted to uppercase
+  ) +
+  theme_bfh()
+```
+
+### Custom Text Elements
+
+Add annotations:
+
+```{r annotations}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  annotate(
+    "text",
+    x = 4.5, y = 30,
+    label = "High efficiency zone",
+    color = bfh_cols("hospital_primary"),
+    size = 4
+  ) +
+  annotate(
+    "rect",
+    xmin = 1.5, xmax = 3.5,
+    ymin = 25, ymax = 35,
+    alpha = 0.1,
+    fill = bfh_cols("hospital_blue")
+  ) +
+  labs(title = "Annotated Plot") +
+  theme_bfh()
+```
+
+## Faceting
+
+### Facet Customization
+
+Style faceted plots:
+
+```{r facets}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(color = bfh_cols("hospital_primary")) +
+  facet_wrap(~cyl, labeller = labeller(cyl = function(x) paste(x, "cylinders"))) +
+  labs(title = "Fuel Efficiency by Cylinder Count") +
+  theme_bfh() +
+  theme(
+    strip.background = element_rect(fill = bfh_cols("hospital_light_blue1")),
+    strip.text = element_text(color = bfh_cols("hospital_primary"), face = "bold")
+  )
+```
+
+## Export and File Formats
+
+### High-Resolution Export
+
+Export plots for publication:
+
+```{r export, eval=FALSE}
+p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  theme_bfh()
+
+# High-resolution PNG
+bfh_save("figure.png", p, preset = "report_full", dpi = 600)
+
+# Vector format for editing
+bfh_save("figure.pdf", p, preset = "report_full")
+
+# Custom dimensions
+bfh_save("figure.png", p, width = 10, height = 8, units = "cm", dpi = 300)
+```
+
+### Dimension Presets
+
+Get recommended dimensions programmatically:
+
+```{r dimensions}
+# Get dimensions for different output types
+report_dims <- get_bfh_dimensions(type = "report", format = "standard")
+print(report_dims)
+
+presentation_dims <- get_bfh_dimensions(type = "presentation", format = "wide")
+print(presentation_dims)
+```
+
+## Performance Optimization
+
+### Font Caching
+
+Font detection is cached automatically for performance. Clear cache if fonts are installed or removed during the session:
+
+```{r cache, eval=FALSE}
+# Font detection is cached automatically
+get_bfh_font()  # First call: detects font
+get_bfh_font()  # Subsequent calls: uses cache
+
+# Clear cache if needed
+clear_bfh_font_cache()
+
+# Force re-detection
+get_bfh_font(force_refresh = TRUE)
+```
+
+### Large Datasets
+
+For large datasets, consider:
+
+```{r performance, eval=FALSE}
+# Use alpha for overplotting
+ggplot(large_data, aes(x, y)) +
+  geom_point(alpha = 0.3) +
+  theme_bfh()
+
+# Use geom_hex or geom_bin2d
+ggplot(large_data, aes(x, y)) +
+  geom_hex() +
+  scale_fill_bfh_continuous(palette = "blues") +
+  theme_bfh()
+
+# Reduce point size
+ggplot(large_data, aes(x, y)) +
+  geom_point(size = 0.5) +
+  theme_bfh()
+```
+
+## Next Steps
+
+- See `vignette("getting-started")` for basic usage
+- See `vignette("theming")` for multi-hospital branding
+- Check function documentation for detailed parameter descriptions

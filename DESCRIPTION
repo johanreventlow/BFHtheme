@@ -37,4 +37,5 @@ Suggests:
     png,
     jpeg,
     patchwork
+VignetteBuilder: knitr
 Config/testthat/edition: 3

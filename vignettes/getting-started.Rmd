@@ -1,0 +1,243 @@
+---
+title: "Getting Started with BFHtheme"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with BFHtheme}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Introduction
+
+BFHtheme provides comprehensive theming support for ggplot2 graphics following Bispebjerg og Frederiksberg Hospital and Region Hovedstaden visual identity guidelines. The package includes color palettes, themes, scale functions, and helper utilities for creating consistent and professional visualizations.
+
+## Installation
+
+Install from GitHub:
+
+```{r eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("johanreventlow/BFHtheme")
+```
+
+## Basic Usage
+
+### Applying a Theme
+
+The primary function is `theme_bfh()`, which applies the complete BFH visual identity to your plots.
+
+```{r basic-theme, message=FALSE}
+library(BFHtheme)
+library(ggplot2)
+
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  labs(
+    title = "Fuel Efficiency by Vehicle Weight",
+    x = "Weight (1000 lbs)",
+    y = "Miles per Gallon"
+  ) +
+  theme_bfh()
+```
+
+### Using Color Scales
+
+For plots with discrete color mappings, use `scale_color_bfh()` or `scale_fill_bfh()`:
+
+```{r color-scales, message=FALSE}
+ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  labs(
+    title = "Fuel Efficiency by Cylinder Count",
+    x = "Weight (1000 lbs)",
+    y = "Miles per Gallon",
+    color = "Cylinders"
+  ) +
+  scale_color_bfh() +
+  theme_bfh()
+```
+
+For continuous color mappings, use the continuous variants:
+
+```{r continuous-colors, message=FALSE}
+ggplot(mtcars, aes(x = wt, y = mpg, color = hp)) +
+  geom_point(size = 3) +
+  labs(
+    title = "Fuel Efficiency and Horsepower",
+    x = "Weight (1000 lbs)",
+    y = "Miles per Gallon",
+    color = "Horsepower"
+  ) +
+  scale_color_bfh_continuous(palette = "blues") +
+  theme_bfh()
+```
+
+### Available Color Palettes
+
+The package includes several predefined color palettes:
+
+```{r show-palettes, eval=FALSE}
+# Display all available palettes
+show_bfh_palettes()
+```
+
+Main palettes:
+
+- `main`: Default hospital palette with primary colors
+- `hospital`: Bispebjerg og Frederiksberg Hospital colors
+- `hospital_blues`: Sequential blue palette for hospital
+- `regionh`: Region Hovedstaden primary colors
+- `regionh_blues`: Sequential blue palette for Region H
+
+Access individual colors:
+
+```{r colors}
+# Get specific colors
+bfh_cols("hospital_primary", "hospital_blue")
+
+# Get all colors
+head(bfh_cols())
+```
+
+## Theme Variants
+
+BFHtheme provides several theme variants for different use cases:
+
+### Standard Theme
+
+```{r theme-standard, message=FALSE}
+ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
+  geom_bar() +
+  labs(title = "Vehicle Count by Cylinder") +
+  scale_fill_bfh() +
+  theme_bfh()
+```
+
+### Minimal Theme
+
+For presentations or when a cleaner look is preferred:
+
+```{r theme-minimal, message=FALSE}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  labs(title = "Minimal Theme Example") +
+  theme_bfh_minimal()
+```
+
+### Print Theme
+
+Optimized for print output with higher contrast:
+
+```{r theme-print, message=FALSE}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  labs(title = "Print Theme Example") +
+  theme_bfh_print()
+```
+
+### Presentation Theme
+
+Larger text and elements for visibility in presentations:
+
+```{r theme-presentation, message=FALSE}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  labs(title = "Presentation Theme") +
+  theme_bfh_presentation()
+```
+
+### Dark Theme
+
+For dark backgrounds:
+
+```{r theme-dark, message=FALSE}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(color = "white") +
+  labs(title = "Dark Theme Example") +
+  theme_bfh_dark()
+```
+
+## Setting Global Defaults
+
+To avoid adding `theme_bfh()` to every plot, set it as the default theme:
+
+```{r defaults, eval=FALSE}
+# Set BFH theme and colors as defaults
+set_bfh_defaults()
+
+# Now all plots automatically use BFH styling
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point()
+
+# For plots with color mappings, still add the scale manually
+ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point() +
+  scale_color_bfh()
+
+# Reset to ggplot2 defaults when done
+reset_bfh_defaults()
+```
+
+## Saving Plots
+
+Use `bfh_save()` for consistent dimensions:
+
+```{r save-plot, eval=FALSE}
+p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  theme_bfh()
+
+# Save with preset dimensions
+bfh_save("plot.png", p, preset = "report_full")
+
+# Available presets:
+# - report_full: 7x5 inches (full-width figure)
+# - report_half: 3.5x3 inches (half-width figure)
+# - presentation: 10x6 inches (standard slide)
+# - presentation_wide: 12x6.75 inches (widescreen)
+# - square: 6x6 inches
+# - poster: 12x9 inches
+
+# Custom dimensions
+bfh_save("plot.pdf", p, width = 8, height = 6, dpi = 600)
+```
+
+## Font Configuration
+
+BFHtheme automatically detects and uses the best available font. Priority order:
+
+1. Mari (BFH official font, installed on employee PCs)
+2. Roboto (open-source alternative)
+3. Arial (universal fallback)
+4. sans (system fallback)
+
+Check font availability:
+
+```{r fonts, eval=FALSE}
+check_bfh_fonts()
+```
+
+Manual font setup:
+
+```{r font-setup, eval=FALSE}
+# Setup and enable fonts
+setup_bfh_fonts()
+
+# Set as default for all themes
+set_bfh_fonts()
+```
+
+## Next Steps
+
+- See `vignette("customization")` for advanced customization options
+- See `vignette("theming")` for multi-hospital branding configuration
+- Check function documentation with `?theme_bfh` or `?scale_color_bfh`
