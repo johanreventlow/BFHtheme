@@ -30,6 +30,58 @@ test_that("add_bfh_logo validates file exists", {
   )
 })
 
+test_that("add_bfh_logo blocks path traversal attempts", {
+  skip_if_not_installed("ggplot2")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  # Test path traversal patterns
+  expect_error(
+    add_bfh_logo(p, "../../../etc/passwd"),
+    "Path traversal patterns"
+  )
+
+  expect_error(
+    add_bfh_logo(p, "~/secret/file.png"),
+    "Path traversal patterns"
+  )
+
+  expect_error(
+    add_bfh_logo(p, "../logo.png"),
+    "Path traversal patterns"
+  )
+})
+
+test_that("add_bfh_logo validates logo_path type", {
+  skip_if_not_installed("ggplot2")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  # NULL
+  expect_error(
+    add_bfh_logo(p, NULL),
+    "logo_path must be a non-empty character string"
+  )
+
+  # Empty string
+  expect_error(
+    add_bfh_logo(p, ""),
+    "logo_path must be a non-empty character string"
+  )
+
+  # Numeric
+  expect_error(
+    add_bfh_logo(p, 123),
+    "logo_path must be a non-empty character string"
+  )
+
+  # Vector
+  expect_error(
+    add_bfh_logo(p, c("file1.png", "file2.png")),
+    "logo_path must be a non-empty character string"
+  )
+})
+
 test_that("add_bfh_logo validates size parameter", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("png")

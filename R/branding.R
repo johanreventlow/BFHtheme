@@ -34,8 +34,31 @@ add_bfh_logo <- function(plot,
                          padding = 0.02) {
 
   # Input validation
-  if (!file.exists(logo_path)) {
-    stop("Logo file not found: ", logo_path, call. = FALSE)
+  if (!is.character(logo_path) || length(logo_path) != 1 || nchar(logo_path) == 0) {
+    stop("logo_path must be a non-empty character string", call. = FALSE)
+  }
+
+  # Security: Check for path traversal patterns
+  if (grepl("\\.\\.", logo_path) || grepl("^~", logo_path)) {
+    stop("Path traversal patterns (.., ~) not allowed in logo_path", call. = FALSE)
+  }
+
+  # Normalize path and verify it exists
+  normalized_path <- tryCatch(
+    normalizePath(logo_path, mustWork = FALSE),
+    error = function(e) {
+      stop("Invalid file path: ", logo_path, call. = FALSE)
+    }
+  )
+
+  if (!file.exists(normalized_path)) {
+    stop("Logo file not found: ", basename(logo_path), call. = FALSE)
+  }
+
+  # Verify file is readable and has content
+  file_info <- file.info(normalized_path)
+  if (is.na(file_info$size) || file_info$size == 0) {
+    stop("Logo file is empty or unreadable", call. = FALSE)
   }
 
   if (!is.numeric(size) || size <= 0 || size > 1) {
@@ -46,22 +69,34 @@ add_bfh_logo <- function(plot,
     stop("alpha must be a number between 0 and 1", call. = FALSE)
   }
 
+  if (!is.numeric(padding) || padding < 0 || padding > 1) {
+    stop("padding must be a number between 0 and 1", call. = FALSE)
+  }
+
   if (!requireNamespace("png", quietly = TRUE) &&
       !requireNamespace("jpeg", quietly = TRUE)) {
     warning("Packages 'png' and/or 'jpeg' recommended for image support.")
   }
 
-  # Read the image
-  if (grepl("\\.png$", logo_path, ignore.case = TRUE)) {
+  # Read the image using normalized path
+  if (grepl("\\.png$", normalized_path, ignore.case = TRUE)) {
     if (!requireNamespace("png", quietly = TRUE)) {
       stop("Package 'png' is required to read PNG files. Install with: install.packages('png')", call. = FALSE)
     }
-    logo <- png::readPNG(logo_path)
-  } else if (grepl("\\.(jpg|jpeg)$", logo_path, ignore.case = TRUE)) {
+    logo <- tryCatch({
+      png::readPNG(normalized_path)
+    }, error = function(e) {
+      stop("Failed to read PNG file: ", e$message, call. = FALSE)
+    })
+  } else if (grepl("\\.(jpg|jpeg)$", normalized_path, ignore.case = TRUE)) {
     if (!requireNamespace("jpeg", quietly = TRUE)) {
       stop("Package 'jpeg' is required to read JPEG files. Install with: install.packages('jpeg')", call. = FALSE)
     }
-    logo <- jpeg::readJPEG(logo_path)
+    logo <- tryCatch({
+      jpeg::readJPEG(normalized_path)
+    }, error = function(e) {
+      stop("Failed to read JPEG file: ", e$message, call. = FALSE)
+    })
   } else {
     stop("Logo must be a PNG or JPEG file", call. = FALSE)
   }
