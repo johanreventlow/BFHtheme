@@ -177,6 +177,9 @@ bfh_palettes <- list(
                            "hospital_grey", "dark_grey")
 )
 
+# Package-level palette cache environment
+.bfh_pal_cache <- new.env(parent = emptyenv())
+
 #' Interpolate a BFH Color Palette
 #'
 #' @description
@@ -203,11 +206,47 @@ bfh_pal <- function(palette = "main", reverse = FALSE, ...) {
     )
   }
 
-  pal <- bfh_palettes[[palette]]
+  # Create cache key from palette name and reverse flag
+  cache_key <- paste0(palette, "_", reverse)
 
+  # Check cache first
+  if (exists(cache_key, envir = .bfh_pal_cache, inherits = FALSE)) {
+    return(get(cache_key, envir = .bfh_pal_cache, inherits = FALSE))
+  }
+
+  # Create and cache the palette function
+  pal <- bfh_palettes[[palette]]
   if (reverse) pal <- rev(pal)
 
-  grDevices::colorRampPalette(pal, ...)
+  pal_fn <- grDevices::colorRampPalette(pal, ...)
+
+  # Store in cache
+  assign(cache_key, pal_fn, envir = .bfh_pal_cache)
+
+  pal_fn
+}
+
+#' Clear Palette Cache
+#'
+#' @description
+#' Removes cached palette interpolation functions, ensuring that the next call to
+#' [bfh_pal()] triggers fresh palette creation. Useful after modifying palettes
+#' or for testing purposes.
+#'
+#' @return Invisibly returns `TRUE`.
+#' @export
+#' @seealso [bfh_pal()]
+#' @family BFH colors
+#' @examples
+#' # Clear palette cache
+#' clear_bfh_pal_cache()
+#'
+#' # Next call will recreate palette
+#' pal <- bfh_pal("main")
+clear_bfh_pal_cache <- function() {
+  rm(list = ls(envir = .bfh_pal_cache), envir = .bfh_pal_cache)
+  message("BFH palette cache cleared")
+  invisible(TRUE)
 }
 
 #' Visualise BFH Palettes

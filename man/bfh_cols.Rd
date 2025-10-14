@@ -41,6 +41,7 @@ Other BFH colors:
 \code{\link{bfh_pal}()},
 \code{\link{bfh_palettes}},
 \code{\link{check_colorblind_safe}()},
+\code{\link{clear_bfh_pal_cache}()},
 \code{\link{show_bfh_palettes}()}
 }
 \concept{BFH colors}
