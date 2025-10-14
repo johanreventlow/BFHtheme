@@ -73,7 +73,9 @@ bfh_colors <- c(
 bfh_cols <- function(...) {
   cols <- c(...)
 
-  if (is.null(cols))
+  # Return all colors when no arguments provided
+  # c(...) with no args gives character(0), not NULL
+  if (length(cols) == 0)
     return(bfh_colors)
 
   # Input validation
