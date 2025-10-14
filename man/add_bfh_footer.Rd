@@ -2,7 +2,7 @@
 % Please edit documentation in R/branding.R
 \name{add_bfh_footer}
 \alias{add_bfh_footer}
-\title{Add BFH footer to plot}
+\title{Add BFH Footer to a Plot}
 \usage{
 add_bfh_footer(
   plot,
@@ -13,22 +13,27 @@ add_bfh_footer(
 )
 }
 \arguments{
-\item{plot}{A ggplot2 object}
+\item{plot}{A ggplot2 object.}
 
-\item{text}{Footer text. If NULL, uses default BFH text.}
+\item{text}{Footer text. Defaults to `"Bispebjerg og Frederiksberg Hospital"`.}
 
-\item{color}{Color of the footer bar. Default is BFH primary blue.}
+\item{color}{Footer background colour. Defaults to `bfh_cols("hospital_primary")`.}
 
-\item{text_color}{Color of the footer text. Default is white.}
+\item{text_color}{Text colour. Defaults to `"white"`.}
 
-\item{height}{Height of the footer as fraction of plot. Default is 0.05.}
+\item{height}{Footer height as a fraction of the plotting area. Defaults to `0.05`.}
 }
 \value{
-A modified ggplot2 object with footer
+ggplot2 object with the footer applied.
 }
 \description{
-Adds a footer with BFH branding information to the plot.
-Useful for adding contact information or copyright notices.
+Appends a coloured footer bar with optional text, ideal for credits or
+contact details in BFH-branded material.
+}
+\details{
+The footer spans the width of the plot. Provide `text = NULL` to fall back to
+a default hospital identifier. Adjust `height` (0–1) to control the bar
+thickness relative to the plotting area.
 }
 \examples{
 \dontrun{
@@ -40,3 +45,14 @@ p <- ggplot(mtcars, aes(wt, mpg)) +
 add_bfh_footer(p, text = "Bispebjerg og Frederiksberg Hospital - 2024")
 }
 }
+\seealso{
+[add_bfh_logo()], [add_bfh_color_bar()], [bfh_title_block()]
+
+Other BFH branding: 
+\code{\link{add_bfh_color_bar}()},
+\code{\link{add_bfh_logo}()},
+\code{\link{add_logo}()},
+\code{\link{bfh_title_block}()},
+\code{\link{get_bfh_logo}()}
+}
+\concept{BFH branding}

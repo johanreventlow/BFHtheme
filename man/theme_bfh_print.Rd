@@ -14,18 +14,22 @@ theme_bfh_print(
 \arguments{
 \item{base_size}{Base font size in points. Default is 12.}
 
-\item{base_family}{Base font family. Default is "sans".}
+\item{base_family}{Base font family. Set to `NULL` (default) to auto-detect a
+BFH approved font via [get_bfh_font()].}
 
-\item{base_line_size}{Base line size. Default is base_size/22.}
+\item{base_line_size}{Base line size. Default is `base_size / 22`.}
 
-\item{base_rect_size}{Base rectangle size. Default is base_size/22.}
+\item{base_rect_size}{Base rectangle size. Default is `base_size / 22`.}
 }
 \value{
-A ggplot2 theme object
+A [ggplot2::theme] object
 }
 \description{
-Theme optimized for print output with higher contrast and
-more prominent elements.
+High-contrast rendition of [theme_bfh()] tailored to print production.
+Adjusts font defaults, line weights, and colors to remain legible on paper.
+}
+\details{
+Increases base size, bolds titles, and darkens grid/axis colors to survive grayscale printing.
 }
 \examples{
 \dontrun{
@@ -35,3 +39,13 @@ ggplot(mtcars, aes(wt, mpg)) +
   theme_bfh_print()
 }
 }
+\seealso{
+[theme_bfh()]
+
+Other BFH themes: 
+\code{\link{theme_bfh}()},
+\code{\link{theme_bfh_dark}()},
+\code{\link{theme_bfh_minimal}()},
+\code{\link{theme_bfh_presentation}()}
+}
+\concept{BFH themes}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/logo_helpers.R
 \name{add_logo}
 \alias{add_logo}
-\title{Add BFH logo to plot (convenience wrapper)}
+\title{Add Packaged BFH Logo to a Plot}
 \usage{
 add_logo(
   plot,
@@ -14,25 +14,25 @@ add_logo(
 )
 }
 \arguments{
-\item{plot}{A ggplot2 object}
+\item{plot}{A ggplot2 object.}
 
-\item{position}{Position of logo: "topleft", "topright", "bottomleft", "bottomright"}
+\item{position}{Logo location: `"topleft"`, `"topright"`, `"bottomleft"`, or `"bottomright"`.
+Defaults to `"bottomright"`.}
 
-\item{size}{Relative size of the logo (0-1). Default is 0.15 (15% of plot width).}
+\item{size}{Relative size of the logo (0–1). Defaults to `0.15`.}
 
-\item{alpha}{Transparency of the logo (0-1). Default is 0.9.}
+\item{alpha}{Transparency of the logo (0–1). Defaults to `0.9`.}
 
-\item{logo_size}{Logo file size: "full", "web", or "small". Default is "web".}
+\item{logo_size}{Logo file size: `"full"`, `"web"`, or `"small"`. Defaults to `"web"`.}
 
-\item{variant}{Logo variant: "color" (default), "grey" (greyscale), or "mark" (symbol only).}
+\item{variant}{Logo variant: `"color"` (default), `"grey"`, or `"mark"`.}
 }
 \value{
-A modified ggplot2 object with the logo
+Modified ggplot2 object with the logo applied.
 }
 \description{
-Convenience function that adds the BFH logo from the package to a plot.
-This is a wrapper around add_bfh_logo() that automatically uses the
-packaged logo. Multiple logo variants are available.
+Convenience wrapper around [add_bfh_logo()] that automatically pulls logo
+assets from the package via [get_bfh_logo()].
 }
 \examples{
 \dontrun{
@@ -54,3 +54,14 @@ add_logo(p, variant = "grey")
 add_logo(p, variant = "mark", size = 0.08)
 }
 }
+\seealso{
+[get_bfh_logo()], [add_bfh_logo()]
+
+Other BFH branding: 
+\code{\link{add_bfh_color_bar}()},
+\code{\link{add_bfh_footer}()},
+\code{\link{add_bfh_logo}()},
+\code{\link{bfh_title_block}()},
+\code{\link{get_bfh_logo}()}
+}
+\concept{BFH branding}

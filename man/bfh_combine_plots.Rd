@@ -2,25 +2,30 @@
 % Please edit documentation in R/helpers.R
 \name{bfh_combine_plots}
 \alias{bfh_combine_plots}
-\title{Create a multi-panel figure with shared legend}
+\title{Create a Multi-Panel Figure with Shared Legend}
 \usage{
 bfh_combine_plots(plots, ncol = NULL, nrow = NULL, legend_position = "bottom")
 }
 \arguments{
-\item{plots}{List of ggplot2 plot objects}
+\item{plots}{List of ggplot2 plot objects.}
 
-\item{ncol}{Number of columns in the layout}
+\item{ncol}{Optional number of columns in the layout.}
 
-\item{nrow}{Number of rows in the layout}
+\item{nrow}{Optional number of rows in the layout.}
 
-\item{legend_position}{Position of shared legend: "bottom", "top", "left", "right", "none"}
+\item{legend_position}{Legend placement. One of `"bottom"`, `"top"`, `"left"`,
+`"right"`, or `"none"`. Defaults to `"bottom"`.}
 }
 \value{
-A combined plot object (requires patchwork or cowplot)
+Combined plot object produced by `patchwork`.
 }
 \description{
-Arranges multiple ggplot2 plots into a single figure with a shared legend.
-Useful for creating multi-panel figures for reports.
+Arranges multiple ggplot2 plots into a single layout with an optional shared
+legend, ideal for BFH report panels and slide decks.
+}
+\details{
+The function currently depends on the `patchwork` package. When unavailable a
+descriptive error is raised; install `patchwork` to use this helper.
 }
 \examples{
 \dontrun{
@@ -33,3 +38,12 @@ p3 <- ggplot(mtcars, aes(disp, mpg, color = factor(cyl))) + geom_point()
 bfh_combine_plots(list(p1, p2, p3), ncol = 3)
 }
 }
+\seealso{
+[patchwork::wrap_plots()], [bfh_save()]
+
+Other BFH helpers: 
+\code{\link{bfh_labs}()},
+\code{\link{bfh_save}()},
+\code{\link{get_bfh_dimensions}()}
+}
+\concept{BFH helpers}

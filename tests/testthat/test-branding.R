@@ -82,6 +82,20 @@ test_that("add_bfh_logo validates logo_path type", {
   )
 })
 
+test_that("add_bfh_logo rejects invalid MIME types", {
+  skip_if_not_installed("ggplot2")
+
+  bogus_logo <- tempfile(fileext = ".png")
+  writeLines("not a real image", bogus_logo)
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  expect_error(
+    add_bfh_logo(p, bogus_logo),
+    "Logo file must be a valid PNG or JPEG image"
+  )
+})
+
 test_that("add_bfh_logo validates size parameter", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("png")

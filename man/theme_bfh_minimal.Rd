@@ -14,18 +14,22 @@ theme_bfh_minimal(
 \arguments{
 \item{base_size}{Base font size in points. Default is 12.}
 
-\item{base_family}{Base font family. Default is "sans".}
+\item{base_family}{Base font family. Set to `NULL` (default) to auto-detect a
+BFH approved font via [get_bfh_font()].}
 
-\item{base_line_size}{Base line size. Default is base_size/22.}
+\item{base_line_size}{Base line size. Default is `base_size / 22`.}
 
-\item{base_rect_size}{Base rectangle size. Default is base_size/22.}
+\item{base_rect_size}{Base rectangle size. Default is `base_size / 22`.}
 }
 \value{
-A ggplot2 theme object
+A [ggplot2::theme] object
 }
 \description{
-A minimal version of theme_bfh with reduced visual elements.
-Good for presentations or when you want a cleaner look.
+Streamlined variant of [theme_bfh()] with gridlines and axis accents removed.
+Useful for dense dashboards or when the visual design should stay unobtrusive.
+}
+\details{
+Removes panel grids, axis lines, and tick marks while keeping BFH typography.
 }
 \examples{
 \dontrun{
@@ -35,3 +39,13 @@ ggplot(mtcars, aes(wt, mpg)) +
   theme_bfh_minimal()
 }
 }
+\seealso{
+[theme_bfh()]
+
+Other BFH themes: 
+\code{\link{theme_bfh}()},
+\code{\link{theme_bfh_dark}()},
+\code{\link{theme_bfh_presentation}()},
+\code{\link{theme_bfh_print}()}
+}
+\concept{BFH themes}

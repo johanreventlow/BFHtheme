@@ -2,18 +2,29 @@
 % Please edit documentation in R/colors.R
 \name{show_bfh_palettes}
 \alias{show_bfh_palettes}
-\title{Show all available BFH color palettes}
+\title{Visualise BFH Palettes}
 \usage{
 show_bfh_palettes(n = NULL)
 }
 \arguments{
-\item{n}{Number of colors to display from each palette}
+\item{n}{Optional integer specifying how many colors to preview from each
+palette. When `NULL` (default) all palette entries are shown.}
 }
 \description{
-Show all available BFH color palettes
+Displays every palette defined in [bfh_palettes] using `scales::show_col()`
+to assist with palette selection.
 }
 \examples{
 \dontrun{
 show_bfh_palettes()
 }
 }
+\seealso{
+Other BFH colors: 
+\code{\link{bfh_colors}},
+\code{\link{bfh_cols}()},
+\code{\link{bfh_pal}()},
+\code{\link{bfh_palettes}},
+\code{\link{check_colorblind_safe}()}
+}
+\concept{BFH colors}

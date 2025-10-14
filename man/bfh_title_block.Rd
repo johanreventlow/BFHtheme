@@ -2,23 +2,28 @@
 % Please edit documentation in R/branding.R
 \name{bfh_title_block}
 \alias{bfh_title_block}
-\title{Create a branded title block}
+\title{Create a Branded Title Block}
 \usage{
 bfh_title_block(title, subtitle = NULL, caption = NULL)
 }
 \arguments{
-\item{title}{Main title text}
+\item{title}{Main title text.}
 
-\item{subtitle}{Subtitle text (optional)}
+\item{subtitle}{Optional subtitle text.}
 
-\item{caption}{Caption text (optional)}
+\item{caption}{Optional caption text.}
 }
 \value{
-A ggplot2 labs() object
+A [ggplot2::labs] object.
 }
 \description{
-Creates a formatted title block with BFH branding colors.
-Returns a list of ggplot2 labs() elements.
+Generates a reusable set of labels for BFH-styled titles, subtitles, and
+captions.
+}
+\details{
+Pair with [bfh_labs()] for automatic uppercase conversion or add the result
+directly to ggplot objects. Use `NULL` for optional arguments you want to
+omit.
 }
 \examples{
 \dontrun{
@@ -33,3 +38,14 @@ ggplot(mtcars, aes(wt, mpg)) +
   theme_bfh()
 }
 }
+\seealso{
+[bfh_labs()], [theme_bfh()], [add_bfh_footer()]
+
+Other BFH branding: 
+\code{\link{add_bfh_color_bar}()},
+\code{\link{add_bfh_footer}()},
+\code{\link{add_bfh_logo}()},
+\code{\link{add_logo}()},
+\code{\link{get_bfh_logo}()}
+}
+\concept{BFH branding}

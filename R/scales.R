@@ -1,18 +1,28 @@
-#' BFH Color Scales for ggplot2
+#' BFH Colour Scales for ggplot2
 #'
 #' @description
-#' Color and fill scales using BFH color palettes for ggplot2.
+#' Convenient wrappers around ggplot2 scales that apply BFH brand palettes to
+#' colour or fill aesthetics.
 #'
-#' @param palette Character name of palette in bfh_palettes. Default is "main".
-#' @param discrete Boolean indicating whether color aesthetic is discrete or not
-#' @param reverse Boolean indicating whether the palette should be reversed
-#' @param ... Additional arguments passed to discrete_scale() or
-#'   scale_color_gradientn(), used respectively when discrete is TRUE or FALSE
+#' @details
+#' When `discrete = TRUE` the functions delegate to [ggplot2::discrete_scale()].
+#' For continuous aesthetics they build a gradient using [bfh_pal()] and
+#' [ggplot2::scale_color_gradientn()] / [ggplot2::scale_fill_gradientn()]. Set
+#' `reverse = TRUE` to invert palette order, and pass additional arguments via
+#' `...` to fine-tune scale behaviour.
+#'
+#' @param palette Character name of a palette in [bfh_palettes()]. Defaults to `"main"`.
+#' @param discrete Logical; treat the mapped variable as discrete? Defaults to `TRUE`.
+#' @param reverse Logical; reverse the palette order? Defaults to `FALSE`.
+#' @param ... Additional arguments passed to the underlying ggplot2 scale
+#'   functions.
 #' @name scale_bfh
-#' @return A ggplot2 scale object
+#' @return A ggplot2 scale object.
 #' @export
 #'
 #' @importFrom ggplot2 discrete_scale scale_color_gradientn scale_fill_gradientn
+#' @seealso [bfh_pal()], [bfh_palettes], [scale_fill_bfh_continuous()]
+#' @family BFH scales
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -21,18 +31,9 @@
 #'   scale_color_bfh()
 #' }
 scale_color_bfh <- function(palette = "main", discrete = TRUE, reverse = FALSE, ...) {
-  # Input validation
-  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
-    stop("palette must be a single character string", call. = FALSE)
-  }
-
-  if (!is.logical(discrete) || length(discrete) != 1 || is.na(discrete)) {
-    stop("discrete must be a single logical value (TRUE or FALSE)", call. = FALSE)
-  }
-
-  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
-    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
-  }
+  palette <- validate_palette_argument(palette)
+  discrete <- validate_logical_argument(discrete, "discrete")
+  reverse <- validate_logical_argument(reverse, "reverse")
 
   pal <- bfh_pal(palette = palette, reverse = reverse)
 
@@ -57,18 +58,9 @@ scale_colour_bfh <- scale_color_bfh
 #'   scale_fill_bfh()
 #' }
 scale_fill_bfh <- function(palette = "main", discrete = TRUE, reverse = FALSE, ...) {
-  # Input validation
-  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
-    stop("palette must be a single character string", call. = FALSE)
-  }
-
-  if (!is.logical(discrete) || length(discrete) != 1 || is.na(discrete)) {
-    stop("discrete must be a single logical value (TRUE or FALSE)", call. = FALSE)
-  }
-
-  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
-    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
-  }
+  palette <- validate_palette_argument(palette)
+  discrete <- validate_logical_argument(discrete, "discrete")
+  reverse <- validate_logical_argument(reverse, "reverse")
 
   pal <- bfh_pal(palette = palette, reverse = reverse)
 
@@ -79,12 +71,14 @@ scale_fill_bfh <- function(palette = "main", discrete = TRUE, reverse = FALSE, .
   }
 }
 
-#' Continuous color scales using specific BFH palettes
+#' Continuous colour scales using specific BFH palettes
 #'
-#' @param palette Character name of palette in bfh_palettes
-#' @param reverse Boolean indicating whether the palette should be reversed
-#' @param ... Additional arguments passed to scale_color_gradientn()
+#' @param palette Character name of a palette in [bfh_palettes()].
+#' @param reverse Logical; reverse palette direction? Defaults to `FALSE`.
+#' @param ... Additional arguments passed to [ggplot2::scale_color_gradientn()].
 #' @export
+#' @seealso [scale_color_bfh()], [bfh_pal()]
+#' @family BFH scales
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -93,14 +87,8 @@ scale_fill_bfh <- function(palette = "main", discrete = TRUE, reverse = FALSE, .
 #'   scale_fill_bfh_continuous(palette = "blues")
 #' }
 scale_fill_bfh_continuous <- function(palette = "blues", reverse = FALSE, ...) {
-  # Input validation
-  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
-    stop("palette must be a single character string", call. = FALSE)
-  }
-
-  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
-    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
-  }
+  palette <- validate_palette_argument(palette)
+  reverse <- validate_logical_argument(reverse, "reverse")
 
   pal <- bfh_pal(palette = palette, reverse = reverse)
   ggplot2::scale_fill_gradientn(colours = pal(256), ...)
@@ -109,14 +97,8 @@ scale_fill_bfh_continuous <- function(palette = "blues", reverse = FALSE, ...) {
 #' @rdname scale_fill_bfh_continuous
 #' @export
 scale_color_bfh_continuous <- function(palette = "blues", reverse = FALSE, ...) {
-  # Input validation
-  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
-    stop("palette must be a single character string", call. = FALSE)
-  }
-
-  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
-    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
-  }
+  palette <- validate_palette_argument(palette)
+  reverse <- validate_logical_argument(reverse, "reverse")
 
   pal <- bfh_pal(palette = palette, reverse = reverse)
   ggplot2::scale_color_gradientn(colours = pal(256), ...)
@@ -126,12 +108,14 @@ scale_color_bfh_continuous <- function(palette = "blues", reverse = FALSE, ...) 
 #' @export
 scale_colour_bfh_continuous <- scale_color_bfh_continuous
 
-#' Discrete color scales using specific BFH palettes
+#' Discrete colour scales using specific BFH palettes
 #'
-#' @param palette Character name of palette in bfh_palettes
-#' @param reverse Boolean indicating whether the palette should be reversed
-#' @param ... Additional arguments passed to discrete_scale()
+#' @param palette Character name of a palette in [bfh_palettes()].
+#' @param reverse Logical; reverse palette direction? Defaults to `FALSE`.
+#' @param ... Additional arguments passed to [ggplot2::discrete_scale()].
 #' @export
+#' @seealso [scale_color_bfh()], [bfh_pal()], [bfh_palettes]
+#' @family BFH scales
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -140,14 +124,8 @@ scale_colour_bfh_continuous <- scale_color_bfh_continuous
 #'   scale_color_bfh_discrete(palette = "primary")
 #' }
 scale_fill_bfh_discrete <- function(palette = "main", reverse = FALSE, ...) {
-  # Input validation
-  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
-    stop("palette must be a single character string", call. = FALSE)
-  }
-
-  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
-    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
-  }
+  palette <- validate_palette_argument(palette)
+  reverse <- validate_logical_argument(reverse, "reverse")
 
   pal <- bfh_pal(palette = palette, reverse = reverse)
   ggplot2::discrete_scale("fill", palette = pal, ...)
@@ -156,14 +134,8 @@ scale_fill_bfh_discrete <- function(palette = "main", reverse = FALSE, ...) {
 #' @rdname scale_fill_bfh_discrete
 #' @export
 scale_color_bfh_discrete <- function(palette = "main", reverse = FALSE, ...) {
-  # Input validation
-  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
-    stop("palette must be a single character string", call. = FALSE)
-  }
-
-  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
-    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
-  }
+  palette <- validate_palette_argument(palette)
+  reverse <- validate_logical_argument(reverse, "reverse")
 
   pal <- bfh_pal(palette = palette, reverse = reverse)
   ggplot2::discrete_scale("colour", palette = pal, ...)
@@ -172,3 +144,19 @@ scale_color_bfh_discrete <- function(palette = "main", reverse = FALSE, ...) {
 #' @rdname scale_fill_bfh_discrete
 #' @export
 scale_colour_bfh_discrete <- scale_color_bfh_discrete
+
+#' @keywords internal
+validate_palette_argument <- function(palette) {
+  if (!is.character(palette) || length(palette) != 1 || !nzchar(palette)) {
+    stop("palette must be a single character string", call. = FALSE)
+  }
+  palette
+}
+
+#' @keywords internal
+validate_logical_argument <- function(value, name) {
+  if (!is.logical(value) || length(value) != 1 || is.na(value)) {
+    stop(sprintf("%s must be a single logical value (TRUE or FALSE)", name), call. = FALSE)
+  }
+  value
+}

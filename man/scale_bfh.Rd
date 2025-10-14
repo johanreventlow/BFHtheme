@@ -5,7 +5,7 @@
 \alias{scale_color_bfh}
 \alias{scale_colour_bfh}
 \alias{scale_fill_bfh}
-\title{BFH Color Scales for ggplot2}
+\title{BFH Colour Scales for ggplot2}
 \usage{
 scale_color_bfh(palette = "main", discrete = TRUE, reverse = FALSE, ...)
 
@@ -14,20 +14,28 @@ scale_colour_bfh(palette = "main", discrete = TRUE, reverse = FALSE, ...)
 scale_fill_bfh(palette = "main", discrete = TRUE, reverse = FALSE, ...)
 }
 \arguments{
-\item{palette}{Character name of palette in bfh_palettes. Default is "main".}
+\item{palette}{Character name of a palette in [bfh_palettes()]. Defaults to `"main"`.}
 
-\item{discrete}{Boolean indicating whether color aesthetic is discrete or not}
+\item{discrete}{Logical; treat the mapped variable as discrete? Defaults to `TRUE`.}
 
-\item{reverse}{Boolean indicating whether the palette should be reversed}
+\item{reverse}{Logical; reverse the palette order? Defaults to `FALSE`.}
 
-\item{...}{Additional arguments passed to discrete_scale() or
-scale_color_gradientn(), used respectively when discrete is TRUE or FALSE}
+\item{...}{Additional arguments passed to the underlying ggplot2 scale
+functions.}
 }
 \value{
-A ggplot2 scale object
+A ggplot2 scale object.
 }
 \description{
-Color and fill scales using BFH color palettes for ggplot2.
+Convenient wrappers around ggplot2 scales that apply BFH brand palettes to
+colour or fill aesthetics.
+}
+\details{
+When `discrete = TRUE` the functions delegate to [ggplot2::discrete_scale()].
+For continuous aesthetics they build a gradient using [bfh_pal()] and
+[ggplot2::scale_color_gradientn()] / [ggplot2::scale_fill_gradientn()]. Set
+`reverse = TRUE` to invert palette order, and pass additional arguments via
+`...` to fine-tune scale behaviour.
 }
 \examples{
 \dontrun{
@@ -43,3 +51,11 @@ ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
   scale_fill_bfh()
 }
 }
+\seealso{
+[bfh_pal()], [bfh_palettes], [scale_fill_bfh_continuous()]
+
+Other BFH scales: 
+\code{\link{scale_fill_bfh_continuous}()},
+\code{\link{scale_fill_bfh_discrete}()}
+}
+\concept{BFH scales}

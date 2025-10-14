@@ -2,27 +2,32 @@
 % Please edit documentation in R/fonts.R
 \name{get_bfh_font}
 \alias{get_bfh_font}
-\title{Get BFH font family}
+\title{Determine BFH Font Family}
 \usage{
 get_bfh_font(check_installed = TRUE, silent = FALSE, force_refresh = FALSE)
 }
 \arguments{
-\item{check_installed}{Logical. If TRUE, checks if fonts are actually installed.
-Default is TRUE.}
+\item{check_installed}{Logical. If `TRUE` (default) verify fonts are installed.
+Set to `FALSE` to simply return the highest-priority font name.}
 
-\item{silent}{Logical. If TRUE, suppresses informational messages.
-Default is FALSE.}
+\item{silent}{Logical. Suppress informational messages when `TRUE`. Defaults to `FALSE`.}
 
-\item{force_refresh}{Logical. If TRUE, bypasses cache and re-checks fonts.
-Default is FALSE.}
+\item{force_refresh}{Logical. When `TRUE`, bypass the cache and re-run the detection.
+Defaults to `FALSE`.}
 }
 \value{
-Character string with font family name
+Character string containing the selected font family.
 }
 \description{
-Returns the best available font for BFH plots with automatic fallback.
-Results are cached for the session to improve performance.
-Priority order: Mari/Mari Office → Roboto → Arial → sans
+Identifies the best available typeface for BFH-branded plots, caching the
+result to avoid repeated system queries. The priority order is:
+Mari/Mari Office → Roboto → Arial → sans.
+}
+\details{
+When `systemfonts` (preferred) or `extrafont` is installed the function checks
+actual system availability. Results are cached in the package environment; use
+[clear_bfh_font_cache()] or set `force_refresh = TRUE` after installing new
+fonts.
 }
 \examples{
 # Get best available font (cached after first call)
@@ -34,3 +39,14 @@ theme_bfh(base_family = get_bfh_font())
 # Force refresh cache if fonts change
 font <- get_bfh_font(force_refresh = TRUE)
 }
+\seealso{
+[check_bfh_fonts()], [set_bfh_fonts()], [set_bfh_defaults()]
+
+Other BFH fonts: 
+\code{\link{check_bfh_fonts}()},
+\code{\link{clear_bfh_font_cache}()},
+\code{\link{install_roboto_font}()},
+\code{\link{set_bfh_fonts}()},
+\code{\link{setup_bfh_fonts}()}
+}
+\concept{BFH fonts}

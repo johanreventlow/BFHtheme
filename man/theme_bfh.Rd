@@ -14,18 +14,28 @@ theme_bfh(
 \arguments{
 \item{base_size}{Base font size in points. Default is 12.}
 
-\item{base_family}{Base font family. Default is "sans".}
+\item{base_family}{Base font family. Set to `NULL` (default) to auto-detect a
+BFH approved font via [get_bfh_font()].}
 
-\item{base_line_size}{Base line size. Default is base_size/22.}
+\item{base_line_size}{Base line size. Default is `base_size / 22`.}
 
-\item{base_rect_size}{Base rectangle size. Default is base_size/22.}
+\item{base_rect_size}{Base rectangle size. Default is `base_size / 22`.}
 }
 \value{
-A ggplot2 theme object
+A [ggplot2::theme] object that can be added to ggplot graphs.
 }
 \description{
-A complete theme following Bispebjerg og Frederiksberg Hospital visual identity.
-This is the main theme for creating professional, consistent plots.
+Primary ggplot2 theme aligned with Bispebjerg og Frederiksberg Hospital's
+visual identity guidelines. Applies typography, spacing, and layout defaults
+that mirror official templates.
+}
+\details{
+The theme builds on `ggplot2::theme_minimal()` and augments it with
+BFH-specific typography via `marquee::element_marquee`, custom axis styling,
+and legend placement. When `base_family = NULL` (the default) the best
+available BFH font is detected automatically using [get_bfh_font()]. Use
+the `base_*` arguments to fine-tune typography while preserving the brand
+aesthetic.
 }
 \examples{
 \dontrun{
@@ -35,3 +45,13 @@ ggplot(mtcars, aes(wt, mpg)) +
   theme_bfh()
 }
 }
+\seealso{
+[theme_bfh_minimal()], [theme_bfh_print()], [theme_bfh_presentation()], [theme_bfh_dark()]
+
+Other BFH themes: 
+\code{\link{theme_bfh_dark}()},
+\code{\link{theme_bfh_minimal}()},
+\code{\link{theme_bfh_presentation}()},
+\code{\link{theme_bfh_print}()}
+}
+\concept{BFH themes}

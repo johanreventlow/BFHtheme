@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{add_bfh_color_bar}
 \alias{add_bfh_color_bar}
-\title{Add BFH color bar annotation to plot}
+\title{Add a BFH Colour Bar Annotation}
 \usage{
 add_bfh_color_bar(
   plot,
@@ -12,19 +12,26 @@ add_bfh_color_bar(
 )
 }
 \arguments{
-\item{plot}{A ggplot2 object}
+\item{plot}{A ggplot2 object.}
 
-\item{position}{Position of the bar: "top", "bottom", "left", "right"}
+\item{position}{Plot side on which the bar should appear: `"top"`, `"bottom"`,
+`"left"`, or `"right"`. Defaults to `"top"`.}
 
-\item{color}{Color of the bar. Default is BFH primary blue.}
+\item{color}{Fill colour of the bar. Defaults to `bfh_cols("hospital_primary")`.}
 
-\item{size}{Size of the bar (height for horizontal, width for vertical)}
+\item{size}{Thickness of the bar (height for horizontal, width for vertical)
+expressed as a fraction of the plotting area. Defaults to `0.02`.}
 }
 \value{
-A ggplot2 object with the color bar annotation
+ggplot2 object with the annotation added.
 }
 \description{
-Adds a colored bar to the plot, useful for adding a visual BFH brand element.
+Adds a slim coloured band to any plot edge—a simple way to inject BFH brand
+cues without altering the main chart area.
+}
+\details{
+The `size` argument is expressed as a fraction of the plotting area (0–1).
+Values between 0.015 and 0.04 typically balance visibility with subtlety.
 }
 \examples{
 \dontrun{
@@ -36,3 +43,14 @@ p <- ggplot(mtcars, aes(wt, mpg)) +
 add_bfh_color_bar(p, position = "top")
 }
 }
+\seealso{
+[add_bfh_footer()], [add_bfh_logo()], [bfh_title_block()]
+
+Other BFH branding: 
+\code{\link{add_bfh_footer}()},
+\code{\link{add_bfh_logo}()},
+\code{\link{add_logo}()},
+\code{\link{bfh_title_block}()},
+\code{\link{get_bfh_logo}()}
+}
+\concept{BFH branding}

@@ -2,18 +2,30 @@
 % Please edit documentation in R/fonts.R
 \name{check_bfh_fonts}
 \alias{check_bfh_fonts}
-\title{Check if BFH fonts are installed}
+\title{Check BFH Font Availability}
 \usage{
 check_bfh_fonts()
 }
 \value{
-Invisibly returns a named logical vector of font availability
+Invisibly returns a named logical vector with font availability.
 }
 \description{
-Checks system for BFH preferred fonts and reports availability.
+Reports whether key BFH fonts (Mari, Roboto, Arial) are installed on the
+system, using `systemfonts` or `extrafont` when available.
 }
 \examples{
 \dontrun{
 check_bfh_fonts()
 }
 }
+\seealso{
+[get_bfh_font()], [install_roboto_font()]
+
+Other BFH fonts: 
+\code{\link{clear_bfh_font_cache}()},
+\code{\link{get_bfh_font}()},
+\code{\link{install_roboto_font}()},
+\code{\link{set_bfh_fonts}()},
+\code{\link{setup_bfh_fonts}()}
+}
+\concept{BFH fonts}

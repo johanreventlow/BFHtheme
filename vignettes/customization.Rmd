@@ -18,7 +18,21 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-This vignette covers advanced customization options for BFHtheme, including theme modifications, custom color palettes, and specialized plot enhancements.
+This vignette dives deeper into BFHtheme for users who need more than the
+out-of-the-box defaults. You will learn how to:
+
+- fine-tune theme parameters and override individual elements,
+- craft bespoke colour palettes and gradients,
+- add BFH-branded annotations such as footers, logos, and colour bars,
+- organise multi-panel figures, and
+- optimise fonts and performance for production workflows.
+
+| Customisation area | Key functions |
+| --- | --- |
+| Theme tweaks | `theme_bfh_*()`, `theme()` |
+| Colours & palettes | `bfh_cols()`, `bfh_pal()`, `scale_*_bfh_*()` |
+| Branding elements | `add_bfh_logo()`, `add_bfh_footer()`, `add_bfh_color_bar()` |
+| Layout helpers | `bfh_combine_plots()`, `bfh_save()` |
 
 ```{r load, message=FALSE}
 library(BFHtheme)
@@ -29,7 +43,9 @@ library(ggplot2)
 
 ### Modifying Base Theme Parameters
 
-All theme functions accept parameters for customization:
+All BFH themes expose the standard ggplot2 base arguments. Adjust them to fit
+specific deliverables—larger fonts for accessibility, a fixed typeface for
+compliance, or heavier lines for print.
 
 ```{r theme-params}
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -45,7 +61,8 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 
 ### Overriding Theme Elements
 
-BFH themes can be extended with additional ggplot2 theme elements:
+Layer additional ggplot2 theme calls on top of the BFH defaults to fine-tune
+individual components such as titles, panels, or grids.
 
 ```{r theme-override}
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -59,9 +76,10 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
   )
 ```
 
-### Legend Customization
+### Legend Customisation
 
-Position and style the legend:
+Legends inherit BFH styling but can be repositioned or reformatted to suit the
+layout.
 
 ```{r legend-custom}
 ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
@@ -79,11 +97,11 @@ ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
   )
 ```
 
-## Color Palette Customization
+## Colour Palette Customisation
 
 ### Using Different Palettes
 
-Select from available palettes:
+Switch palettes dynamically to emphasise different aspects of the brand.
 
 ```{r palettes}
 p <- ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
@@ -96,22 +114,24 @@ p + scale_fill_bfh(palette = "hospital_blues")
 
 ### Reversing Palettes
 
-Reverse the color order:
+Reverse the palette order when a gradient needs to flow in the opposite
+direction.
 
 ```{r reverse-palette}
 ggplot(mtcars, aes(x = wt, y = mpg, color = hp)) +
   geom_point(size = 3) +
-  labs(title = "Reversed Color Scale") +
+  labs(title = "Reversed Colour Scale") +
   scale_color_bfh_continuous(palette = "blues", reverse = TRUE) +
   theme_bfh()
 ```
 
 ### Creating Custom Palettes
 
-Access the color interpolation function directly:
+Combine individual colours or build a bespoke gradient with `bfh_pal()` to match
+department-specific requirements.
 
 ```{r custom-palette}
-# Create a custom palette with specific colors
+# Create a custom palette with specific colours
 custom_colors <- c(
   bfh_cols("hospital_primary"),
   bfh_cols("hospital_grey"),
@@ -120,31 +140,35 @@ custom_colors <- c(
 
 ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
   geom_bar() +
-  labs(title = "Custom Color Selection") +
+  labs(title = "Custom Colour Selection") +
   scale_fill_manual(values = custom_colors) +
   theme_bfh()
 ```
 
-### Working with Color Functions
+### Working with Colour Functions
 
-Use the palette function for continuous scales:
+Use `bfh_pal()` to generate smooth gradients or truncate palettes for a precise
+number of categories.
 
 ```{r palette-function}
-# Generate color ramp
+# Generate colour ramp
 blues_pal <- bfh_pal("hospital_blues")
 
 # Use in continuous scale
 ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
   geom_tile() +
-  scale_fill_gradientn(colors = blues_pal(100)) +
+  scale_fill_gradientn(colours = blues_pal(100)) +
   theme_bfh()
 ```
 
 ## Plot Enhancements
 
+Extend a finished plot with branded components and annotations to convey
+context, ownership, or emphasis without redesigning the underlying chart.
+
 ### Adding BFH Branding
 
-Add footer with organization information:
+Anchor a plot with official branding using `add_bfh_footer()`:
 
 ```{r footer, eval=FALSE}
 p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -158,9 +182,9 @@ add_bfh_footer(
 )
 ```
 
-### Color Bar Annotations
+### Colour Bar Annotations
 
-Add colored bars for visual emphasis:
+Introduce subtle brand accents with a slim colour bar:
 
 ```{r color-bar, eval=FALSE}
 p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -178,7 +202,7 @@ add_bfh_color_bar(
 
 ### Multi-Panel Figures
 
-Combine multiple plots with shared legend:
+Combine multiple plots with a shared legend for consistent storytelling:
 
 ```{r multi-panel, eval=FALSE}
 library(patchwork)
@@ -200,18 +224,18 @@ p1 + p2 + plot_layout(guides = "collect") &
   theme(legend.position = "bottom")
 ```
 
-Alternatively, use the built-in helper:
+Alternatively, call the BFH helper directly:
 
 ```{r combine-plots, eval=FALSE}
 plots <- list(p1, p2)
 bfh_combine_plots(plots, ncol = 2, legend_position = "bottom")
 ```
 
-## Axis Customization
+## Axis Customisation
 
 ### Formatting Axes
 
-Customize axis appearance:
+Tidy up axes with breaks, limits, and units that match your narrative:
 
 ```{r axis-format}
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -230,7 +254,7 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 
 ### Date Axes
 
-For time series data:
+For time-series data, combine date scales with BFH colours:
 
 ```{r date-axis, eval=FALSE}
 library(lubridate)
@@ -256,9 +280,13 @@ ggplot(date_data, aes(x = date, y = value)) +
 
 ## Text and Labels
 
+Typography and copy tone are central to the BFH identity. These helpers keep
+labels consistent while still giving you room for context-specific annotations.
+
 ### Uppercase Labels
 
-Automatically convert labels to uppercase following BFH style:
+Use `bfh_labs()` to align subtitles, axis titles, and captions with the
+uppercase convention while preserving the main title casing:
 
 ```{r uppercase-labels}
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -275,7 +303,8 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 
 ### Custom Text Elements
 
-Add annotations:
+Layer additional annotations for storytelling while staying within the BFH
+colour system:
 
 ```{r annotations}
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -300,9 +329,12 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 
 ## Faceting
 
-### Facet Customization
+Facets inherit BFH defaults, but subtle tweaks can make multi-panel layouts feel
+polished and balanced.
 
-Style faceted plots:
+### Facet Customisation
+
+Adjust strip backgrounds and text to reinforce brand colours:
 
 ```{r facets}
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -318,9 +350,12 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 
 ## Export and File Formats
 
+Produce publication-ready figures while keeping file sizes manageable.
+
 ### High-Resolution Export
 
-Export plots for publication:
+Use `bfh_save()` presets for common outputs, or override the size when you need
+an exact width and height.
 
 ```{r export, eval=FALSE}
 p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -339,7 +374,7 @@ bfh_save("figure.png", p, width = 10, height = 8, units = "cm", dpi = 300)
 
 ### Dimension Presets
 
-Get recommended dimensions programmatically:
+Query the recommended sizes directly from the helper for reproducible reporting:
 
 ```{r dimensions}
 # Get dimensions for different output types
@@ -350,11 +385,14 @@ presentation_dims <- get_bfh_dimensions(type = "presentation", format = "wide")
 print(presentation_dims)
 ```
 
-## Performance Optimization
+## Performance Optimisation
+
+Keep your workflow responsive when working with fonts or large datasets.
 
 ### Font Caching
 
-Font detection is cached automatically for performance. Clear cache if fonts are installed or removed during the session:
+Font detection results are cached for speed. Clear or refresh the cache after
+adding or removing fonts mid-session:
 
 ```{r cache, eval=FALSE}
 # Font detection is cached automatically
@@ -370,7 +408,7 @@ get_bfh_font(force_refresh = TRUE)
 
 ### Large Datasets
 
-For large datasets, consider:
+High-volume data can strain rendering. Consider these approaches:
 
 ```{r performance, eval=FALSE}
 # Use alpha for overplotting
@@ -390,8 +428,8 @@ ggplot(large_data, aes(x, y)) +
   theme_bfh()
 ```
 
-## Next Steps
+## Wrap-Up
 
-- See `vignette("getting-started")` for basic usage
-- See `vignette("theming")` for multi-hospital branding
-- Check function documentation for detailed parameter descriptions
+- Revisit `vignette("getting-started")` for the foundational workflow.
+- Explore `vignette("theming")` when you need hospital vs Region H branding.
+- Consult the function reference (`help(package = "BFHtheme")`) for parameter details.

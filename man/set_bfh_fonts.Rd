@@ -2,19 +2,19 @@
 % Please edit documentation in R/fonts.R
 \name{set_bfh_fonts}
 \alias{set_bfh_fonts}
-\title{Update theme defaults to use BFH fonts}
+\title{Update Theme Defaults with BFH Fonts}
 \usage{
 set_bfh_fonts(use_showtext = FALSE)
 }
 \arguments{
-\item{use_showtext}{Logical. Use showtext for font rendering. Default FALSE.}
+\item{use_showtext}{Logical. Forwarded to [setup_bfh_fonts()]. Defaults to `FALSE`.}
 }
 \value{
-Invisibly returns the font family being used
+Invisibly returns the font family that was set.
 }
 \description{
-Sets BFH fonts as default for all themes. This is a convenience wrapper
-that combines font setup with theme defaults.
+Convenience wrapper around [setup_bfh_fonts()] that immediately updates
+`ggplot2`'s global theme text family to the detected BFH font.
 }
 \examples{
 \dontrun{
@@ -28,3 +28,14 @@ ggplot(mtcars, aes(wt, mpg)) +
   theme_bfh()
 }
 }
+\seealso{
+[setup_bfh_fonts()], [set_bfh_defaults()]
+
+Other BFH fonts: 
+\code{\link{check_bfh_fonts}()},
+\code{\link{clear_bfh_font_cache}()},
+\code{\link{get_bfh_font}()},
+\code{\link{install_roboto_font}()},
+\code{\link{setup_bfh_fonts}()}
+}
+\concept{BFH fonts}

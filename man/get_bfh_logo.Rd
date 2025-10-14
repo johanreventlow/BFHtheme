@@ -2,23 +2,25 @@
 % Please edit documentation in R/logo_helpers.R
 \name{get_bfh_logo}
 \alias{get_bfh_logo}
-\title{Get path to BFH logo}
+\title{Get Path to the Packaged BFH Logo}
 \usage{
 get_bfh_logo(size = "web", variant = "color")
 }
 \arguments{
-\item{size}{Character string specifying logo size: "full" (300 DPI), "web" (800px), or "small" (400px).
-Default is "web".}
+\item{size}{Logo size: `"full"` (print resolution), `"web"` (800 px), or
+`"small"` (400 px). Defaults to `"web"`.}
 
-\item{variant}{Character string specifying logo variant: "color" (default), "grey" (greyscale), or
-"mark" (hospital symbol only, without text).}
+\item{variant}{Logo variant: `"color"` (default), `"grey"` (greyscale), or
+`"mark"` (symbol only).}
 }
 \value{
-Character string with the full path to the logo file
+Character string containing the absolute path, or `NULL` if the asset
+  is unavailable.
 }
 \description{
-Returns the file path to the BFH logo included with the package.
-Multiple variants are available: full color, greyscale, and mark (symbol only).
+Retrieves the file path to BFH logo assets bundled with the package.
+Variants include full colour, greyscale, and symbol-only marks across
+multiple resolutions.
 }
 \examples{
 \dontrun{
@@ -40,3 +42,14 @@ add_bfh_logo(p, get_bfh_logo(variant = "grey"))
 add_bfh_logo(p, get_bfh_logo(variant = "mark"))
 }
 }
+\seealso{
+[add_logo()], [add_bfh_logo()]
+
+Other BFH branding: 
+\code{\link{add_bfh_color_bar}()},
+\code{\link{add_bfh_footer}()},
+\code{\link{add_bfh_logo}()},
+\code{\link{add_logo}()},
+\code{\link{bfh_title_block}()}
+}
+\concept{BFH branding}

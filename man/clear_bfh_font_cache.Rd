@@ -2,16 +2,16 @@
 % Please edit documentation in R/fonts.R
 \name{clear_bfh_font_cache}
 \alias{clear_bfh_font_cache}
-\title{Clear font cache}
+\title{Clear Font Cache}
 \usage{
 clear_bfh_font_cache()
 }
 \value{
-Invisibly returns TRUE
+Invisibly returns `TRUE`.
 }
 \description{
-Clears the cached font selection. Useful if fonts are installed or uninstalled
-during the R session, or if you want to force re-detection.
+Removes cached font detection results, ensuring that the next call to
+[get_bfh_font()] triggers a fresh lookup.
 }
 \examples{
 # Clear font cache after installing new fonts
@@ -20,3 +20,14 @@ clear_bfh_font_cache()
 # Font will be re-detected on next call
 font <- get_bfh_font()
 }
+\seealso{
+[get_bfh_font()]
+
+Other BFH fonts: 
+\code{\link{check_bfh_fonts}()},
+\code{\link{get_bfh_font}()},
+\code{\link{install_roboto_font}()},
+\code{\link{set_bfh_fonts}()},
+\code{\link{setup_bfh_fonts}()}
+}
+\concept{BFH fonts}

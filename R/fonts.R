@@ -1,23 +1,30 @@
 # Package-level font cache environment
 .bfh_font_cache <- new.env(parent = emptyenv())
 
-#' Get BFH font family
+#' Determine BFH Font Family
 #'
 #' @description
-#' Returns the best available font for BFH plots with automatic fallback.
-#' Results are cached for the session to improve performance.
-#' Priority order: Mari/Mari Office → Roboto → Arial → sans
+#' Identifies the best available typeface for BFH-branded plots, caching the
+#' result to avoid repeated system queries. The priority order is:
+#' Mari/Mari Office → Roboto → Arial → sans.
 #'
-#' @param check_installed Logical. If TRUE, checks if fonts are actually installed.
-#'   Default is TRUE.
-#' @param silent Logical. If TRUE, suppresses informational messages.
-#'   Default is FALSE.
-#' @param force_refresh Logical. If TRUE, bypasses cache and re-checks fonts.
-#'   Default is FALSE.
-#' @return Character string with font family name
+#' @details
+#' When `systemfonts` (preferred) or `extrafont` is installed the function checks
+#' actual system availability. Results are cached in the package environment; use
+#' [clear_bfh_font_cache()] or set `force_refresh = TRUE` after installing new
+#' fonts.
+#'
+#' @param check_installed Logical. If `TRUE` (default) verify fonts are installed.
+#'   Set to `FALSE` to simply return the highest-priority font name.
+#' @param silent Logical. Suppress informational messages when `TRUE`. Defaults to `FALSE`.
+#' @param force_refresh Logical. When `TRUE`, bypass the cache and re-run the detection.
+#'   Defaults to `FALSE`.
+#' @return Character string containing the selected font family.
 #' @export
 #'
 #' @importFrom ggplot2 theme_update element_text
+#' @seealso [check_bfh_fonts()], [set_bfh_fonts()], [set_bfh_defaults()]
+#' @family BFH fonts
 #' @examples
 #' # Get best available font (cached after first call)
 #' font <- get_bfh_font()
@@ -91,14 +98,16 @@ get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh =
   return(selected_font)
 }
 
-#' Clear font cache
+#' Clear Font Cache
 #'
 #' @description
-#' Clears the cached font selection. Useful if fonts are installed or uninstalled
-#' during the R session, or if you want to force re-detection.
+#' Removes cached font detection results, ensuring that the next call to
+#' [get_bfh_font()] triggers a fresh lookup.
 #'
-#' @return Invisibly returns TRUE
+#' @return Invisibly returns `TRUE`.
 #' @export
+#' @seealso [get_bfh_font()]
+#' @family BFH fonts
 #' @examples
 #' # Clear font cache after installing new fonts
 #' clear_bfh_font_cache()
@@ -111,13 +120,16 @@ clear_bfh_font_cache <- function() {
   invisible(TRUE)
 }
 
-#' Check if BFH fonts are installed
+#' Check BFH Font Availability
 #'
 #' @description
-#' Checks system for BFH preferred fonts and reports availability.
+#' Reports whether key BFH fonts (Mari, Roboto, Arial) are installed on the
+#' system, using `systemfonts` or `extrafont` when available.
 #'
-#' @return Invisibly returns a named logical vector of font availability
+#' @return Invisibly returns a named logical vector with font availability.
 #' @export
+#' @seealso [get_bfh_font()], [install_roboto_font()]
+#' @family BFH fonts
 #' @examples
 #' \dontrun{
 #' check_bfh_fonts()
@@ -177,13 +189,19 @@ check_bfh_fonts <- function() {
   invisible(results)
 }
 
-#' Install Roboto font (helper)
+#' Install Roboto Font (Guidance Helper)
 #'
 #' @description
-#' Provides instructions for installing Roboto font on different systems.
-#' Roboto is an open-source font by Google, free to use and distribute.
+#' Prints platform-agnostic instructions for installing Google's Roboto font,
+#' the recommended open-source fallback when Mari is unavailable.
+#'
+#' @details
+#' No files are downloaded or installed automatically; the function only
+#' provides guidance that you can follow manually.
 #'
 #' @export
+#' @seealso [check_bfh_fonts()]
+#' @family BFH fonts
 #' @examples
 #' \dontrun{
 #' install_roboto_font()
@@ -221,16 +239,18 @@ install_roboto_font <- function() {
   cat("   - Run: check_bfh_fonts()\n\n")
 }
 
-#' Setup fonts for BFH theme
+#' Configure Fonts for BFH Themes
 #'
 #' @description
-#' Helper function to setup fonts for BFH theme. Handles both system fonts
-#' and showtext/sysfonts for better cross-platform compatibility.
+#' Ensures an appropriate font is available for BFH visuals. Optionally loads
+#' Roboto via the `showtext` package when system fonts are not accessible.
 #'
-#' @param use_showtext Logical. If TRUE, attempts to use showtext package
-#'   for better font rendering. Default is FALSE.
-#' @return Character string with font family to use
+#' @param use_showtext Logical. When `TRUE`, attempts to load Roboto through
+#'   `showtext::font_add_google()` and enable `showtext_auto()`. Defaults to `FALSE`.
+#' @return Character string naming the font family that should be used.
 #' @export
+#' @seealso [set_bfh_fonts()], [get_bfh_font()], [install_roboto_font()]
+#' @family BFH fonts
 #' @examples
 #' \dontrun{
 #' # Setup fonts
@@ -261,15 +281,17 @@ setup_bfh_fonts <- function(use_showtext = FALSE) {
   return(font)
 }
 
-#' Update theme defaults to use BFH fonts
+#' Update Theme Defaults with BFH Fonts
 #'
 #' @description
-#' Sets BFH fonts as default for all themes. This is a convenience wrapper
-#' that combines font setup with theme defaults.
+#' Convenience wrapper around [setup_bfh_fonts()] that immediately updates
+#' `ggplot2`'s global theme text family to the detected BFH font.
 #'
-#' @param use_showtext Logical. Use showtext for font rendering. Default FALSE.
-#' @return Invisibly returns the font family being used
+#' @param use_showtext Logical. Forwarded to [setup_bfh_fonts()]. Defaults to `FALSE`.
+#' @return Invisibly returns the font family that was set.
 #' @export
+#' @seealso [setup_bfh_fonts()], [set_bfh_defaults()]
+#' @family BFH fonts
 #' @examples
 #' \dontrun{
 #' # Set BFH fonts as default

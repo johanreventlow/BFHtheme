@@ -1,30 +1,32 @@
-#' Save a plot with BFH specifications
+#' Save a Plot with BFH Specifications
 #'
 #' @description
-#' Convenience function to save ggplot2 plots with recommended dimensions and
-#' settings for BFH reports and presentations. Wraps ggplot2::ggsave() with
-#' sensible defaults.
+#' Wrapper around [ggplot2::ggsave()] that applies BFH-recommended dimensions,
+#' resolution, and message output for reproducible plot exports.
 #'
-#' @param filename File name to save the plot. Should include extension
-#'   (e.g., "plot.png", "figure.pdf").
-#' @param plot Plot to save. Defaults to last plot displayed.
-#' @param preset Character string specifying a size preset:
-#'   - "report_full": Full-width figure for reports (7x5 inches)
-#'   - "report_half": Half-width figure for reports (3.5x3 inches)
-#'   - "presentation": Standard presentation slide (10x6 inches)
-#'   - "presentation_wide": Widescreen presentation (12x6.75 inches)
-#'   - "square": Square format (6x6 inches)
-#'   - "poster": Large format for posters (12x9 inches)
-#' @param width Plot width in units. If specified, overrides preset.
-#' @param height Plot height in units. If specified, overrides preset.
-#' @param units Units for width and height ("in", "cm", "mm", "px"). Default is "in".
-#' @param dpi Resolution in dots per inch. Default is 300 for high quality.
-#' @param ... Additional arguments passed to ggplot2::ggsave()
-#' @return Invisibly returns the filename
+#' @details
+#' Use the `preset` argument to quickly match internal communication formats.
+#' Width/height arguments override presets when supplied. For more control,
+#' pair with [get_bfh_dimensions()] to retrieve structured size guidance.
+#'
+#' @param filename File name to save the plot. Include an extension such as
+#'   `"plot.png"` or `"figure.pdf"`.
+#' @param plot Plot to save. Defaults to the last displayed plot.
+#' @param preset Character string specifying size presets:
+#'   `"report_full"` (7x5 in), `"report_half"` (3.5x3 in), `"presentation"` (10x6 in),
+#'   `"presentation_wide"` (12x6.75 in), `"square"` (6x6 in), `"poster"` (12x9 in).
+#' @param width Plot width. Overrides `preset` when provided.
+#' @param height Plot height. Overrides `preset` when provided.
+#' @param units Units for width/height (`"in"`, `"cm"`, `"mm"`, `"px"`). Defaults to `"in"`.
+#' @param dpi Resolution in dots per inch. Defaults to 300.
+#' @param ... Additional arguments passed to [ggplot2::ggsave()].
+#' @return Invisibly returns `filename`.
 #' @export
 #'
 #' @importFrom ggplot2 ggsave last_plot labs annotation_custom coord_cartesian annotate theme
 #' @importFrom grid rectGrob unit gpar
+#' @seealso [get_bfh_dimensions()], [theme_bfh()], [bfh_title_block()]
+#' @family BFH helpers
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -87,16 +89,22 @@ bfh_save <- function(filename,
   invisible(filename)
 }
 
-#' Get recommended plot dimensions
+#' Get Recommended Plot Dimensions
 #'
 #' @description
-#' Returns recommended plot dimensions for different output types.
+#' Supplies canonical width/height combinations for common BFH output formats,
+#' facilitating consistent figure sizing across documents and slides.
 #'
-#' @param type Character string specifying the output type:
-#'   "report", "presentation", "poster", "web", "print"
-#' @param format Character string for aspect ratio: "standard", "wide", "square"
-#' @return Named list with width and height in inches
+#' @param type Output target. One of `"report"`, `"presentation"`, `"poster"`,
+#'   `"web"`, or `"print"`. Defaults to `"report"`.
+#' @param format Aspect ratio. One of `"standard"`, `"wide"`, or `"square"`.
+#'   Defaults to `"standard"`.
+#' @return Named list with `width` and `height` in inches.
 #' @export
+#' @seealso [bfh_save()], [theme_bfh()]
+#' @family BFH helpers
+#' @details Invalid `type`/`format` combinations trigger a warning and fall back
+#' to the closest supported option.
 #' @examples
 #' get_bfh_dimensions("report", "standard")
 #' get_bfh_dimensions("presentation", "wide")
@@ -142,18 +150,25 @@ get_bfh_dimensions <- function(type = "report", format = "standard") {
   dimensions[[type]][[format]]
 }
 
-#' Create a multi-panel figure with shared legend
+#' Create a Multi-Panel Figure with Shared Legend
 #'
 #' @description
-#' Arranges multiple ggplot2 plots into a single figure with a shared legend.
-#' Useful for creating multi-panel figures for reports.
+#' Arranges multiple ggplot2 plots into a single layout with an optional shared
+#' legend, ideal for BFH report panels and slide decks.
 #'
-#' @param plots List of ggplot2 plot objects
-#' @param ncol Number of columns in the layout
-#' @param nrow Number of rows in the layout
-#' @param legend_position Position of shared legend: "bottom", "top", "left", "right", "none"
-#' @return A combined plot object (requires patchwork or cowplot)
+#' @details
+#' The function currently depends on the `patchwork` package. When unavailable a
+#' descriptive error is raised; install `patchwork` to use this helper.
+#'
+#' @param plots List of ggplot2 plot objects.
+#' @param ncol Optional number of columns in the layout.
+#' @param nrow Optional number of rows in the layout.
+#' @param legend_position Legend placement. One of `"bottom"`, `"top"`, `"left"`,
+#'   `"right"`, or `"none"`. Defaults to `"bottom"`.
+#' @return Combined plot object produced by `patchwork`.
 #' @export
+#' @seealso [patchwork::wrap_plots()], [bfh_save()]
+#' @family BFH helpers
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -195,17 +210,26 @@ bfh_combine_plots <- function(plots,
   }
 }
 
-#' Add BFH color bar annotation to plot
+#' Add a BFH Colour Bar Annotation
 #'
 #' @description
-#' Adds a colored bar to the plot, useful for adding a visual BFH brand element.
+#' Adds a slim coloured band to any plot edge—a simple way to inject BFH brand
+#' cues without altering the main chart area.
 #'
-#' @param plot A ggplot2 object
-#' @param position Position of the bar: "top", "bottom", "left", "right"
-#' @param color Color of the bar. Default is BFH primary blue.
-#' @param size Size of the bar (height for horizontal, width for vertical)
-#' @return A ggplot2 object with the color bar annotation
+#' @details
+#' The `size` argument is expressed as a fraction of the plotting area (0–1).
+#' Values between 0.015 and 0.04 typically balance visibility with subtlety.
+#'
+#' @param plot A ggplot2 object.
+#' @param position Plot side on which the bar should appear: `"top"`, `"bottom"`,
+#'   `"left"`, or `"right"`. Defaults to `"top"`.
+#' @param color Fill colour of the bar. Defaults to `bfh_cols("hospital_primary")`.
+#' @param size Thickness of the bar (height for horizontal, width for vertical)
+#'   expressed as a fraction of the plotting area. Defaults to `0.02`.
+#' @return ggplot2 object with the annotation added.
 #' @export
+#' @seealso [add_bfh_footer()], [add_bfh_logo()], [bfh_title_block()]
+#' @family BFH branding
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -273,26 +297,31 @@ add_bfh_color_bar <- function(plot,
   return(plot)
 }
 
-#' BFH-style plot labels with automatic uppercase
+#' BFH-Style Plot Labels with Automatic Uppercase
 #'
 #' @description
-#' Wrapper around ggplot2::labs() that automatically converts axis labels,
-#' subtitles, and legend titles to uppercase, following BFH visual identity
-#' guidelines. Only the main title is left unchanged to preserve natural
-#' capitalization.
+#' Wrapper around [ggplot2::labs()] that converts subtitles, captions, axes, and
+#' legend titles to uppercase, matching BFH typographic guidance while leaving
+#' the main title unchanged.
 #'
-#' @param ... Named arguments passed to ggplot2::labs(). Character values will
-#'   be converted to uppercase except for title. Common arguments include:
-#'   - title: Plot title (unchanged - natural case)
-#'   - subtitle: Plot subtitle (uppercase)
-#'   - caption: Plot caption (uppercase)
-#'   - x: X-axis label (uppercase)
-#'   - y: Y-axis label (uppercase)
-#'   - color/colour: Legend title for color aesthetic (uppercase)
-#'   - fill: Legend title for fill aesthetic (uppercase)
-#' @return A ggplot2 labels object
+#' @details
+#' Only the argument named `"title"` is exempt from uppercasing. Supply other
+#' character values via `...` and they will be converted using [base::toupper()].
+#'
+#' @param ... Named arguments passed to [ggplot2::labs()]. Character values are
+#'   uppercased except for `title`. Common keys include:
+#'   \itemize{
+#'     \item `title`: Plot title (kept in natural case).
+#'     \item `subtitle`: Subtitle (uppercased).
+#'     \item `caption`: Caption (uppercased).
+#'     \item `x`, `y`: Axis labels (uppercased).
+#'     \item `color`/`colour`, `fill`: Legend titles (uppercased).
+#'   }
+#' @return A ggplot2 labels object.
 #' @export
 #' @importFrom purrr map
+#' @seealso [ggplot2::labs()], [bfh_title_block()]
+#' @family BFH helpers
 #' @examples
 #' \dontrun{
 #' library(ggplot2)

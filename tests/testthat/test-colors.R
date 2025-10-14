@@ -68,8 +68,25 @@ test_that("show_bfh_palettes runs without error", {
   expect_no_error(show_bfh_palettes())
 })
 
-test_that("check_colorblind_safe placeholder works", {
-  # This is a placeholder function, just check it runs without error
-  # It returns the colors invisibly
-  expect_no_error(check_colorblind_safe(c("#007dbb", "#e30613")))
+test_that("check_colorblind_safe returns structured diagnostics", {
+  palette <- c(primary = "#007dbb", accent = "#e30613", highlight = "#ffed00")
+  result <- check_colorblind_safe(palette, threshold = 8)
+
+  expect_type(result, "list")
+  expect_true(result$passes)
+  expect_equal(result$threshold, 8)
+  expect_true(all(c("summary", "pairwise") %in% names(result)))
+  expect_s3_class(result$summary, "data.frame")
+  expect_named(result$pairwise)
+  expect_true(all(result$summary$min_delta_e >= 0))
+})
+
+test_that("check_colorblind_safe flags low-contrast palettes", {
+  palette <- c(shade1 = "#002244", shade2 = "#012345")
+  result <- check_colorblind_safe(palette, threshold = 2)
+
+  expect_false(result$passes)
+  expect_true(any(!result$summary$passes))
+  normal_pairs <- result$pairwise$normal
+  expect_true(any(normal_pairs$below_threshold))
 })

@@ -1,26 +1,30 @@
-#' Set BFH defaults for ggplot2
+#' Set BFH Defaults for ggplot2
 #'
 #' @description
-#' Sets default BFH theme and geom colors for all plots in the current session.
-#' This function modifies the global ggplot2 theme and updates default colors
-#' for common geoms (point, line, bar, etc.).
+#' Applies a BFH theme globally and updates default geom colours for the current
+#' R session. Ideal for scripts or reports where every plot should inherit BFH
+#' styling without repeated boilerplate.
 #'
-#' **Note:** This function does NOT set default color/fill scales for aesthetic
-#' mappings. If you use `aes(color = ...)` or `aes(fill = ...)`, you must
-#' manually add `scale_color_bfh()` or `scale_fill_bfh()` to your plots.
+#' @details
+#' The function calls [ggplot2::theme_set()] with the selected BFH theme and
+#' updates default aesthetics for commonly used geoms (points, lines, bars, and
+#' more). Colour/fill scales are not altered automatically—continue to add
+#' `scale_*_bfh()` when mapping aesthetics.
 #'
-#' @param theme Character name of the BFH theme to use as default.
-#'   Options: "bfh", "bfh_minimal", "bfh_print", "bfh_presentation", "bfh_dark".
-#'   Default is "bfh".
-#' @param palette Character name of the default color palette used for geom defaults.
-#'   Default is "main".
-#' @param base_size Base font size for the theme. Default is 12.
-#' @param base_family Base font family for the theme. If NULL (default),
-#'   automatically detects best available BFH font (Mari, Roboto, Arial, or sans).
-#' @return Invisibly returns TRUE after setting defaults
+#' @param theme Character name of the BFH theme to adopt. Valid choices are
+#'   `"bfh"`, `"bfh_minimal"`, `"bfh_print"`, `"bfh_presentation"`, and
+#'   `"bfh_dark"`. Defaults to `"bfh"`.
+#' @param palette Character name of the palette from [bfh_palettes] used to seed
+#'   geom defaults. Defaults to `"main"`.
+#' @param base_size Base font size for the theme. Defaults to 12.
+#' @param base_family Base font family. Use `NULL` (default) to auto-detect with
+#'   [get_bfh_font()].
+#' @return Invisibly returns `TRUE` after the defaults have been applied.
 #' @export
 #'
 #' @importFrom ggplot2 theme_set theme_gray update_geom_defaults
+#' @seealso [reset_bfh_defaults()], [apply_bfh_theme()], [set_bfh_fonts()]
+#' @family BFH defaults
 #' @examples
 #' \dontrun{
 #' # Set BFH defaults at the start of your script
@@ -83,14 +87,16 @@ set_bfh_defaults <- function(theme = "bfh",
   invisible(TRUE)
 }
 
-#' Reset ggplot2 defaults
+#' Reset ggplot2 Defaults
 #'
 #' @description
-#' Resets ggplot2 to its default theme and geom colors.
-#' Use this to undo the effects of set_bfh_defaults().
+#' Restores ggplot2's original theme and geom defaults, undoing the effect of
+#' [set_bfh_defaults()].
 #'
-#' @return Invisibly returns TRUE after resetting defaults
+#' @return Invisibly returns `TRUE` once defaults are reset.
 #' @export
+#' @seealso [set_bfh_defaults()]
+#' @family BFH defaults
 #' @examples
 #' \dontrun{
 #' # Set BFH defaults
@@ -122,19 +128,25 @@ reset_bfh_defaults <- function() {
   invisible(TRUE)
 }
 
-#' Apply BFH theme to the current plot
+#' Apply BFH Theme to a Plot
 #'
 #' @description
-#' A convenience function that applies the BFH theme to the current plot.
-#' Optionally adds BFH color scales for discrete mappings.
+#' Lightweight helper that returns a list containing the requested BFH theme and
+#' optional discrete colour/fill scales. Designed for piping directly into a
+#' ggplot call.
 #'
-#' @param theme Character name of the BFH theme. Default is "bfh".
-#' @param palette Character name of the color palette. Default is "main".
-#' @param base_size Base font size. Default is 12.
-#' @param add_color_scale Logical. If TRUE, adds discrete color scale. Default is FALSE.
-#' @param add_fill_scale Logical. If TRUE, adds discrete fill scale. Default is FALSE.
-#' @return A list of ggplot2 theme and scale components
+#' @param theme Character name of the BFH theme variant. Defaults to `"bfh"`.
+#' @param palette Character name of the palette (from [bfh_palettes]) used when
+#'   adding scales. Defaults to `"main"`.
+#' @param base_size Base font size supplied to the chosen theme. Defaults to 12.
+#' @param add_color_scale Logical; add [scale_color_bfh()] if `TRUE`.
+#'   Defaults to `FALSE`.
+#' @param add_fill_scale Logical; add [scale_fill_bfh()] if `TRUE`.
+#'   Defaults to `FALSE`.
+#' @return A list of ggplot2 components that can be added to a plot.
 #' @export
+#' @seealso [set_bfh_defaults()], [theme_bfh()], [scale_color_bfh()]
+#' @family BFH defaults
 #' @examples
 #' \dontrun{
 #' library(ggplot2)

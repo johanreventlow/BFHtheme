@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{bfh_save}
 \alias{bfh_save}
-\title{Save a plot with BFH specifications}
+\title{Save a Plot with BFH Specifications}
 \usage{
 bfh_save(
   filename,
@@ -16,36 +16,36 @@ bfh_save(
 )
 }
 \arguments{
-\item{filename}{File name to save the plot. Should include extension
-(e.g., "plot.png", "figure.pdf").}
+\item{filename}{File name to save the plot. Include an extension such as
+`"plot.png"` or `"figure.pdf"`.}
 
-\item{plot}{Plot to save. Defaults to last plot displayed.}
+\item{plot}{Plot to save. Defaults to the last displayed plot.}
 
-\item{preset}{Character string specifying a size preset:
-- "report_full": Full-width figure for reports (7x5 inches)
-- "report_half": Half-width figure for reports (3.5x3 inches)
-- "presentation": Standard presentation slide (10x6 inches)
-- "presentation_wide": Widescreen presentation (12x6.75 inches)
-- "square": Square format (6x6 inches)
-- "poster": Large format for posters (12x9 inches)}
+\item{preset}{Character string specifying size presets:
+`"report_full"` (7x5 in), `"report_half"` (3.5x3 in), `"presentation"` (10x6 in),
+`"presentation_wide"` (12x6.75 in), `"square"` (6x6 in), `"poster"` (12x9 in).}
 
-\item{width}{Plot width in units. If specified, overrides preset.}
+\item{width}{Plot width. Overrides `preset` when provided.}
 
-\item{height}{Plot height in units. If specified, overrides preset.}
+\item{height}{Plot height. Overrides `preset` when provided.}
 
-\item{units}{Units for width and height ("in", "cm", "mm", "px"). Default is "in".}
+\item{units}{Units for width/height (`"in"`, `"cm"`, `"mm"`, `"px"`). Defaults to `"in"`.}
 
-\item{dpi}{Resolution in dots per inch. Default is 300 for high quality.}
+\item{dpi}{Resolution in dots per inch. Defaults to 300.}
 
-\item{...}{Additional arguments passed to ggplot2::ggsave()}
+\item{...}{Additional arguments passed to [ggplot2::ggsave()].}
 }
 \value{
-Invisibly returns the filename
+Invisibly returns `filename`.
 }
 \description{
-Convenience function to save ggplot2 plots with recommended dimensions and
-settings for BFH reports and presentations. Wraps ggplot2::ggsave() with
-sensible defaults.
+Wrapper around [ggplot2::ggsave()] that applies BFH-recommended dimensions,
+resolution, and message output for reproducible plot exports.
+}
+\details{
+Use the `preset` argument to quickly match internal communication formats.
+Width/height arguments override presets when supplied. For more control,
+pair with [get_bfh_dimensions()] to retrieve structured size guidance.
 }
 \examples{
 \dontrun{
@@ -61,3 +61,12 @@ bfh_save("my_plot.png", p, preset = "report_full")
 bfh_save("my_plot.pdf", p, width = 8, height = 6, dpi = 600)
 }
 }
+\seealso{
+[get_bfh_dimensions()], [theme_bfh()], [bfh_title_block()]
+
+Other BFH helpers: 
+\code{\link{bfh_combine_plots}()},
+\code{\link{bfh_labs}()},
+\code{\link{get_bfh_dimensions}()}
+}
+\concept{BFH helpers}

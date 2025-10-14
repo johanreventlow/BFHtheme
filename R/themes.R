@@ -7,14 +7,26 @@
 #' BFH ggplot2 Theme
 #'
 #' @description
-#' A complete theme following Bispebjerg og Frederiksberg Hospital visual identity.
-#' This is the main theme for creating professional, consistent plots.
+#' Primary ggplot2 theme aligned with Bispebjerg og Frederiksberg Hospital's
+#' visual identity guidelines. Applies typography, spacing, and layout defaults
+#' that mirror official templates.
+#'
+#' @details
+#' The theme builds on `ggplot2::theme_minimal()` and augments it with
+#' BFH-specific typography via `marquee::element_marquee`, custom axis styling,
+#' and legend placement. When `base_family = NULL` (the default) the best
+#' available BFH font is detected automatically using [get_bfh_font()]. Use
+#' the `base_*` arguments to fine-tune typography while preserving the brand
+#' aesthetic.
 #'
 #' @param base_size Base font size in points. Default is 12.
-#' @param base_family Base font family. Default is "sans".
-#' @param base_line_size Base line size. Default is base_size/22.
-#' @param base_rect_size Base rectangle size. Default is base_size/22.
-#' @return A ggplot2 theme object
+#' @param base_family Base font family. Set to `NULL` (default) to auto-detect a
+#'   BFH approved font via [get_bfh_font()].
+#' @param base_line_size Base line size. Default is `base_size / 22`.
+#' @param base_rect_size Base rectangle size. Default is `base_size / 22`.
+#' @return A [ggplot2::theme] object that can be added to ggplot graphs.
+#' @family BFH themes
+#' @seealso [theme_bfh_minimal()], [theme_bfh_print()], [theme_bfh_presentation()], [theme_bfh_dark()]
 #' @export
 #'
 #' @importFrom ggplot2 theme theme_minimal element_text element_rect element_line element_blank margin rel unit
@@ -108,11 +120,14 @@ theme_bfh <- function(base_size = 12,
 #' BFH Minimal Theme
 #'
 #' @description
-#' A minimal version of theme_bfh with reduced visual elements.
-#' Good for presentations or when you want a cleaner look.
+#' Streamlined variant of [theme_bfh()] with gridlines and axis accents removed.
+#' Useful for dense dashboards or when the visual design should stay unobtrusive.
 #'
 #' @inheritParams theme_bfh
-#' @return A ggplot2 theme object
+#' @details Removes panel grids, axis lines, and tick marks while keeping BFH typography.
+#' @return A [ggplot2::theme] object
+#' @family BFH themes
+#' @seealso [theme_bfh()]
 #' @export
 #' @examples
 #' \dontrun{
@@ -145,11 +160,14 @@ theme_bfh_minimal <- function(base_size = 12,
 #' BFH Print Theme
 #'
 #' @description
-#' Theme optimized for print output with higher contrast and
-#' more prominent elements.
+#' High-contrast rendition of [theme_bfh()] tailored to print production.
+#' Adjusts font defaults, line weights, and colors to remain legible on paper.
 #'
 #' @inheritParams theme_bfh
-#' @return A ggplot2 theme object
+#' @details Increases base size, bolds titles, and darkens grid/axis colors to survive grayscale printing.
+#' @return A [ggplot2::theme] object
+#' @family BFH themes
+#' @seealso [theme_bfh()]
 #' @export
 #' @examples
 #' \dontrun{
@@ -197,7 +215,10 @@ theme_bfh_print <- function(base_size = 14,
 #' higher contrast elements for visibility.
 #'
 #' @inheritParams theme_bfh
-#' @return A ggplot2 theme object
+#' @details Enlarges typographic elements, thickens grid lines, and scales legends for projection screens.
+#' @return A [ggplot2::theme] object
+#' @family BFH themes
+#' @seealso [theme_bfh()]
 #' @export
 #' @examples
 #' \dontrun{
@@ -246,7 +267,10 @@ theme_bfh_presentation <- function(base_size = 16,
 #' when a dark background is preferred.
 #'
 #' @inheritParams theme_bfh
-#' @return A ggplot2 theme object
+#' @details Swaps to dark backgrounds, bright text, and subtle grid lines while preserving spacing.
+#' @return A [ggplot2::theme] object
+#' @family BFH themes
+#' @seealso [theme_bfh()]
 #' @export
 #' @examples
 #' \dontrun{

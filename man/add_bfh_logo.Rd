@@ -2,7 +2,7 @@
 % Please edit documentation in R/branding.R
 \name{add_bfh_logo}
 \alias{add_bfh_logo}
-\title{Add BFH logo to plot}
+\title{Add BFH Logo to a Plot}
 \usage{
 add_bfh_logo(
   plot,
@@ -14,25 +14,32 @@ add_bfh_logo(
 )
 }
 \arguments{
-\item{plot}{A ggplot2 object}
+\item{plot}{A ggplot2 object.}
 
-\item{logo_path}{Path to the logo image file (PNG, JPG, or SVG)}
+\item{logo_path}{Path to a PNG or JPEG logo file.}
 
-\item{position}{Position of logo: "topleft", "topright", "bottomleft", "bottomright"}
+\item{position}{Logo location: `"topleft"`, `"topright"`, `"bottomleft"`, or
+`"bottomright"`. Defaults to `"bottomright"`.}
 
-\item{size}{Relative width of the logo (0-1). Default is 0.1 (10% of plot width).
-Height is automatically calculated to preserve aspect ratio.}
+\item{size}{Relative width of the logo (0–1). Defaults to `0.1` (10% of plot width).
+Height is derived from the image aspect ratio.}
 
-\item{alpha}{Transparency of the logo (0-1). Default is 1 (fully opaque).}
+\item{alpha}{Transparency of the logo (0–1). Defaults to `1` (fully opaque).}
 
-\item{padding}{Padding from the plot edge as a fraction of plot size. Default is 0.02.}
+\item{padding}{Padding from plot edge as a fraction of plot size. Defaults to `0.02`.}
 }
 \value{
-A modified ggplot2 object with the logo
+Modified ggplot2 object with the logo applied.
 }
 \description{
-Adds the Bispebjerg og Frederiksberg Hospital logo to a ggplot2 plot.
-The logo file must be provided by the user.
+Places a Bispebjerg og Frederiksberg Hospital logo onto an existing ggplot,
+preserving the original chart while adding brand context.
+}
+\details{
+The helper reads PNG or JPEG files supplied via `logo_path`. Aspect ratio is
+preserved automatically, and the logo is positioned using absolute
+coordinates based on the selected corner. For packaged logos, see [add_logo()]
+and [get_bfh_logo()].
 }
 \examples{
 \dontrun{
@@ -45,3 +52,14 @@ p <- ggplot(mtcars, aes(wt, mpg)) +
 add_bfh_logo(p, "path/to/bfh_logo.png", position = "topright")
 }
 }
+\seealso{
+[add_logo()], [get_bfh_logo()], [add_bfh_footer()], [add_bfh_color_bar()]
+
+Other BFH branding: 
+\code{\link{add_bfh_color_bar}()},
+\code{\link{add_bfh_footer}()},
+\code{\link{add_logo}()},
+\code{\link{bfh_title_block}()},
+\code{\link{get_bfh_logo}()}
+}
+\concept{BFH branding}

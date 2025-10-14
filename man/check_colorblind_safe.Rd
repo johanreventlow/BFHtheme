@@ -2,16 +2,34 @@
 % Please edit documentation in R/colors.R
 \name{check_colorblind_safe}
 \alias{check_colorblind_safe}
-\title{Check if colors are colorblind-friendly}
+\title{Check Colourblind Friendliness}
 \usage{
-check_colorblind_safe(colors)
+check_colorblind_safe(colors, threshold = 10)
 }
 \arguments{
-\item{colors}{Character vector of hex colors}
+\item{colors}{Character vector of hex colours (`#RRGGBB`) to inspect.}
+
+\item{threshold}{Minimum Delta E (CIE76) required for a pair of colours to be
+considered distinguishable. Defaults to `10`.}
 }
 \value{
-Message about colorblind accessibility
+Invisibly returns a list with summary statistics: `passes` (logical),
+  `threshold`, `summary` (data frame with minimum Delta E per vision type),
+  and `pairwise` (Delta E for each colour pair).
 }
 \description{
-Check if colors are colorblind-friendly
+Evaluates how well a set of colours remains distinguishable under simulated
+colour vision deficiencies (protanopia, deuteranopia, tritanopia) using
+simple LMS transformation matrices and CIE76 Delta E thresholds.
 }
+\seealso{
+[show_bfh_palettes()]
+
+Other BFH colors: 
+\code{\link{bfh_colors}},
+\code{\link{bfh_cols}()},
+\code{\link{bfh_pal}()},
+\code{\link{bfh_palettes}},
+\code{\link{show_bfh_palettes}()}
+}
+\concept{BFH colors}

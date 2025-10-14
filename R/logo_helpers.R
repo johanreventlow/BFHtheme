@@ -1,15 +1,19 @@
-#' Get path to BFH logo
+#' Get Path to the Packaged BFH Logo
 #'
 #' @description
-#' Returns the file path to the BFH logo included with the package.
-#' Multiple variants are available: full color, greyscale, and mark (symbol only).
+#' Retrieves the file path to BFH logo assets bundled with the package.
+#' Variants include full colour, greyscale, and symbol-only marks across
+#' multiple resolutions.
 #'
-#' @param size Character string specifying logo size: "full" (300 DPI), "web" (800px), or "small" (400px).
-#'   Default is "web".
-#' @param variant Character string specifying logo variant: "color" (default), "grey" (greyscale), or
-#'   "mark" (hospital symbol only, without text).
-#' @return Character string with the full path to the logo file
+#' @param size Logo size: `"full"` (print resolution), `"web"` (800 px), or
+#'   `"small"` (400 px). Defaults to `"web"`.
+#' @param variant Logo variant: `"color"` (default), `"grey"` (greyscale), or
+#'   `"mark"` (symbol only).
+#' @return Character string containing the absolute path, or `NULL` if the asset
+#'   is unavailable.
 #' @export
+#' @seealso [add_logo()], [add_bfh_logo()]
+#' @family BFH branding
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -63,21 +67,23 @@ get_bfh_logo <- function(size = "web", variant = "color") {
   return(logo_path)
 }
 
-#' Add BFH logo to plot (convenience wrapper)
+#' Add Packaged BFH Logo to a Plot
 #'
 #' @description
-#' Convenience function that adds the BFH logo from the package to a plot.
-#' This is a wrapper around add_bfh_logo() that automatically uses the
-#' packaged logo. Multiple logo variants are available.
+#' Convenience wrapper around [add_bfh_logo()] that automatically pulls logo
+#' assets from the package via [get_bfh_logo()].
 #'
-#' @param plot A ggplot2 object
-#' @param position Position of logo: "topleft", "topright", "bottomleft", "bottomright"
-#' @param size Relative size of the logo (0-1). Default is 0.15 (15% of plot width).
-#' @param alpha Transparency of the logo (0-1). Default is 0.9.
-#' @param logo_size Logo file size: "full", "web", or "small". Default is "web".
-#' @param variant Logo variant: "color" (default), "grey" (greyscale), or "mark" (symbol only).
-#' @return A modified ggplot2 object with the logo
+#' @param plot A ggplot2 object.
+#' @param position Logo location: `"topleft"`, `"topright"`, `"bottomleft"`, or `"bottomright"`.
+#'   Defaults to `"bottomright"`.
+#' @param size Relative size of the logo (0–1). Defaults to `0.15`.
+#' @param alpha Transparency of the logo (0–1). Defaults to `0.9`.
+#' @param logo_size Logo file size: `"full"`, `"web"`, or `"small"`. Defaults to `"web"`.
+#' @param variant Logo variant: `"color"` (default), `"grey"`, or `"mark"`.
+#' @return Modified ggplot2 object with the logo applied.
 #' @export
+#' @seealso [get_bfh_logo()], [add_bfh_logo()]
+#' @family BFH branding
 #' @examples
 #' \dontrun{
 #' library(ggplot2)

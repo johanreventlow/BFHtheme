@@ -18,27 +18,51 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-BFHtheme provides comprehensive theming support for ggplot2 graphics following Bispebjerg og Frederiksberg Hospital and Region Hovedstaden visual identity guidelines. The package includes color palettes, themes, scale functions, and helper utilities for creating consistent and professional visualizations.
+BFHtheme streamlines the process of producing ggplot2 graphics that follow the
+visual identity for Bispebjerg og Frederiksberg Hospital and Region
+Hovedstaden. The package bundles branded themes, colour palettes, scales, and
+workflow helpers that keep your plots on-brand with minimal effort.
+
+In this vignette you will learn how to:
+
+- install and load the package,
+- apply the core BFH theme and colour scales,
+- explore the available palettes and theme variants,
+- set global defaults for a session, and
+- save or export plots using BFH-recommended dimensions.
+
+| Task | Helpful functions |
+| --- | --- |
+| Apply the default styling | `theme_bfh()` |
+| Use branded colour scales | `scale_color_bfh()`, `scale_fill_bfh()` |
+| Manage fonts and defaults | `set_bfh_defaults()`, `set_bfh_fonts()` |
+| Browse colours and palettes | `bfh_cols()`, `show_bfh_palettes()` |
+| Export figures | `bfh_save()`, `get_bfh_dimensions()` |
 
 ## Installation
 
-Install from GitHub:
+BFHtheme is currently distributed via GitHub. Install the package with
+`devtools` or `remotes` and then load it alongside ggplot2:
 
 ```{r eval=FALSE}
-# install.packages("devtools")
-devtools::install_github("johanreventlow/BFHtheme")
+# install.packages("remotes")
+remotes::install_github("johanreventlow/BFHtheme")
+```
+
+```{r load-packages, message=FALSE}
+library(BFHtheme)
+library(ggplot2)
 ```
 
 ## Basic Usage
 
 ### Applying a Theme
 
-The primary function is `theme_bfh()`, which applies the complete BFH visual identity to your plots.
+Start by adding `theme_bfh()` to any ggplot. It injects BFH typography,
+spacing, and colour defaults while leaving your existing geoms untouched.
+Fonts are auto-detected the first time you call the theme.
 
 ```{r basic-theme, message=FALSE}
-library(BFHtheme)
-library(ggplot2)
-
 ggplot(mtcars, aes(x = wt, y = mpg)) +
   geom_point() +
   labs(
@@ -49,9 +73,10 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
   theme_bfh()
 ```
 
-### Using Color Scales
+### Using Colour Scales
 
-For plots with discrete color mappings, use `scale_color_bfh()` or `scale_fill_bfh()`:
+Pair the theme with branded colour scales. Use the discrete variants when
+mapping factors and the continuous versions for numeric gradients.
 
 ```{r color-scales, message=FALSE}
 ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
@@ -66,7 +91,9 @@ ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
   theme_bfh()
 ```
 
-For continuous color mappings, use the continuous variants:
+`scale_fill_bfh()` works the same way for fills (bars, areas, etc.).
+
+For continuous colour mappings, switch to the gradient helpers:
 
 ```{r continuous-colors, message=FALSE}
 ggplot(mtcars, aes(x = wt, y = mpg, color = hp)) +
@@ -81,24 +108,28 @@ ggplot(mtcars, aes(x = wt, y = mpg, color = hp)) +
   theme_bfh()
 ```
 
-### Available Color Palettes
+The `palette` argument controls which sequential palette is used. Reverse the
+direction with `reverse = TRUE` when needed for visual clarity.
 
-The package includes several predefined color palettes:
+### Available Colour Palettes
+
+Use `show_bfh_palettes()` to preview every palette side by side:
 
 ```{r show-palettes, eval=FALSE}
 # Display all available palettes
 show_bfh_palettes()
 ```
 
-Main palettes:
+| Palette | Description | Recommended for |
+| --- | --- | --- |
+| `main` | Core hospital colours | Default discrete scales |
+| `hospital` | Full Bispebjerg & Frederiksberg Hospital palette | Hospital reports |
+| `hospital_blues` / `hospital_blues_seq` | Monochrome blue gradients | Continuous hospital data |
+| `regionh` | Region Hovedstaden primaries | Region-level reporting |
+| `regionh_blues` / `regionh_blues_seq` | Navy-focused gradients | Region dashboards |
+| `hospital_infographic`, `regionh_infographic` | High-contrast mixes | Infographics and slides |
 
-- `main`: Default hospital palette with primary colors
-- `hospital`: Bispebjerg og Frederiksberg Hospital colors
-- `hospital_blues`: Sequential blue palette for hospital
-- `regionh`: Region Hovedstaden primary colors
-- `regionh_blues`: Sequential blue palette for Region H
-
-Access individual colors:
+Access individual colours programmatically:
 
 ```{r colors}
 # Get specific colors
@@ -114,6 +145,8 @@ BFHtheme provides several theme variants for different use cases:
 
 ### Standard Theme
 
+`theme_bfh()` is the all-purpose choice for reports and dashboards.
+
 ```{r theme-standard, message=FALSE}
 ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
   geom_bar() +
@@ -124,7 +157,8 @@ ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
 
 ### Minimal Theme
 
-For presentations or when a cleaner look is preferred:
+Remove gridlines and axis accents with `theme_bfh_minimal()` whenever you want
+the data ink to stand out.
 
 ```{r theme-minimal, message=FALSE}
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -135,7 +169,8 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 
 ### Print Theme
 
-Optimized for print output with higher contrast:
+`theme_bfh_print()` increases contrast, line weights, and title emphasis so
+graphics survive grayscale printing.
 
 ```{r theme-print, message=FALSE}
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -146,7 +181,7 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 
 ### Presentation Theme
 
-Larger text and elements for visibility in presentations:
+`theme_bfh_presentation()` scales typography and legends for projector use.
 
 ```{r theme-presentation, message=FALSE}
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -157,7 +192,8 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 
 ### Dark Theme
 
-For dark backgrounds:
+Use `theme_bfh_dark()` when presenting on dark backgrounds or embedding plots
+in night-mode dashboards.
 
 ```{r theme-dark, message=FALSE}
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -168,7 +204,9 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 
 ## Setting Global Defaults
 
-To avoid adding `theme_bfh()` to every plot, set it as the default theme:
+Call `set_bfh_defaults()` at the start of a session to make BFH styling the
+global ggplot2 default. This updates the active theme and seed colours for
+common geoms.
 
 ```{r defaults, eval=FALSE}
 # Set BFH theme and colors as defaults
@@ -187,9 +225,12 @@ ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
 reset_bfh_defaults()
 ```
 
+Remember to reset the defaults before working on non-BFH projects.
+
 ## Saving Plots
 
-Use `bfh_save()` for consistent dimensions:
+`bfh_save()` wraps `ggplot2::ggsave()` with BFH-friendly presets so exported
+figures drop straight into reports and slides.
 
 ```{r save-plot, eval=FALSE}
 p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -199,34 +240,36 @@ p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
 # Save with preset dimensions
 bfh_save("plot.png", p, preset = "report_full")
 
-# Available presets:
-# - report_full: 7x5 inches (full-width figure)
-# - report_half: 3.5x3 inches (half-width figure)
-# - presentation: 10x6 inches (standard slide)
-# - presentation_wide: 12x6.75 inches (widescreen)
-# - square: 6x6 inches
-# - poster: 12x9 inches
-
 # Custom dimensions
 bfh_save("plot.pdf", p, width = 8, height = 6, dpi = 600)
 ```
 
+Inspect the recommended sizes programmatically:
+
+```{r dimensions, eval=FALSE}
+get_bfh_dimensions("presentation", "wide")
+```
+
 ## Font Configuration
 
-BFHtheme automatically detects and uses the best available font. Priority order:
+Consistent typography is central to the BFH visual language. The package
+detects the best available font in this order:
 
-1. Mari (BFH official font, installed on employee PCs)
+1. Mari (official BFH font installed on hospital machines)
 2. Roboto (open-source alternative)
 3. Arial (universal fallback)
-4. sans (system fallback)
+4. A system sans-serif font
 
-Check font availability:
+Check which fonts are available on your machine:
 
 ```{r fonts, eval=FALSE}
 check_bfh_fonts()
 ```
 
-Manual font setup:
+If you install new fonts during a session, run `clear_bfh_font_cache()` or call
+`get_bfh_font(force_refresh = TRUE)` to re-detect them.
+
+Set up fonts and update ggplot defaults in one go:
 
 ```{r font-setup, eval=FALSE}
 # Setup and enable fonts
@@ -236,8 +279,10 @@ setup_bfh_fonts()
 set_bfh_fonts()
 ```
 
-## Next Steps
+Need Roboto? `install_roboto_font()` prints step-by-step installation guidance.
 
-- See `vignette("customization")` for advanced customization options
-- See `vignette("theming")` for multi-hospital branding configuration
-- Check function documentation with `?theme_bfh` or `?scale_color_bfh`
+## Where to Next
+
+- Deepen your workflow in `vignette("customization")` (advanced theme tweaks, palettes, and layout helpers).
+- Configure organisation-specific branding with `vignette("theming")`.
+- Browse documentation for individual helpers using `help(package = "BFHtheme")` or `?theme_bfh`.

@@ -1,21 +1,30 @@
-#' Add BFH logo to plot
+#' Add BFH Logo to a Plot
 #'
 #' @description
-#' Adds the Bispebjerg og Frederiksberg Hospital logo to a ggplot2 plot.
-#' The logo file must be provided by the user.
+#' Places a Bispebjerg og Frederiksberg Hospital logo onto an existing ggplot,
+#' preserving the original chart while adding brand context.
 #'
-#' @param plot A ggplot2 object
-#' @param logo_path Path to the logo image file (PNG, JPG, or SVG)
-#' @param position Position of logo: "topleft", "topright", "bottomleft", "bottomright"
-#' @param size Relative width of the logo (0-1). Default is 0.1 (10% of plot width).
-#'   Height is automatically calculated to preserve aspect ratio.
-#' @param alpha Transparency of the logo (0-1). Default is 1 (fully opaque).
-#' @param padding Padding from the plot edge as a fraction of plot size. Default is 0.02.
-#' @return A modified ggplot2 object with the logo
+#' @details
+#' The helper reads PNG or JPEG files supplied via `logo_path`. Aspect ratio is
+#' preserved automatically, and the logo is positioned using absolute
+#' coordinates based on the selected corner. For packaged logos, see [add_logo()]
+#' and [get_bfh_logo()].
+#'
+#' @param plot A ggplot2 object.
+#' @param logo_path Path to a PNG or JPEG logo file.
+#' @param position Logo location: `"topleft"`, `"topright"`, `"bottomleft"`, or
+#'   `"bottomright"`. Defaults to `"bottomright"`.
+#' @param size Relative width of the logo (0–1). Defaults to `0.1` (10% of plot width).
+#'   Height is derived from the image aspect ratio.
+#' @param alpha Transparency of the logo (0–1). Defaults to `1` (fully opaque).
+#' @param padding Padding from plot edge as a fraction of plot size. Defaults to `0.02`.
+#' @return Modified ggplot2 object with the logo applied.
 #' @export
 #'
 #' @importFrom ggplot2 annotation_custom coord_cartesian theme margin annotate labs
 #' @importFrom grid rectGrob textGrob grobTree gpar unit rasterGrob
+#' @seealso [add_logo()], [get_bfh_logo()], [add_bfh_footer()], [add_bfh_color_bar()]
+#' @family BFH branding
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -73,33 +82,39 @@ add_bfh_logo <- function(plot,
     stop("padding must be a number between 0 and 1", call. = FALSE)
   }
 
+  logo_type <- detect_logo_image_type(normalized_path, file_info$size)
+
   if (!requireNamespace("png", quietly = TRUE) &&
       !requireNamespace("jpeg", quietly = TRUE)) {
     warning("Packages 'png' and/or 'jpeg' recommended for image support.")
   }
 
-  # Read the image using normalized path
-  if (grepl("\\.png$", normalized_path, ignore.case = TRUE)) {
-    if (!requireNamespace("png", quietly = TRUE)) {
-      stop("Package 'png' is required to read PNG files. Install with: install.packages('png')", call. = FALSE)
-    }
-    logo <- tryCatch({
-      png::readPNG(normalized_path)
-    }, error = function(e) {
-      stop("Failed to read PNG file: ", e$message, call. = FALSE)
-    })
-  } else if (grepl("\\.(jpg|jpeg)$", normalized_path, ignore.case = TRUE)) {
-    if (!requireNamespace("jpeg", quietly = TRUE)) {
-      stop("Package 'jpeg' is required to read JPEG files. Install with: install.packages('jpeg')", call. = FALSE)
-    }
-    logo <- tryCatch({
-      jpeg::readJPEG(normalized_path)
-    }, error = function(e) {
-      stop("Failed to read JPEG file: ", e$message, call. = FALSE)
-    })
-  } else {
-    stop("Logo must be a PNG or JPEG file", call. = FALSE)
-  }
+  logo <- switch(
+    logo_type,
+    png = {
+      if (!requireNamespace("png", quietly = TRUE)) {
+        stop("Package 'png' is required to read PNG files. Install with: install.packages('png')", call. = FALSE)
+      }
+      tryCatch(
+        png::readPNG(normalized_path),
+        error = function(e) {
+          stop("Failed to read PNG file: ", e$message, call. = FALSE)
+        }
+      )
+    },
+    jpeg = {
+      if (!requireNamespace("jpeg", quietly = TRUE)) {
+        stop("Package 'jpeg' is required to read JPEG files. Install with: install.packages('jpeg')", call. = FALSE)
+      }
+      tryCatch(
+        jpeg::readJPEG(normalized_path),
+        error = function(e) {
+          stop("Failed to read JPEG file: ", e$message, call. = FALSE)
+        }
+      )
+    },
+    stop("Logo file must be a valid PNG or JPEG image", call. = FALSE)
+  )
 
   # Beregn aspect ratio for at bevare logoets proportioner
   # Logo array har dimensioner [height, width, channels] eller [height, width]
@@ -154,19 +169,62 @@ add_bfh_logo <- function(plot,
     ggplot2::coord_cartesian(clip = "off")
 }
 
-#' Add BFH footer to plot
+#' @keywords internal
+#' @noRd
+detect_logo_image_type <- function(path, file_size) {
+  con <- file(path, "rb")
+  on.exit(close(con), add = TRUE)
+
+  header <- readBin(con, what = "raw", n = min(12L, file_size))
+  if (length(header) == 0) {
+    stop("Logo file must be a valid PNG or JPEG image", call. = FALSE)
+  }
+
+  png_signature <- charToRaw("\x89PNG\r\n\x1a\n")
+  if (length(header) >= length(png_signature) &&
+      identical(header[seq_along(png_signature)], png_signature)) {
+    return("png")
+  }
+
+  # JPEG files should start with FF D8 and end with FF D9
+  if (length(header) >= 2 &&
+      header[1] == as.raw(0xff) &&
+      header[2] == as.raw(0xd8)) {
+    if (file_size < 4) {
+      stop("Logo file must be a valid PNG or JPEG image", call. = FALSE)
+    }
+    seek(con, where = file_size - 2, origin = "start")
+    trailer <- readBin(con, what = "raw", n = 2)
+    if (length(trailer) == 2 &&
+        trailer[1] == as.raw(0xff) &&
+        trailer[2] == as.raw(0xd9)) {
+      return("jpeg")
+    }
+  }
+
+  stop("Logo file must be a valid PNG or JPEG image", call. = FALSE)
+}
+
+#' Add BFH Footer to a Plot
 #'
 #' @description
-#' Adds a footer with BFH branding information to the plot.
-#' Useful for adding contact information or copyright notices.
+#' Appends a coloured footer bar with optional text, ideal for credits or
+#' contact details in BFH-branded material.
 #'
-#' @param plot A ggplot2 object
-#' @param text Footer text. If NULL, uses default BFH text.
-#' @param color Color of the footer bar. Default is BFH primary blue.
-#' @param text_color Color of the footer text. Default is white.
-#' @param height Height of the footer as fraction of plot. Default is 0.05.
-#' @return A modified ggplot2 object with footer
+#' @details
+#' The footer spans the width of the plot. Provide `text = NULL` to fall back to
+#' a default hospital identifier. Adjust `height` (0–1) to control the bar
+#' thickness relative to the plotting area.
+#'
+#' @param plot A ggplot2 object.
+#' @param text Footer text. Defaults to `"Bispebjerg og Frederiksberg Hospital"`.
+#' @param color Footer background colour. Defaults to `bfh_cols("hospital_primary")`.
+#' @param text_color Text colour. Defaults to `"white"`.
+#' @param height Footer height as a fraction of the plotting area. Defaults to `0.05`.
+#' @return ggplot2 object with the footer applied.
 #' @export
+#' @seealso [add_bfh_logo()], [add_bfh_color_bar()], [bfh_title_block()]
+#' @family BFH branding
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -218,17 +276,24 @@ add_bfh_footer <- function(plot,
     ggplot2::theme(plot.margin = ggplot2::margin(b = height * 100, unit = "pt"))
 }
 
-#' Create a branded title block
+#' Create a Branded Title Block
 #'
 #' @description
-#' Creates a formatted title block with BFH branding colors.
-#' Returns a list of ggplot2 labs() elements.
+#' Generates a reusable set of labels for BFH-styled titles, subtitles, and
+#' captions.
 #'
-#' @param title Main title text
-#' @param subtitle Subtitle text (optional)
-#' @param caption Caption text (optional)
-#' @return A ggplot2 labs() object
+#' @details
+#' Pair with [bfh_labs()] for automatic uppercase conversion or add the result
+#' directly to ggplot objects. Use `NULL` for optional arguments you want to
+#' omit.
+#'
+#' @param title Main title text.
+#' @param subtitle Optional subtitle text.
+#' @param caption Optional caption text.
+#' @return A [ggplot2::labs] object.
 #' @export
+#' @seealso [bfh_labs()], [theme_bfh()], [add_bfh_footer()]
+#' @family BFH branding
 #' @examples
 #' \dontrun{
 #' library(ggplot2)

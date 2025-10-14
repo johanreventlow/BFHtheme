@@ -18,28 +18,47 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-BFHtheme supports branding for both Bispebjerg og Frederiksberg Hospital and Region Hovedstaden (koncern level). This vignette demonstrates how to work with different organizational branding requirements.
+BFHtheme supports both Bispebjerg og Frederiksberg Hospital and Region
+Hovedstaden branding. This vignette shows how to choose palettes, scales, and
+defaults that match the audience for each deliverable.
+
+You will learn how to:
+
+- access the hospital and regional colour systems,
+- apply sequential and infographic palettes,
+- switch defaults on the fly between organisations,
+- ensure accessibility and departmental consistency,
+- and document branding choices for multi-site reporting.
+
+| Need | Hospital focus | Region focus |
+| --- | --- | --- |
+| Core discrete palette | `palette = "hospital"` | `palette = "regionh"` |
+| Sequential gradients | `"hospital_blues_seq"` | `"regionh_blues_seq"` |
+| Infographics / many categories | `"hospital_infographic"` | `"regionh_infographic"` |
+| Default session styling | `set_bfh_defaults(palette = "hospital")` | `set_bfh_defaults(palette = "regionh")` |
 
 ```{r load, message=FALSE}
 library(BFHtheme)
 library(ggplot2)
 ```
 
-## Organizational Color Palettes
+## Organisational Colour Palettes
 
 ### Bispebjerg og Frederiksberg Hospital
 
-The hospital-level branding uses blue as the primary color:
+Hospital-level materials emphasise bright blues with light neutrals. Use these
+palettes for BFH internal reports, departmental dashboards, and patient-facing
+content.
 
 ```{r hospital-colors}
-# Access hospital colors
+# Access hospital colours
 hospital_primary <- bfh_cols("hospital_primary")
 hospital_blue <- bfh_cols("hospital_blue")
 
 print(hospital_primary)
 print(hospital_blue)
 
-# View all hospital colors
+# View all hospital colours
 hospital_palette <- bfh_cols(
   "hospital_primary",
   "hospital_blue",
@@ -50,7 +69,7 @@ hospital_palette <- bfh_cols(
 print(hospital_palette)
 ```
 
-Use hospital palettes in plots:
+Apply the hospital palette to discrete fills:
 
 ```{r hospital-plot}
 ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
@@ -66,17 +85,17 @@ ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
 
 ### Region Hovedstaden
 
-The regional branding uses navy blue as the primary color:
+Region-level communications lean on a deeper navy and cool neutrals.
 
 ```{r regionh-colors}
-# Access Region H colors
+# Access Region H colours
 regionh_primary <- bfh_cols("regionh_primary")
 regionh_blue <- bfh_cols("regionh_blue")
 
 print(regionh_primary)
 print(regionh_blue)
 
-# View all Region H colors
+# View all Region H colours
 regionh_palette <- bfh_cols(
   "regionh_primary",
   "regionh_blue",
@@ -87,7 +106,7 @@ regionh_palette <- bfh_cols(
 print(regionh_palette)
 ```
 
-Use Region H palettes in plots:
+Switch to the Region H palette when preparing cross-hospital material:
 
 ```{r regionh-plot}
 ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
@@ -105,7 +124,8 @@ ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
 
 ### Hospital Sequential Palettes
 
-For data visualizations requiring sequential color scales:
+For visualisations that map magnitude or rank, use the hospital sequential
+palettes:
 
 ```{r hospital-sequential}
 # Create sample data
@@ -122,6 +142,9 @@ ggplot(data, aes(x = x, y = y, fill = z)) +
 
 ### Region H Sequential Palettes
 
+Regional gradients emphasise the darker navy tones while maintaining legible
+steps for heatmaps and surface plots.
+
 ```{r regionh-sequential}
 ggplot(data, aes(x = x, y = y, fill = z)) +
   geom_tile() +
@@ -132,7 +155,8 @@ ggplot(data, aes(x = x, y = y, fill = z)) +
 
 ## Infographic Palettes
 
-For presentations and infographics with multiple distinct categories:
+Use infographic palettes when you need many clearly differentiated categories.
+They balance the brand primaries with supportive neutrals.
 
 ### Hospital Infographic Palette
 
@@ -147,7 +171,7 @@ ggplot(category_data, aes(x = reorder(category, value), y = value, fill = catego
   geom_col() +
   coord_flip() +
   labs(
-    title = "Hospital Infographic Colors",
+    title = "Hospital Infographic Colours",
     x = "Category",
     y = "Value"
   ) +
@@ -163,7 +187,7 @@ ggplot(category_data, aes(x = reorder(category, value), y = value, fill = catego
   geom_col() +
   coord_flip() +
   labs(
-    title = "Region H Infographic Colors",
+    title = "Region H Infographic Colours",
     x = "Category",
     y = "Value"
   ) +
@@ -172,15 +196,15 @@ ggplot(category_data, aes(x = reorder(category, value), y = value, fill = catego
   theme(legend.position = "none")
 ```
 
-## Combining Organizational Branding
+## Combining Organisational Branding
 
 ### Consistent Theme with Different Palettes
 
-Use the same theme structure across organizations with different color schemes:
+Use the same theme structure across organisations while swapping palettes:
 
 ```{r combined-hospital}
 # Hospital version
-p_hospital <- ggplot(mtcars, aes(x = wt, y = mpg, color = hp)) +
+p_hospital <- ggplot(mtcars, aes(x = wt, y = mpg, colour = hp)) +
   geom_point(size = 3) +
   labs(
     title = "Hospital Analysis",
@@ -194,7 +218,7 @@ print(p_hospital)
 
 ```{r combined-regionh}
 # Region H version
-p_regionh <- ggplot(mtcars, aes(x = wt, y = mpg, color = hp)) +
+p_regionh <- ggplot(mtcars, aes(x = wt, y = mpg, colour = hp)) +
   geom_point(size = 3) +
   labs(
     title = "Region Hovedstaden Analysis",
@@ -208,13 +232,13 @@ print(p_regionh)
 
 ### Setting Default Palette
 
-Set organizational defaults for a session:
+Set organisational defaults for a session:
 
 ```{r defaults-hospital, eval=FALSE}
 # Set hospital as default
 set_bfh_defaults(palette = "hospital")
 
-# All subsequent plots use hospital colors
+# All subsequent plots use hospital colours
 ggplot(mtcars, aes(x = factor(cyl))) +
   geom_bar()
 ```
@@ -223,12 +247,12 @@ ggplot(mtcars, aes(x = factor(cyl))) +
 # Switch to Region H defaults
 set_bfh_defaults(palette = "regionh")
 
-# All subsequent plots use Region H colors
+# All subsequent plots use Region H colours
 ggplot(mtcars, aes(x = factor(cyl))) +
   geom_bar()
 ```
 
-## Color Accessibility
+## Colour Accessibility
 
 ### Contrast and Readability
 
@@ -237,18 +261,18 @@ Both hospital and Region H palettes are designed for adequate contrast:
 ```{r contrast}
 # Hospital primary on white background
 ggplot(mtcars, aes(x = wt, y = mpg)) +
-  geom_point(color = bfh_cols("hospital_primary"), size = 3) +
-  labs(title = "Hospital Primary Color") +
+  geom_point(colour = bfh_cols("hospital_primary"), size = 3) +
+  labs(title = "Hospital Primary Colour") +
   theme_bfh()
 
 # Region H primary on white background
 ggplot(mtcars, aes(x = wt, y = mpg)) +
-  geom_point(color = bfh_cols("regionh_primary"), size = 3) +
-  labs(title = "Region H Primary Color") +
+  geom_point(colour = bfh_cols("regionh_primary"), size = 3) +
+  labs(title = "Region H Primary Colour") +
   theme_bfh()
 ```
 
-### Colorblind Considerations
+### Colourblind Considerations
 
 Check palette accessibility:
 
@@ -256,7 +280,7 @@ Check palette accessibility:
 # Basic check
 check_colorblind_safe(bfh_cols("hospital_primary", "hospital_blue"))
 
-# For comprehensive testing, use specialized packages
+# For comprehensive testing, use specialised packages
 # install.packages("colorblindcheck")
 library(colorblindcheck)
 
@@ -266,14 +290,14 @@ palette_check(
 )
 ```
 
-## Customizing for Specific Departments
+## Customising for Specific Departments
 
-### Department-Specific Colors
+### Department-Specific Colours
 
-Extend the color system for department use:
+Extend the colour system for department use:
 
 ```{r department-colors}
-# Define department colors using base palette
+# Define department colours using base palette
 dept_emergency <- bfh_cols("hospital_primary")
 dept_surgery <- bfh_cols("hospital_blue")
 dept_pediatrics <- bfh_cols("hospital_light_blue1")
@@ -306,7 +330,8 @@ ggplot(dept_data, aes(x = department, y = patients, fill = department)) +
 
 ### Comparing Data Across Sites
 
-Maintain consistent styling when comparing multiple sites:
+Maintain consistent styling when comparing multiple sites by mapping each site
+to a predefined brand colour:
 
 ```{r multi-site}
 # Sample multi-site data
@@ -320,16 +345,16 @@ site_data <- data.frame(
   )
 )
 
-ggplot(site_data, aes(x = quarter, y = value, group = site, color = site)) +
+ggplot(site_data, aes(x = quarter, y = value, group = site, colour = site)) +
   geom_line(linewidth = 1) +
   geom_point(size = 3) +
   labs(
     title = "Quarterly Performance Across Sites",
     x = "Quarter",
     y = "Performance Score",
-    color = "Site"
+    colour = "Site"
   ) +
-  scale_color_manual(
+  scale_colour_manual(
     values = c(
       "BFH" = bfh_cols("hospital_primary"),
       "Rigshospitalet" = bfh_cols("regionh_primary"),
@@ -341,10 +366,10 @@ ggplot(site_data, aes(x = quarter, y = value, group = site, color = site)) +
 
 ## Brand Guidelines Reference
 
-### Hospital Colors
+### Hospital Colours
 
 **Primary**: `hospital_primary` (#007dbb)
-- Use: Main brand color, primary data series
+- Use: Main brand colour, primary data series
 - Usage: Headers, primary chart elements
 
 **Secondary**: `hospital_blue` (#009ce8)
@@ -359,10 +384,10 @@ ggplot(site_data, aes(x = quarter, y = value, group = site, color = site)) +
 - Use: Text, borders, secondary information
 - Usage: Axis labels, grid lines
 
-### Region Hovedstaden Colors
+### Region Hovedstaden Colours
 
 **Primary**: `regionh_primary` (#002555)
-- Use: Main brand color for regional reporting
+- Use: Main brand colour for regional reporting
 - Usage: Headers, primary emphasis
 
 **Secondary**: `regionh_blue` (#007dbb)
@@ -399,12 +424,12 @@ ggplot(site_data, aes(x = quarter, y = value, group = site, color = site)) +
 2. Maintain consistent palette choice across related documents
 3. Use infographic palettes for categorical data with many groups
 4. Use sequential palettes for continuous data
-5. Test color combinations for accessibility
+5. Test colour combinations for accessibility
 6. Document palette choice in analysis scripts
 
 ## Next Steps
 
 - See `vignette("getting-started")` for basic usage patterns
 - See `vignette("customization")` for advanced options
-- Review organizational brand guidelines for detailed specifications
-- Check `?bfh_cols` and `?bfh_palettes` for complete color reference
+- Review organisational brand guidelines for detailed specifications
+- Check `?bfh_cols` and `?bfh_palettes` for complete colour reference

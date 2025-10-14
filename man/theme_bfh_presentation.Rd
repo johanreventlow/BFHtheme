@@ -14,18 +14,22 @@ theme_bfh_presentation(
 \arguments{
 \item{base_size}{Base font size in points. Default is 12.}
 
-\item{base_family}{Base font family. Default is "sans".}
+\item{base_family}{Base font family. Set to `NULL` (default) to auto-detect a
+BFH approved font via [get_bfh_font()].}
 
-\item{base_line_size}{Base line size. Default is base_size/22.}
+\item{base_line_size}{Base line size. Default is `base_size / 22`.}
 
-\item{base_rect_size}{Base rectangle size. Default is base_size/22.}
+\item{base_rect_size}{Base rectangle size. Default is `base_size / 22`.}
 }
 \value{
-A ggplot2 theme object
+A [ggplot2::theme] object
 }
 \description{
 Theme optimized for presentations with larger text and
 higher contrast elements for visibility.
+}
+\details{
+Enlarges typographic elements, thickens grid lines, and scales legends for projection screens.
 }
 \examples{
 \dontrun{
@@ -35,3 +39,13 @@ ggplot(mtcars, aes(wt, mpg)) +
   theme_bfh_presentation()
 }
 }
+\seealso{
+[theme_bfh()]
+
+Other BFH themes: 
+\code{\link{theme_bfh}()},
+\code{\link{theme_bfh_dark}()},
+\code{\link{theme_bfh_minimal}()},
+\code{\link{theme_bfh_print}()}
+}
+\concept{BFH themes}

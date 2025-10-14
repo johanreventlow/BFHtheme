@@ -3,7 +3,7 @@
 \docType{data}
 \name{bfh_palettes}
 \alias{bfh_palettes}
-\title{BFH Color Palettes (named list)}
+\title{BFH Color Palettes (Named List)}
 \format{
 An object of class \code{list} of length 16.
 }
@@ -11,7 +11,23 @@ An object of class \code{list} of length 16.
 bfh_palettes
 }
 \description{
-Predefined color palettes for different types of visualizations.
-Includes palettes for both Hospital and Region Hovedstaden (koncern) branding.
+Predefined discrete and sequential palettes covering hospital, regional, and
+legacy BFH use cases. Palettes are sourced from [bfh_colors].
 }
+\details{
+The list is structured for use with [bfh_pal()] and the `scale_*_bfh*()`
+helpers. Palettes ending in `"_seq"` are suited for continuous scales while
+the rest target categorical data and infographics.
+}
+\seealso{
+[bfh_pal()], [show_bfh_palettes()], [scale_color_bfh()]
+
+Other BFH colors: 
+\code{\link{bfh_colors}},
+\code{\link{bfh_cols}()},
+\code{\link{bfh_pal}()},
+\code{\link{check_colorblind_safe}()},
+\code{\link{show_bfh_palettes}()}
+}
+\concept{BFH colors}
 \keyword{datasets}

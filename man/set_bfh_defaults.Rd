@@ -2,7 +2,7 @@
 % Please edit documentation in R/defaults.R
 \name{set_bfh_defaults}
 \alias{set_bfh_defaults}
-\title{Set BFH defaults for ggplot2}
+\title{Set BFH Defaults for ggplot2}
 \usage{
 set_bfh_defaults(
   theme = "bfh",
@@ -12,29 +12,31 @@ set_bfh_defaults(
 )
 }
 \arguments{
-\item{theme}{Character name of the BFH theme to use as default.
-Options: "bfh", "bfh_minimal", "bfh_print", "bfh_presentation", "bfh_dark".
-Default is "bfh".}
+\item{theme}{Character name of the BFH theme to adopt. Valid choices are
+`"bfh"`, `"bfh_minimal"`, `"bfh_print"`, `"bfh_presentation"`, and
+`"bfh_dark"`. Defaults to `"bfh"`.}
 
-\item{palette}{Character name of the default color palette used for geom defaults.
-Default is "main".}
+\item{palette}{Character name of the palette from [bfh_palettes] used to seed
+geom defaults. Defaults to `"main"`.}
 
-\item{base_size}{Base font size for the theme. Default is 12.}
+\item{base_size}{Base font size for the theme. Defaults to 12.}
 
-\item{base_family}{Base font family for the theme. If NULL (default),
-automatically detects best available BFH font (Mari, Roboto, Arial, or sans).}
+\item{base_family}{Base font family. Use `NULL` (default) to auto-detect with
+[get_bfh_font()].}
 }
 \value{
-Invisibly returns TRUE after setting defaults
+Invisibly returns `TRUE` after the defaults have been applied.
 }
 \description{
-Sets default BFH theme and geom colors for all plots in the current session.
-This function modifies the global ggplot2 theme and updates default colors
-for common geoms (point, line, bar, etc.).
-
-**Note:** This function does NOT set default color/fill scales for aesthetic
-mappings. If you use `aes(color = ...)` or `aes(fill = ...)`, you must
-manually add `scale_color_bfh()` or `scale_fill_bfh()` to your plots.
+Applies a BFH theme globally and updates default geom colours for the current
+R session. Ideal for scripts or reports where every plot should inherit BFH
+styling without repeated boilerplate.
+}
+\details{
+The function calls [ggplot2::theme_set()] with the selected BFH theme and
+updates default aesthetics for commonly used geoms (points, lines, bars, and
+more). Colour/fill scales are not altered automatically—continue to add
+`scale_*_bfh()` when mapping aesthetics.
 }
 \examples{
 \dontrun{
@@ -55,3 +57,11 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 set_bfh_defaults(theme = "bfh_minimal", palette = "blues")
 }
 }
+\seealso{
+[reset_bfh_defaults()], [apply_bfh_theme()], [set_bfh_fonts()]
+
+Other BFH defaults: 
+\code{\link{apply_bfh_theme}()},
+\code{\link{reset_bfh_defaults}()}
+}
+\concept{BFH defaults}

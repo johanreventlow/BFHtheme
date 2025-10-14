@@ -4,7 +4,7 @@
 \alias{scale_fill_bfh_continuous}
 \alias{scale_color_bfh_continuous}
 \alias{scale_colour_bfh_continuous}
-\title{Continuous color scales using specific BFH palettes}
+\title{Continuous colour scales using specific BFH palettes}
 \usage{
 scale_fill_bfh_continuous(palette = "blues", reverse = FALSE, ...)
 
@@ -13,14 +13,14 @@ scale_color_bfh_continuous(palette = "blues", reverse = FALSE, ...)
 scale_colour_bfh_continuous(palette = "blues", reverse = FALSE, ...)
 }
 \arguments{
-\item{palette}{Character name of palette in bfh_palettes}
+\item{palette}{Character name of a palette in [bfh_palettes()].}
 
-\item{reverse}{Boolean indicating whether the palette should be reversed}
+\item{reverse}{Logical; reverse palette direction? Defaults to `FALSE`.}
 
-\item{...}{Additional arguments passed to scale_color_gradientn()}
+\item{...}{Additional arguments passed to [ggplot2::scale_color_gradientn()].}
 }
 \description{
-Continuous color scales using specific BFH palettes
+Continuous colour scales using specific BFH palettes
 }
 \examples{
 \dontrun{
@@ -30,3 +30,11 @@ ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
   scale_fill_bfh_continuous(palette = "blues")
 }
 }
+\seealso{
+[scale_color_bfh()], [bfh_pal()]
+
+Other BFH scales: 
+\code{\link{scale_bfh}},
+\code{\link{scale_fill_bfh_discrete}()}
+}
+\concept{BFH scales}

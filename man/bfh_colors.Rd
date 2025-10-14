@@ -3,15 +3,33 @@
 \docType{data}
 \name{bfh_colors}
 \alias{bfh_colors}
-\title{BFH Color Palettes}
+\title{BFH Brand Color Definitions}
 \format{
-Named character vectors with hex color codes
+A named character vector where each element is a hex color code.
 }
 \usage{
 bfh_colors
 }
 \description{
-Color palettes for Bispebjerg og Frederiksberg Hospital and Region Hovedstaden.
-These colors follow Region Hovedstaden's official visual identity guidelines.
+Master vector of Bispebjerg og Frederiksberg Hospital and Region Hovedstaden
+brand colors. Values are hex codes that comply with the official visual
+identity guidelines.
 }
+\details{
+The object exposes both official color names (e.g. `"hospital_primary"`) and
+pragmatic aliases (e.g. `"primary"`, `"blue"`) for quick scripting. Use
+[bfh_cols()] to extract colors safely with validation and helpful error
+messages.
+}
+\seealso{
+[bfh_cols()], [bfh_palettes], [show_bfh_palettes()]
+
+Other BFH colors: 
+\code{\link{bfh_cols}()},
+\code{\link{bfh_pal}()},
+\code{\link{bfh_palettes}},
+\code{\link{check_colorblind_safe}()},
+\code{\link{show_bfh_palettes}()}
+}
+\concept{BFH colors}
 \keyword{datasets}

@@ -2,24 +2,36 @@
 % Please edit documentation in R/colors.R
 \name{bfh_pal}
 \alias{bfh_pal}
-\title{Return function to interpolate a BFH color palette}
+\title{Interpolate a BFH Color Palette}
 \usage{
 bfh_pal(palette = "main", reverse = FALSE, ...)
 }
 \arguments{
-\item{palette}{Character name of palette in bfh_palettes}
+\item{palette}{Character name of the palette in [bfh_palettes]. Defaults to `"main"`.}
 
-\item{reverse}{Boolean indicating whether the palette should be reversed}
+\item{reverse}{Logical; reverse the palette order. Defaults to `FALSE`.}
 
-\item{...}{Additional arguments to pass to colorRampPalette()}
+\item{...}{Additional arguments forwarded to [grDevices::colorRampPalette()].}
 }
 \value{
-A function that takes an integer n and returns n colors
+Function that accepts an integer `n` and returns `n` colors.
 }
 \description{
-Return function to interpolate a BFH color palette
+Creates a color interpolation function for any named palette in
+[bfh_palettes], enabling smooth gradients or truncated palette selections.
 }
 \examples{
 bfh_pal("main")(5)
 bfh_pal("blues", reverse = TRUE)(3)
 }
+\seealso{
+[bfh_palettes], [scale_color_bfh()], [scale_fill_bfh()]
+
+Other BFH colors: 
+\code{\link{bfh_colors}},
+\code{\link{bfh_cols}()},
+\code{\link{bfh_palettes}},
+\code{\link{check_colorblind_safe}()},
+\code{\link{show_bfh_palettes}()}
+}
+\concept{BFH colors}

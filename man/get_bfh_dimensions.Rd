@@ -2,23 +2,38 @@
 % Please edit documentation in R/helpers.R
 \name{get_bfh_dimensions}
 \alias{get_bfh_dimensions}
-\title{Get recommended plot dimensions}
+\title{Get Recommended Plot Dimensions}
 \usage{
 get_bfh_dimensions(type = "report", format = "standard")
 }
 \arguments{
-\item{type}{Character string specifying the output type:
-"report", "presentation", "poster", "web", "print"}
+\item{type}{Output target. One of `"report"`, `"presentation"`, `"poster"`,
+`"web"`, or `"print"`. Defaults to `"report"`.}
 
-\item{format}{Character string for aspect ratio: "standard", "wide", "square"}
+\item{format}{Aspect ratio. One of `"standard"`, `"wide"`, or `"square"`.
+Defaults to `"standard"`.}
 }
 \value{
-Named list with width and height in inches
+Named list with `width` and `height` in inches.
 }
 \description{
-Returns recommended plot dimensions for different output types.
+Supplies canonical width/height combinations for common BFH output formats,
+facilitating consistent figure sizing across documents and slides.
+}
+\details{
+Invalid `type`/`format` combinations trigger a warning and fall back
+to the closest supported option.
 }
 \examples{
 get_bfh_dimensions("report", "standard")
 get_bfh_dimensions("presentation", "wide")
 }
+\seealso{
+[bfh_save()], [theme_bfh()]
+
+Other BFH helpers: 
+\code{\link{bfh_combine_plots}()},
+\code{\link{bfh_labs}()},
+\code{\link{bfh_save}()}
+}
+\concept{BFH helpers}

@@ -4,7 +4,7 @@
 \alias{scale_fill_bfh_discrete}
 \alias{scale_color_bfh_discrete}
 \alias{scale_colour_bfh_discrete}
-\title{Discrete color scales using specific BFH palettes}
+\title{Discrete colour scales using specific BFH palettes}
 \usage{
 scale_fill_bfh_discrete(palette = "main", reverse = FALSE, ...)
 
@@ -13,14 +13,14 @@ scale_color_bfh_discrete(palette = "main", reverse = FALSE, ...)
 scale_colour_bfh_discrete(palette = "main", reverse = FALSE, ...)
 }
 \arguments{
-\item{palette}{Character name of palette in bfh_palettes}
+\item{palette}{Character name of a palette in [bfh_palettes()].}
 
-\item{reverse}{Boolean indicating whether the palette should be reversed}
+\item{reverse}{Logical; reverse palette direction? Defaults to `FALSE`.}
 
-\item{...}{Additional arguments passed to discrete_scale()}
+\item{...}{Additional arguments passed to [ggplot2::discrete_scale()].}
 }
 \description{
-Discrete color scales using specific BFH palettes
+Discrete colour scales using specific BFH palettes
 }
 \examples{
 \dontrun{
@@ -30,3 +30,11 @@ ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) +
   scale_color_bfh_discrete(palette = "primary")
 }
 }
+\seealso{
+[scale_color_bfh()], [bfh_pal()], [bfh_palettes]
+
+Other BFH scales: 
+\code{\link{scale_bfh}},
+\code{\link{scale_fill_bfh_continuous}()}
+}
+\concept{BFH scales}

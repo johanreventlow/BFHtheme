@@ -2,7 +2,7 @@
 % Please edit documentation in R/defaults.R
 \name{apply_bfh_theme}
 \alias{apply_bfh_theme}
-\title{Apply BFH theme to the current plot}
+\title{Apply BFH Theme to a Plot}
 \usage{
 apply_bfh_theme(
   theme = "bfh",
@@ -13,22 +13,26 @@ apply_bfh_theme(
 )
 }
 \arguments{
-\item{theme}{Character name of the BFH theme. Default is "bfh".}
+\item{theme}{Character name of the BFH theme variant. Defaults to `"bfh"`.}
 
-\item{palette}{Character name of the color palette. Default is "main".}
+\item{palette}{Character name of the palette (from [bfh_palettes]) used when
+adding scales. Defaults to `"main"`.}
 
-\item{base_size}{Base font size. Default is 12.}
+\item{base_size}{Base font size supplied to the chosen theme. Defaults to 12.}
 
-\item{add_color_scale}{Logical. If TRUE, adds discrete color scale. Default is FALSE.}
+\item{add_color_scale}{Logical; add [scale_color_bfh()] if `TRUE`.
+Defaults to `FALSE`.}
 
-\item{add_fill_scale}{Logical. If TRUE, adds discrete fill scale. Default is FALSE.}
+\item{add_fill_scale}{Logical; add [scale_fill_bfh()] if `TRUE`.
+Defaults to `FALSE`.}
 }
 \value{
-A list of ggplot2 theme and scale components
+A list of ggplot2 components that can be added to a plot.
 }
 \description{
-A convenience function that applies the BFH theme to the current plot.
-Optionally adds BFH color scales for discrete mappings.
+Lightweight helper that returns a list containing the requested BFH theme and
+optional discrete colour/fill scales. Designed for piping directly into a
+ggplot call.
 }
 \examples{
 \dontrun{
@@ -50,3 +54,11 @@ ggplot(mtcars, aes(wt, mpg, color = hp)) +
   scale_color_bfh_continuous()
 }
 }
+\seealso{
+[set_bfh_defaults()], [theme_bfh()], [scale_color_bfh()]
+
+Other BFH defaults: 
+\code{\link{reset_bfh_defaults}()},
+\code{\link{set_bfh_defaults}()}
+}
+\concept{BFH defaults}

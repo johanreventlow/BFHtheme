@@ -14,18 +14,22 @@ theme_bfh_dark(
 \arguments{
 \item{base_size}{Base font size in points. Default is 12.}
 
-\item{base_family}{Base font family. Default is "sans".}
+\item{base_family}{Base font family. Set to `NULL` (default) to auto-detect a
+BFH approved font via [get_bfh_font()].}
 
-\item{base_line_size}{Base line size. Default is base_size/22.}
+\item{base_line_size}{Base line size. Default is `base_size / 22`.}
 
-\item{base_rect_size}{Base rectangle size. Default is base_size/22.}
+\item{base_rect_size}{Base rectangle size. Default is `base_size / 22`.}
 }
 \value{
-A ggplot2 theme object
+A [ggplot2::theme] object
 }
 \description{
 A dark version of the BFH theme for presentations or
 when a dark background is preferred.
+}
+\details{
+Swaps to dark backgrounds, bright text, and subtle grid lines while preserving spacing.
 }
 \examples{
 \dontrun{
@@ -35,3 +39,13 @@ ggplot(mtcars, aes(wt, mpg)) +
   theme_bfh_dark()
 }
 }
+\seealso{
+[theme_bfh()]
+
+Other BFH themes: 
+\code{\link{theme_bfh}()},
+\code{\link{theme_bfh_minimal}()},
+\code{\link{theme_bfh_presentation}()},
+\code{\link{theme_bfh_print}()}
+}
+\concept{BFH themes}

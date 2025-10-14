@@ -2,20 +2,20 @@
 % Please edit documentation in R/fonts.R
 \name{setup_bfh_fonts}
 \alias{setup_bfh_fonts}
-\title{Setup fonts for BFH theme}
+\title{Configure Fonts for BFH Themes}
 \usage{
 setup_bfh_fonts(use_showtext = FALSE)
 }
 \arguments{
-\item{use_showtext}{Logical. If TRUE, attempts to use showtext package
-for better font rendering. Default is FALSE.}
+\item{use_showtext}{Logical. When `TRUE`, attempts to load Roboto through
+`showtext::font_add_google()` and enable `showtext_auto()`. Defaults to `FALSE`.}
 }
 \value{
-Character string with font family to use
+Character string naming the font family that should be used.
 }
 \description{
-Helper function to setup fonts for BFH theme. Handles both system fonts
-and showtext/sysfonts for better cross-platform compatibility.
+Ensures an appropriate font is available for BFH visuals. Optionally loads
+Roboto via the `showtext` package when system fonts are not accessible.
 }
 \examples{
 \dontrun{
@@ -29,3 +29,14 @@ ggplot(mtcars, aes(wt, mpg)) +
   theme_bfh(base_family = font)
 }
 }
+\seealso{
+[set_bfh_fonts()], [get_bfh_font()], [install_roboto_font()]
+
+Other BFH fonts: 
+\code{\link{check_bfh_fonts}()},
+\code{\link{clear_bfh_font_cache}()},
+\code{\link{get_bfh_font}()},
+\code{\link{install_roboto_font}()},
+\code{\link{set_bfh_fonts}()}
+}
+\concept{BFH fonts}

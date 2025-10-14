@@ -2,29 +2,32 @@
 % Please edit documentation in R/helpers.R
 \name{bfh_labs}
 \alias{bfh_labs}
-\title{BFH-style plot labels with automatic uppercase}
+\title{BFH-Style Plot Labels with Automatic Uppercase}
 \usage{
 bfh_labs(...)
 }
 \arguments{
-\item{...}{Named arguments passed to ggplot2::labs(). Character values will
-be converted to uppercase except for title. Common arguments include:
-- title: Plot title (unchanged - natural case)
-- subtitle: Plot subtitle (uppercase)
-- caption: Plot caption (uppercase)
-- x: X-axis label (uppercase)
-- y: Y-axis label (uppercase)
-- color/colour: Legend title for color aesthetic (uppercase)
-- fill: Legend title for fill aesthetic (uppercase)}
+\item{...}{Named arguments passed to [ggplot2::labs()]. Character values are
+uppercased except for `title`. Common keys include:
+\itemize{
+  \item `title`: Plot title (kept in natural case).
+  \item `subtitle`: Subtitle (uppercased).
+  \item `caption`: Caption (uppercased).
+  \item `x`, `y`: Axis labels (uppercased).
+  \item `color`/`colour`, `fill`: Legend titles (uppercased).
+}}
 }
 \value{
-A ggplot2 labels object
+A ggplot2 labels object.
 }
 \description{
-Wrapper around ggplot2::labs() that automatically converts axis labels,
-subtitles, and legend titles to uppercase, following BFH visual identity
-guidelines. Only the main title is left unchanged to preserve natural
-capitalization.
+Wrapper around [ggplot2::labs()] that converts subtitles, captions, axes, and
+legend titles to uppercase, matching BFH typographic guidance while leaving
+the main title unchanged.
+}
+\details{
+Only the argument named `"title"` is exempt from uppercasing. Supply other
+character values via `...` and they will be converted using [base::toupper()].
 }
 \examples{
 \dontrun{
@@ -54,3 +57,12 @@ ggplot(time_data, aes(date, value, color = group)) +
   )
 }
 }
+\seealso{
+[ggplot2::labs()], [bfh_title_block()]
+
+Other BFH helpers: 
+\code{\link{bfh_combine_plots}()},
+\code{\link{bfh_save}()},
+\code{\link{get_bfh_dimensions}()}
+}
+\concept{BFH helpers}

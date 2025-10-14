@@ -2,18 +2,25 @@
 % Please edit documentation in R/colors.R
 \name{bfh_cols}
 \alias{bfh_cols}
-\title{Extract BFH colors as hex codes}
+\title{Extract BFH Colors}
 \usage{
 bfh_cols(...)
 }
 \arguments{
-\item{...}{Character names of bfh_colors}
+\item{...}{Character names present in [bfh_colors]. If omitted, all colors are
+returned.}
 }
 \value{
-Character vector of hex color codes
+Character vector of hex color codes in the order requested.
 }
 \description{
-Extract BFH colors as hex codes
+Retrieves one or more BFH brand colors by name with validation and friendly
+error messages.
+}
+\details{
+The function accepts both official color identifiers (e.g.
+`"hospital_primary"`) and provided aliases (e.g. `"primary"`). Invalid names
+trigger an informative error listing available options.
 }
 \examples{
 # Get a single color
@@ -28,3 +35,12 @@ bfh_cols()
 # Using aliases
 bfh_cols("blue", "grey")
 }
+\seealso{
+Other BFH colors: 
+\code{\link{bfh_colors}},
+\code{\link{bfh_pal}()},
+\code{\link{bfh_palettes}},
+\code{\link{check_colorblind_safe}()},
+\code{\link{show_bfh_palettes}()}
+}
+\concept{BFH colors}

@@ -2,16 +2,16 @@
 % Please edit documentation in R/defaults.R
 \name{reset_bfh_defaults}
 \alias{reset_bfh_defaults}
-\title{Reset ggplot2 defaults}
+\title{Reset ggplot2 Defaults}
 \usage{
 reset_bfh_defaults()
 }
 \value{
-Invisibly returns TRUE after resetting defaults
+Invisibly returns `TRUE` once defaults are reset.
 }
 \description{
-Resets ggplot2 to its default theme and geom colors.
-Use this to undo the effects of set_bfh_defaults().
+Restores ggplot2's original theme and geom defaults, undoing the effect of
+[set_bfh_defaults()].
 }
 \examples{
 \dontrun{
@@ -24,3 +24,11 @@ set_bfh_defaults()
 reset_bfh_defaults()
 }
 }
+\seealso{
+[set_bfh_defaults()]
+
+Other BFH defaults: 
+\code{\link{apply_bfh_theme}()},
+\code{\link{set_bfh_defaults}()}
+}
+\concept{BFH defaults}

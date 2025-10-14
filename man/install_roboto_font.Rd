@@ -2,16 +2,31 @@
 % Please edit documentation in R/fonts.R
 \name{install_roboto_font}
 \alias{install_roboto_font}
-\title{Install Roboto font (helper)}
+\title{Install Roboto Font (Guidance Helper)}
 \usage{
 install_roboto_font()
 }
 \description{
-Provides instructions for installing Roboto font on different systems.
-Roboto is an open-source font by Google, free to use and distribute.
+Prints platform-agnostic instructions for installing Google's Roboto font,
+the recommended open-source fallback when Mari is unavailable.
+}
+\details{
+No files are downloaded or installed automatically; the function only
+provides guidance that you can follow manually.
 }
 \examples{
 \dontrun{
 install_roboto_font()
 }
 }
+\seealso{
+[check_bfh_fonts()]
+
+Other BFH fonts: 
+\code{\link{check_bfh_fonts}()},
+\code{\link{clear_bfh_font_cache}()},
+\code{\link{get_bfh_font}()},
+\code{\link{set_bfh_fonts}()},
+\code{\link{setup_bfh_fonts}()}
+}
+\concept{BFH fonts}
