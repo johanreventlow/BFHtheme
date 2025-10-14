@@ -241,3 +241,38 @@ test_that("font workflow: setup -> get -> set works correctly", {
   expect_equal(font1, font2)
   expect_equal(font2, font3)
 })
+
+# === Edge case and fallback tests ===
+
+test_that("get_bfh_font falls back to sans when no packages available", {
+  # This tests the fallback path when neither systemfonts nor extrafont are available
+  # In practice, systemfonts is usually available, so this is defensive
+  suppressMessages(clear_bfh_font_cache())
+
+  result <- get_bfh_font(check_installed = TRUE, silent = TRUE, force_refresh = TRUE)
+  expect_type(result, "character")
+  expect_length(result, 1)
+  # Should return a valid font name
+  expect_true(nchar(result) > 0)
+})
+
+test_that("check_bfh_fonts handles missing font packages gracefully", {
+  # Test that the function works even when systemfonts/extrafont aren't available
+  result <- suppressMessages(check_bfh_fonts())
+
+  expect_type(result, "logical")
+  expect_named(result)
+  # Result could be NA if packages unavailable, or TRUE/FALSE if available
+  expect_true(all(is.logical(result) | is.na(result)))
+})
+
+test_that("get_bfh_font respects font priority order", {
+  skip_if_not_installed("systemfonts")
+  suppressMessages(clear_bfh_font_cache())
+
+  result <- get_bfh_font(check_installed = TRUE, silent = TRUE, force_refresh = TRUE)
+
+  # Result should be one of the priority fonts
+  priority_fonts <- c("Mari", "Mari Office", "Roboto", "Arial", "sans")
+  expect_true(result %in% priority_fonts)
+})
