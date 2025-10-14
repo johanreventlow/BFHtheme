@@ -18,3 +18,5 @@
 *.Rcheck/
 *.tar.gz
 *.tgz
+/doc/
+/Meta/

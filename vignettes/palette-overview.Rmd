@@ -1,0 +1,118 @@
+---
+title: "Farvepaletter i BFHtheme"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Farvepaletter i BFHtheme}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Introduktion
+
+BFHtheme samler de officielle farver for Bispebjerg og Frederiksberg Hospital
+og Region Hovedstaden. Denne vignette giver et hurtigt overblik over farver,
+paletter og hvordan du anvender dem i `ggplot2`.
+
+## Officielle farver
+
+### Hospital (BFH)
+
+| Navn | Hex | RGB | Beskrivelse |
+| --- | --- | --- | --- |
+| `hospital_primary` | `#007dbb` | 0, 125, 187 | Primær identitetsfarve |
+| `hospital_blue` | `#009ce8` | 0, 156, 232 | Sekundær blå |
+| `hospital_light_blue1` | `#cce5f1` | 204, 229, 241 | Lys blå 1 |
+| `hospital_light_blue2` | `#e5f2f8` | 229, 242, 248 | Lys blå 2 |
+| `hospital_grey` | `#646c6f` | 100, 108, 111 | Neutral grå |
+| `hospital_dark_grey` | `#333333` | 51, 51, 51 | Mørk grå |
+| `hospital_white` | `#ffffff` | 255, 255, 255 | Hvid |
+
+### Region Hovedstaden
+
+| Navn | Hex | RGB | Beskrivelse |
+| --- | --- | --- | --- |
+| `regionh_primary` | `#002555` | 0, 37, 85 | Primær koncernfarve |
+| `regionh_blue` | `#007dbb` | 0, 125, 187 | Sekundær blå |
+| `regionh_light_grey1` | `#ccd3dd` | 204, 211, 221 | Lys grå 1 |
+| `regionh_light_grey2` | `#e5e9ee` | 229, 233, 238 | Lys grå 2 |
+| `regionh_grey` | `#646c6f` | 100, 108, 111 | Neutral grå |
+| `regionh_dark_grey` | `#333333` | 51, 51, 51 | Mørk grå |
+| `regionh_white` | `#ffffff` | 255, 255, 255 | Hvid |
+
+## Palettekategorier
+
+BFHtheme udstiller paletter via `bfh_palettes`. Brug `names(bfh_palettes)` for
+at se hele listen.
+
+```{r list-palettes, eval=FALSE}
+names(bfh_palettes)
+```
+
+### Hospitalspaletter
+
+- `hospital` / `main`: Primær palette af blå og grå
+- `hospital_blues`: Diskrete blåtoner
+- `hospital_blues_seq`: Sekventiel gradient med hvid slutfarve
+- `hospital_infographic`: Udvidet palette til infografikker
+
+### Region Hovedstaden
+
+- `regionh`: Primær koncernpalette
+- `regionh_main`: Udvidet palette med lyse grå
+- `regionh_blues`: Diskret blå palette
+- `regionh_blues_seq`: Sekventiel gradient
+- `regionh_infographic`: Infografikvariant
+
+### Legacy og kompatibilitet
+
+`primary`, `blues`, `blues_sequential`, `greys`, `contrast` og `infographic`
+beholdes for bagudkompatibilitet.
+
+## Anvendelse i ggplot2
+
+Diskret farveskala:
+
+```{r palette-discrete, eval=FALSE}
+ggplot(iris, aes(Sepal.Length, Sepal.Width, colour = Species)) +
+  geom_point(size = 3) +
+  scale_color_bfh(palette = "hospital") +
+  theme_bfh()
+```
+
+Kontinuerlig udfyldning:
+
+```{r palette-continuous, eval=FALSE}
+ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
+  geom_tile() +
+  scale_fill_bfh_continuous(palette = "hospital_blues_seq") +
+  theme_bfh()
+```
+
+## Udforskning
+
+Brug helper-funktioner til at inspicere farver og se eksempler.
+
+```{r palette-helpers, eval=FALSE}
+bfh_cols("hospital_primary", "hospital_blue")
+show_bfh_palettes()
+show_bfh_palettes(n = 5)
+```
+
+## Reference og metadata
+
+Kildedokumenterne for farverne findes i `inst/source_files/`:
+
+- `RegionH_hospital_farver_infografik.pdf`
+- `RegionH_koncern_farver_infografik.pdf`
+
+Sidst opdateret: 2024. Samlet antal farver: 22. Paletter: 16 (4 hospital, 5
+region, 7 legacy).

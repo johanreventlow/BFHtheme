@@ -1,0 +1,123 @@
+---
+title: "Fejlfinding for BFHtheme"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Fejlfinding for BFHtheme}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Introduktion
+
+Denne vignette samler løsninger på de mest almindelige problemer, der kan opstå
+under installation og brug af BFHtheme. Brug den som første stop før du
+indsender en fejlrapport.
+
+## Installation fejler
+
+**Symptom**
+
+```r
+Error in install.packages: installation of package had non-zero exit status
+```
+
+**Løsning**
+
+1. Kontroller at alle afhængigheder er installeret.
+
+```{r deps, eval=FALSE}
+install.packages(c("ggplot2", "grid", "grDevices", "scales"))
+```
+
+2. Fjern eksisterende version og geninstaller pakken.
+
+```{r reinstall, eval=FALSE}
+remove.packages("BFHtheme")
+install.packages("BFHtheme_0.1.0.tar.gz", repos = NULL, type = "source")
+```
+
+3. Genstart R-sessionen.
+
+## Fejl i farveskalaer
+
+### "need at least two non-NA values to interpolate"
+
+Denne fejl opstår som regel når en ældre cachet version af pakken konflikter med
+den nuværende installation. Genstart og geninstaller:
+
+```{r palette-error, eval=FALSE}
+remove.packages("BFHtheme")
+install.packages("BFHtheme_0.1.0.tar.gz", repos = NULL, type = "source")
+
+library(BFHtheme)
+library(ggplot2)
+
+ggplot(mtcars, aes(wt, mpg, colour = factor(cyl))) +
+  geom_point() +
+  scale_color_bfh(palette = "hospital")
+```
+
+### Farver virker forkerte
+
+```{r palette-checks, eval=FALSE}
+names(bfh_palettes)
+bfh_palettes[["hospital"]]
+show_bfh_palettes()
+```
+
+## Logo relaterede problemer
+
+### "BFH logo file not found"
+
+```{r logo-missing, eval=FALSE}
+logo_path <- get_bfh_logo()
+cat("Logo path:", logo_path, "\n")
+cat("File exists:", file.exists(logo_path), "\n")
+```
+
+Hvis filen mangler, så geninstaller pakken for at gendanne logoressourcerne.
+
+### Logoet er i dårlig kvalitet
+
+```{r logo-quality, eval=FALSE}
+add_logo(plot, logo_size = "full")  # Til print
+add_logo(plot, logo_size = "web")   # Til skærm
+```
+
+### Logoet er for stort eller blokerer data
+
+```{r logo-size, eval=FALSE}
+add_logo(plot, size = 0.08)
+add_logo(plot, size = 0.20)
+add_logo(plot, position = "topleft", alpha = 0.6)
+```
+
+## Tema relaterede problemer
+
+### Tekst rendrer ikke korrekt
+
+```{r text-issues, eval=FALSE}
+p + theme_bfh(base_family = "sans")
+p + theme_bfh(base_family = "Helvetica")
+```
+
+### Temaet ser ikke ud til at være anvendt
+
+```{r theme-applied, eval=FALSE}
+ggplot(data, aes(x, y)) + geom_point()          # Mangler tema
+ggplot(data, aes(x, y)) + geom_point() + theme_bfh()
+```
+
+## Få hjælp
+
+Hvis problemerne fortsætter efter disse trin, så åbner du en issue i
+projektets repo med detaljeret fejllog, R-version og systeminformation.

@@ -1,0 +1,179 @@
+---
+title: "Fonts and Typography in BFHtheme"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Fonts and Typography in BFHtheme}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Introduktion
+
+BFHtheme vælger automatisk passende skrifttyper til dine plots baseret på de
+fonts, der er installeret på systemet. Denne vignette gennemgår rækkefølgen af
+fallbacks, hvordan du kan inspicere tilgængelige fonts, og måder at styre
+typografien manuelt, når du har særlige krav.
+
+## Font-prioritering
+
+Pakken forsøger at finde BFH-fonten Mari først og falder tilbage til åbne
+alternativer hvis nødvendigt:
+
+1. **Mari** – Primær hospitalsskrifttype
+2. **Mari Office** – Alternativt navn brugt internt
+3. **Roboto** – Open source fallback via Google Fonts
+4. **Arial** – Universel fallback tilgængelig på de fleste systemer
+5. **sans** – Sidste udvej, systemets standardskrift
+
+## Automatisk fontvalg
+
+Alle BFH-temaer henter selv den bedst mulige font. Du behøver ikke sætte noget
+op, hvis Mari/Mari Office allerede er installeret på din maskine.
+
+```{r automatic-font, eval=FALSE}
+library(BFHtheme)
+library(ggplot2)
+
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_bfh()
+```
+
+## Manuel styring
+
+Vil du tilsidesætte autoskiftet, kan du angive `base_family` direkte eller hente
+navnet via `get_bfh_font()`.
+
+```{r manual-font, eval=FALSE}
+# Brug specifik font
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_bfh(base_family = "Mari Office")
+
+# Eller brug helper til at hente første tilgængelige font
+font <- get_bfh_font()
+theme_bfh(base_family = font)
+```
+
+## Tjek tilgængelige fonts
+
+`check_bfh_fonts()` viser status for alle understøttede fonts samt anbefalet
+valg.
+
+```{r check-fonts, eval=FALSE}
+check_bfh_fonts()
+```
+
+Eksempel-output:
+
+```
+=== BFH Font Availability ===
+
+Mari           : ✗ Not found
+Mari Office    : ✓ Available
+Roboto         : ✓ Available
+Arial          : ✓ Available
+
+Recommended font: Mari
+```
+
+## Mari Office font
+
+**BFH-medarbejdere:** Mari/Mari Office er normalt forudinstalleret på
+hospitalets computere. Pakken vælger den automatisk.
+
+**Eksterne brugere:** Mari Office er copyrightbeskyttet og må ikke
+redistribueres. Brug Roboto som fallback hvis du ikke har adgang til Mari.
+
+## Roboto (open source)
+
+Roboto kan hentes gratis fra Google og installeres manuelt eller hentes i
+R-sessionen med `showtext`.
+
+```{r showtext-install, eval=FALSE}
+install.packages("showtext")
+
+library(showtext)
+font_add_google("Roboto", "Roboto")
+showtext_auto()
+
+library(BFHtheme)
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_bfh(base_family = "Roboto")
+```
+
+### Manuel installation
+
+**macOS**
+
+```{r macos-install, eval=FALSE}
+# Via Homebrew
+brew install --cask font-roboto
+```
+
+Alternativt kan fonten downloades fra <https://fonts.google.com/specimen/Roboto>
+og installeres ved at åbne `.ttf`-filerne.
+
+**Windows**
+
+1. Download ZIP fra Google Fonts
+2. Højreklik på de relevante `.ttf`-filer
+3. Vælg *Installér*
+
+**Linux (Ubuntu/Debian)**
+
+```{r linux-install, eval=FALSE}
+sudo apt-get install fonts-roboto
+```
+
+## Helper til installation
+
+```{r install-helper, eval=FALSE}
+# Giver platform-specifikke instruktioner
+install_roboto_font()
+```
+
+## Typografiske workflows
+
+### Automatisk (anbefalet)
+
+```{r workflow-auto, eval=FALSE}
+library(BFHtheme)
+
+ggplot(data, aes(x, y)) +
+  geom_point() +
+  theme_bfh()
+```
+
+### Med showtext (Roboto fallback)
+
+```{r workflow-showtext, eval=FALSE}
+library(showtext)
+font_add_google("Roboto", "Roboto")
+showtext_auto()
+
+library(BFHtheme)
+
+ggplot(data, aes(x, y)) +
+  geom_point() +
+  theme_bfh(base_family = "Roboto")
+```
+
+### Fast global font
+
+```{r workflow-global, eval=FALSE}
+set_bfh_defaults(base_family = "Mari Office")
+
+ggplot(data, aes(x, y)) +
+  geom_point()
+```

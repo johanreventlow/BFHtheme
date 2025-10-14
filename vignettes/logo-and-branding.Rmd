@@ -1,0 +1,141 @@
+---
+title: "Logoer og Branding i BFHtheme"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Logoer og Branding i BFHtheme}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Introduktion
+
+BFHtheme leverer hospitalets logoer i flere varianter og hjælper med at placere
+dem konsistent på dine grafer. Denne vignette opsummerer de tilgængelige filer,
+hvordan du tilføjer dem til plots, og best practice for forskellige outputtyper.
+
+## Logo-varianter og størrelser
+
+Pakkeindholdet dækker tre logo-varianter i tre størrelser:
+
+| Variant | Beskrivelse | Standardbrug |
+| --- | --- | --- |
+| `color` | Fuld farve med hospitalnavn | Web og farveplots |
+| `grey` | Gråtonet version | Monokrom print |
+| `mark` | Kun hospitalssymbolet | Små layouts eller diskret branding |
+
+| Størrelse | Opløsning | Anbefalet brug |
+| --- | --- | --- |
+| `full` | 300 DPI | Print og publikationer |
+| `web` | 800 px bred | Standard til plot eksport |
+| `small` | 400 px bred | Små plots eller UI-elementer |
+
+## Grundlæggende brug
+
+`add_logo()` er den nemmeste måde at tilføje et logo til et eksisterende
+`ggplot`-objekt.
+
+```{r basic-logo, eval=FALSE}
+library(BFHtheme)
+library(ggplot2)
+
+p <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_bfh()
+
+add_logo(p)                    # Farvelogo nederst til højre
+add_logo(p, variant = "grey")  # Gråtonet version
+add_logo(p, variant = "mark")  # Kun mærket
+```
+
+## Placering og størrelse
+
+Angiv `position` og `size` for fuld kontrol over placering og skala.
+
+```{r position-size, eval=FALSE}
+add_logo(p, position = "topright")
+add_logo(p, position = "topleft")
+add_logo(p, position = "bottomleft")
+add_logo(p, position = "bottomright", size = 0.12)
+```
+
+`size` refererer til brøkdelen af plottets bredde som logoet fylder. Standard er
+`0.15`, hvilket passer de fleste plots.
+
+## Vælg variant og opløsning
+
+```{r variant-resolution, eval=FALSE}
+# Standardfarve i webopløsning
+add_logo(p, variant = "color", logo_size = "web")
+
+# Gråtonet logo til print
+add_logo(p, variant = "grey", logo_size = "full")
+
+# Kompakt mærke, små plots
+add_logo(p, variant = "mark", logo_size = "small", size = 0.08)
+```
+
+## Gennemsigtighed
+
+Brug `alpha` for at gøre logoet mere eller mindre synligt.
+
+```{r transparency, eval=FALSE}
+add_logo(p, alpha = 0.9)  # Standard
+add_logo(p, alpha = 0.7)  # Mere transparent
+add_logo(p, alpha = 0.3)  # Vandmærkeeffekt
+```
+
+## Avanceret brug
+
+Vil du arbejde direkte med filerne, kan du hente stien til den ønskede
+logoressource via `get_bfh_logo()`.
+
+```{r manual-path, eval=FALSE}
+logo_path <- get_bfh_logo(size = "web")
+add_bfh_logo(p, logo_path, position = "topright", size = 0.15)
+```
+
+Funktionen `add_bfh_color_bar()` kan kombineres med logo og footer for et fuldt
+branded layout.
+
+```{r combined-branding, eval=FALSE}
+library(magrittr)
+
+p %>%
+  add_bfh_color_bar(position = "top") %>%
+  add_logo(position = "bottomright") %>%
+  add_bfh_footer(text = "Bispebjerg og Frederiksberg Hospital - 2024")
+```
+
+## Scenarier
+
+- **Print**: brug `logo_size = "full"` og `size` omkring 0.18–0.20
+- **Web/skærm**: `logo_size = "web"` og standardstørrelsen 0.15
+- **Præsentationer**: øg `size` (0.18–0.25) for synlighed på afstand
+- **Tæt på data**: flyt logoet til et hjørne uden data, eller reducer `alpha`
+
+## Fejlfinding
+
+```{r troubleshooting, eval=FALSE}
+# Logo vises ikke
+logo_path <- get_bfh_logo()
+file.exists(logo_path)
+
+# Justér størrelse
+add_logo(p, size = 0.10)
+add_logo(p, size = 0.20)
+
+# Flyt logo hvis det dækker data
+add_logo(p, position = "topleft", alpha = 0.6)
+```
+
+Hvis logoet mangler i filsystemet, så geninstaller pakken eller regenerer
+filerne fra kilderne i `inst/source_files/`.
