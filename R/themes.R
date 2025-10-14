@@ -1,3 +1,9 @@
+# Internal helper: Resolve base_family with font auto-detection
+# Bruges af alle theme funktioner for at undgå code duplication
+.resolve_base_family <- function(base_family) {
+  base_family %||% get_bfh_font(check_installed = TRUE, silent = TRUE)
+}
+
 #' BFH ggplot2 Theme
 #'
 #' @description
@@ -27,9 +33,7 @@ theme_bfh <- function(base_size = 12,
                       base_rect_size = base_size / 22) {
 
   # Auto-detect best font if not specified
-  if (is.null(base_family)) {
-    base_family <- get_bfh_font(check_installed = TRUE, silent = TRUE)
-  }
+  base_family <- .resolve_base_family(base_family)
 
   # Start with theme_minimal as base
   ggplot2::theme_minimal(
@@ -122,9 +126,8 @@ theme_bfh_minimal <- function(base_size = 12,
                               base_line_size = base_size / 22,
                               base_rect_size = base_size / 22) {
 
-  if (is.null(base_family)) {
-    base_family <- get_bfh_font(check_installed = TRUE, silent = TRUE)
-  }
+  # Auto-detect best font if not specified
+  base_family <- .resolve_base_family(base_family)
 
   theme_bfh(
     base_size = base_size,
@@ -160,9 +163,8 @@ theme_bfh_print <- function(base_size = 14,
                             base_line_size = base_size / 22,
                             base_rect_size = base_size / 22) {
 
-  if (is.null(base_family)) {
-    base_family <- get_bfh_font(check_installed = TRUE, silent = TRUE)
-  }
+  # Auto-detect best font if not specified
+  base_family <- .resolve_base_family(base_family)
 
   theme_bfh(
     base_size = base_size,
@@ -209,9 +211,8 @@ theme_bfh_presentation <- function(base_size = 16,
                                    base_line_size = base_size / 22,
                                    base_rect_size = base_size / 22) {
 
-  if (is.null(base_family)) {
-    base_family <- get_bfh_font(check_installed = TRUE, silent = TRUE)
-  }
+  # Auto-detect best font if not specified
+  base_family <- .resolve_base_family(base_family)
 
   theme_bfh(
     base_size = base_size,
@@ -259,9 +260,8 @@ theme_bfh_dark <- function(base_size = 12,
                            base_line_size = base_size / 22,
                            base_rect_size = base_size / 22) {
 
-  if (is.null(base_family)) {
-    base_family <- get_bfh_font(check_installed = TRUE, silent = TRUE)
-  }
+  # Auto-detect best font if not specified
+  base_family <- .resolve_base_family(base_family)
 
   theme_bfh(
     base_size = base_size,

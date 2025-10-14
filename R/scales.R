@@ -21,6 +21,19 @@
 #'   scale_color_bfh()
 #' }
 scale_color_bfh <- function(palette = "main", discrete = TRUE, reverse = FALSE, ...) {
+  # Input validation
+  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
+    stop("palette must be a single character string", call. = FALSE)
+  }
+
+  if (!is.logical(discrete) || length(discrete) != 1 || is.na(discrete)) {
+    stop("discrete must be a single logical value (TRUE or FALSE)", call. = FALSE)
+  }
+
+  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
+    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
+  }
+
   pal <- bfh_pal(palette = palette, reverse = reverse)
 
   if (discrete) {
@@ -44,6 +57,19 @@ scale_colour_bfh <- scale_color_bfh
 #'   scale_fill_bfh()
 #' }
 scale_fill_bfh <- function(palette = "main", discrete = TRUE, reverse = FALSE, ...) {
+  # Input validation
+  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
+    stop("palette must be a single character string", call. = FALSE)
+  }
+
+  if (!is.logical(discrete) || length(discrete) != 1 || is.na(discrete)) {
+    stop("discrete must be a single logical value (TRUE or FALSE)", call. = FALSE)
+  }
+
+  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
+    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
+  }
+
   pal <- bfh_pal(palette = palette, reverse = reverse)
 
   if (discrete) {
@@ -67,6 +93,15 @@ scale_fill_bfh <- function(palette = "main", discrete = TRUE, reverse = FALSE, .
 #'   scale_fill_bfh_continuous(palette = "blues")
 #' }
 scale_fill_bfh_continuous <- function(palette = "blues", reverse = FALSE, ...) {
+  # Input validation
+  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
+    stop("palette must be a single character string", call. = FALSE)
+  }
+
+  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
+    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
+  }
+
   pal <- bfh_pal(palette = palette, reverse = reverse)
   ggplot2::scale_fill_gradientn(colours = pal(256), ...)
 }
@@ -74,6 +109,15 @@ scale_fill_bfh_continuous <- function(palette = "blues", reverse = FALSE, ...) {
 #' @rdname scale_fill_bfh_continuous
 #' @export
 scale_color_bfh_continuous <- function(palette = "blues", reverse = FALSE, ...) {
+  # Input validation
+  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
+    stop("palette must be a single character string", call. = FALSE)
+  }
+
+  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
+    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
+  }
+
   pal <- bfh_pal(palette = palette, reverse = reverse)
   ggplot2::scale_color_gradientn(colours = pal(256), ...)
 }
@@ -96,6 +140,15 @@ scale_colour_bfh_continuous <- scale_color_bfh_continuous
 #'   scale_color_bfh_discrete(palette = "primary")
 #' }
 scale_fill_bfh_discrete <- function(palette = "main", reverse = FALSE, ...) {
+  # Input validation
+  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
+    stop("palette must be a single character string", call. = FALSE)
+  }
+
+  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
+    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
+  }
+
   pal <- bfh_pal(palette = palette, reverse = reverse)
   ggplot2::discrete_scale("fill", palette = pal, ...)
 }
@@ -103,6 +156,15 @@ scale_fill_bfh_discrete <- function(palette = "main", reverse = FALSE, ...) {
 #' @rdname scale_fill_bfh_discrete
 #' @export
 scale_color_bfh_discrete <- function(palette = "main", reverse = FALSE, ...) {
+  # Input validation
+  if (!is.character(palette) || length(palette) != 1 || nchar(palette) == 0) {
+    stop("palette must be a single character string", call. = FALSE)
+  }
+
+  if (!is.logical(reverse) || length(reverse) != 1 || is.na(reverse)) {
+    stop("reverse must be a single logical value (TRUE or FALSE)", call. = FALSE)
+  }
+
   pal <- bfh_pal(palette = palette, reverse = reverse)
   ggplot2::discrete_scale("colour", palette = pal, ...)
 }
