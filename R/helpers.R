@@ -319,7 +319,7 @@ add_bfh_color_bar <- function(plot,
 #'   }
 #' @return A ggplot2 labels object.
 #' @export
-#' @importFrom purrr map
+#' @importFrom purrr imap
 #' @seealso [ggplot2::labs()], [bfh_title_block()]
 #' @family BFH helpers
 #' @examples
@@ -355,19 +355,14 @@ bfh_labs <- function(...) {
   # Labels that should NOT be uppercased
   keep_as_is <- c("title")
 
-  # Modernized with purrr::map() for functional iteration
-  args <- purrr::map(names(args), function(name) {
-    value <- args[[name]]
-
+  # Use purrr::imap() which preserves names automatically
+  args <- purrr::imap(args, function(value, name) {
     if (is.character(value) && !name %in% keep_as_is) {
       toupper(value)
     } else {
       value
     }
   })
-
-  # Restore names
-  names(args) <- names(list(...))
 
   # Call ggplot2::labs() with converted arguments
   do.call(ggplot2::labs, args)

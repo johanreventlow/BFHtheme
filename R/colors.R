@@ -177,6 +177,9 @@ bfh_palettes <- list(
                            "hospital_grey", "dark_grey")
 )
 
+# Package-level palette cache environment
+.bfh_pal_cache <- new.env(parent = emptyenv())
+
 #' Interpolate a BFH Color Palette
 #'
 #' @description
@@ -203,11 +206,47 @@ bfh_pal <- function(palette = "main", reverse = FALSE, ...) {
     )
   }
 
-  pal <- bfh_palettes[[palette]]
+  # Create cache key from palette name and reverse flag
+  cache_key <- paste0(palette, "_", reverse)
 
+  # Check cache first
+  if (exists(cache_key, envir = .bfh_pal_cache, inherits = FALSE)) {
+    return(get(cache_key, envir = .bfh_pal_cache, inherits = FALSE))
+  }
+
+  # Create and cache the palette function
+  pal <- bfh_palettes[[palette]]
   if (reverse) pal <- rev(pal)
 
-  grDevices::colorRampPalette(pal, ...)
+  pal_fn <- grDevices::colorRampPalette(pal, ...)
+
+  # Store in cache
+  assign(cache_key, pal_fn, envir = .bfh_pal_cache)
+
+  pal_fn
+}
+
+#' Clear Palette Cache
+#'
+#' @description
+#' Removes cached palette interpolation functions, ensuring that the next call to
+#' [bfh_pal()] triggers fresh palette creation. Useful after modifying palettes
+#' or for testing purposes.
+#'
+#' @return Invisibly returns `TRUE`.
+#' @export
+#' @seealso [bfh_pal()]
+#' @family BFH colors
+#' @examples
+#' # Clear palette cache
+#' clear_bfh_pal_cache()
+#'
+#' # Next call will recreate palette
+#' pal <- bfh_pal("main")
+clear_bfh_pal_cache <- function() {
+  rm(list = ls(envir = .bfh_pal_cache), envir = .bfh_pal_cache)
+  message("BFH palette cache cleared")
+  invisible(TRUE)
 }
 
 #' Visualise BFH Palettes
@@ -250,162 +289,4 @@ show_bfh_palettes <- function(n = NULL) {
     scales::show_col(pal, labels = TRUE, borders = NA, cex_label = 0.8)
     graphics::title(main = pal_name, line = -1)
   })
-}
-
-#' Check Colourblind Friendliness
-#'
-#' @description
-#' Evaluates how well a set of colours remains distinguishable under simulated
-#' colour vision deficiencies (protanopia, deuteranopia, tritanopia) using
-#' simple LMS transformation matrices and CIE76 Delta E thresholds.
-#'
-#' @param colors Character vector of hex colours (`#RRGGBB`) to inspect.
-#' @param threshold Minimum Delta E (CIE76) required for a pair of colours to be
-#'   considered distinguishable. Defaults to `10`.
-#' @return Invisibly returns a list with summary statistics: `passes` (logical),
-#'   `threshold`, `summary` (data frame with minimum Delta E per vision type),
-#'   and `pairwise` (Delta E for each colour pair).
-#' @export
-#' @seealso [show_bfh_palettes()]
-#' @family BFH colors
-check_colorblind_safe <- function(colors, threshold = 10) {
-  if (!is.character(colors) || length(colors) == 0) {
-    stop("colors must be a non-empty character vector", call. = FALSE)
-  }
-
-  if (anyNA(colors)) {
-    stop("colors must not include NA values", call. = FALSE)
-  }
-
-  if (!all(grepl("^#[0-9A-Fa-f]{6}$", colors))) {
-    stop("colors must be valid hex codes in the form #RRGGBB", call. = FALSE)
-  }
-
-  if (!is.numeric(threshold) || length(threshold) != 1 || threshold <= 0) {
-    stop("threshold must be a positive numeric value", call. = FALSE)
-  }
-
-  if (length(colors) < 2) {
-    message("At least two colours are required to compare contrast; returning pass.")
-    return(invisible(list(
-      passes = TRUE,
-      threshold = threshold,
-      summary = data.frame(
-        vision_type = character(0),
-        min_delta_e = numeric(0),
-        passes = logical(0),
-        stringsAsFactors = FALSE
-      ),
-      pairwise = list()
-    )))
-  }
-
-  rgb_matrix <- t(grDevices::col2rgb(colors) / 255)
-
-  colour_labels <- names(colors)
-  if (is.null(colour_labels) || any(colour_labels == "")) {
-    colour_labels <- paste0("color_", seq_along(colors))
-  }
-
-  combinations <- utils::combn(seq_len(length(colors)), 2, simplify = FALSE)
-  pair_labels <- vapply(
-    combinations,
-    function(idx) paste(colour_labels[idx], collapse = " vs "),
-    character(1L)
-  )
-
-  cvd_matrices <- list(
-    protanopia = matrix(c(
-      0.56667, 0.43333, 0.00000,
-      0.55833, 0.44167, 0.00000,
-      0.00000, 0.24167, 0.75833
-    ), nrow = 3, byrow = TRUE),
-    deuteranopia = matrix(c(
-      0.62500, 0.37500, 0.00000,
-      0.70000, 0.30000, 0.00000,
-      0.00000, 0.30000, 0.70000
-    ), nrow = 3, byrow = TRUE),
-    tritanopia = matrix(c(
-      0.95000, 0.05000, 0.00000,
-      0.00000, 0.43333, 0.56667,
-      0.00000, 0.47500, 0.52500
-    ), nrow = 3, byrow = TRUE)
-  )
-
-  clamp01 <- function(x) {
-    pmin(pmax(x, 0), 1)
-  }
-
-  compute_pairwise_delta <- function(lab_values) {
-    vapply(
-      seq_along(combinations),
-      function(i) {
-        idx <- combinations[[i]]
-        sqrt(sum((lab_values[idx[1], ] - lab_values[idx[2], ])^2))
-      },
-      numeric(1L)
-    )
-  }
-
-  analyse_palette <- function(matrix_transform) {
-    transformed <- clamp01(rgb_matrix %*% t(matrix_transform))
-    lab_values <- grDevices::convertColor(
-      transformed,
-      from = "sRGB",
-      to = "Lab",
-      scale.in = 1,
-      scale.out = 1
-    )
-    deltas <- compute_pairwise_delta(lab_values)
-    data.frame(
-      pair = pair_labels,
-      delta_e = deltas,
-      below_threshold = deltas < threshold,
-      stringsAsFactors = FALSE
-    )
-  }
-
-  pairwise_results <- c(
-    list(normal = analyse_palette(diag(3))),
-    lapply(cvd_matrices, analyse_palette)
-  )
-
-  summary_df <- data.frame(
-    vision_type = names(pairwise_results),
-    min_delta_e = vapply(
-      pairwise_results,
-      function(df) if (nrow(df) == 0) Inf else min(df$delta_e),
-      numeric(1L)
-    ),
-    passes = vapply(
-      pairwise_results,
-      function(df) if (nrow(df) == 0) TRUE else all(!df$below_threshold),
-      logical(1L)
-    ),
-    stringsAsFactors = FALSE
-  )
-
-  overall_pass <- all(summary_df$passes)
-
-  if (overall_pass) {
-    message(
-      "Palette passes colourblind safety check (minimum Delta E >= ",
-      threshold,
-      ")."
-    )
-  } else {
-    failing <- summary_df$vision_type[!summary_df$passes]
-    message(
-      "Potential colour conflicts detected under: ",
-      paste(failing, collapse = ", "),
-      ". Review pairs below threshold."
-    )
-  }
-
-  invisible(list(
-    passes = overall_pass,
-    threshold = threshold,
-    summary = summary_df,
-    pairwise = pairwise_results
-  ))
 }
