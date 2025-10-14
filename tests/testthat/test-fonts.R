@@ -136,10 +136,79 @@ test_that("set_bfh_fonts prints message", {
   )
 })
 
+# === Tests for font caching ===
+
+test_that("font cache improves performance on repeated calls", {
+  # Clear cache to start fresh
+  suppressMessages(clear_bfh_font_cache())
+
+  # First call should detect font
+  font1 <- suppressMessages(get_bfh_font(check_installed = TRUE, silent = TRUE))
+  expect_type(font1, "character")
+
+  # Second call should return cached result
+  font2 <- get_bfh_font(check_installed = TRUE, silent = FALSE)
+  expect_message(
+    get_bfh_font(check_installed = TRUE, silent = FALSE),
+    "cached"
+  )
+  expect_equal(font1, font2)
+})
+
+test_that("clear_bfh_font_cache() clears the cache", {
+  # Get font (will be cached)
+  font1 <- suppressMessages(get_bfh_font(check_installed = TRUE, silent = TRUE))
+
+  # Clear cache
+  expect_message(clear_bfh_font_cache(), "cache cleared")
+
+  # Next call should not show cached message
+  expect_message(
+    get_bfh_font(check_installed = TRUE, silent = FALSE),
+    "Using font"
+  )
+})
+
+test_that("force_refresh bypasses cache", {
+  # First call caches result
+  font1 <- suppressMessages(get_bfh_font(check_installed = TRUE, silent = TRUE))
+
+  # force_refresh should bypass cache and re-detect
+  font2 <- get_bfh_font(check_installed = TRUE, silent = FALSE, force_refresh = TRUE)
+  expect_message(
+    get_bfh_font(check_installed = TRUE, silent = FALSE, force_refresh = TRUE),
+    "Using font"
+  )
+
+  # Should still return same font
+  expect_equal(font1, font2)
+})
+
+test_that("cache persists across multiple calls", {
+  # Clear cache
+  suppressMessages(clear_bfh_font_cache())
+
+  # First call
+  font1 <- suppressMessages(get_bfh_font(silent = TRUE))
+
+  # Multiple subsequent calls should all use cache
+  for (i in 1:5) {
+    fonti <- get_bfh_font(silent = FALSE)
+    expect_message(
+      get_bfh_font(silent = FALSE),
+      "cached"
+    )
+    expect_equal(font1, fonti)
+  }
+})
+
 # === Integration tests ===
 
 test_that("font workflow: setup -> get -> set works correctly", {
   skip_if_not_installed("ggplot2")
+
+  # Clear cache for clean test
+  suppressMessages(clear_bfh_font_cache())
 
   # Step 1: Get font
   font1 <- suppressMessages(get_bfh_font(check_installed = TRUE, silent = TRUE))
