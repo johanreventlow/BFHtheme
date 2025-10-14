@@ -6,7 +6,7 @@
 #' @description
 #' Identifies the best available typeface for BFH-branded plots, caching the
 #' result to avoid repeated system queries. The priority order is:
-#' Mari/Mari Office → Roboto → Arial → sans.
+#' Mari → Mari Office → Roboto → Arial → sans.
 #'
 #' @details
 #' When `systemfonts` (preferred) or `extrafont` is installed the function checks
@@ -38,8 +38,8 @@ get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh =
 
   # Font priority list
   fonts <- c(
-    "Mari",         # Primary BFH font (installed on employee PCs)
-    # "Mari Office",         # Alternative name
+    "Mari",         # Primary BFH font (preferred when available)
+    "Mari Office",  # Alternative/legacy name on some systems
     "Roboto",       # Open source fallback
     "Arial",        # Universal fallback
     "sans"          # System fallback
@@ -136,8 +136,8 @@ clear_bfh_font_cache <- function() {
 #' }
 check_bfh_fonts <- function() {
   fonts_to_check <- c(
-    "Mari Office" = "Mari Office",
     "Mari" = "Mari",
+    "Mari Office" = "Mari Office",
     "Roboto" = "Roboto",
     "Arial" = "Arial"
   )

@@ -21,7 +21,7 @@ Character string containing the selected font family.
 \description{
 Identifies the best available typeface for BFH-branded plots, caching the
 result to avoid repeated system queries. The priority order is:
-Mari/Mari Office → Roboto → Arial → sans.
+Mari → Mari Office → Roboto → Arial → sans.
 }
 \details{
 When `systemfonts` (preferred) or `extrafont` is installed the function checks
