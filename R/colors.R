@@ -180,6 +180,7 @@ bfh_pal <- function(palette = "main", reverse = FALSE, ...) {
 #'
 #' @param n Number of colors to display from each palette
 #' @export
+#' @importFrom purrr walk
 #' @examples
 #' \dontrun{
 #' show_bfh_palettes()
@@ -197,17 +198,18 @@ show_bfh_palettes <- function(n = NULL) {
 
   graphics::par(mfrow = c(n_pals, 1), mai = c(0.2, 0.6, 0.2, 0.2))
 
-  for (pal_name in pal_names) {
-    pal <- bfh_palettes[[pal_name]]
-    if (is.null(n)) {
-      n_colors <- length(pal)
+  # Modernized with purrr::walk() for functional iteration
+  purrr::walk(pal_names, function(pal_name) {
+    # Use %||% for NULL coalescing
+    pal <- if (is.null(n)) {
+      bfh_palettes[[pal_name]]
     } else {
-      n_colors <- n
-      pal <- bfh_pal(pal_name)(n)
+      bfh_pal(pal_name)(n)
     }
+
     scales::show_col(pal, labels = TRUE, borders = NA, cex_label = 0.8)
     graphics::title(main = pal_name, line = -1)
-  }
+  })
 }
 
 #' Check if colors are colorblind-friendly

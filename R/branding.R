@@ -182,9 +182,8 @@ add_bfh_footer <- function(plot,
                            text_color = "white",
                            height = 0.05) {
 
-  if (is.null(text)) {
-    text <- "Bispebjerg og Frederiksberg Hospital"
-  }
+  # Modernized with %||% NULL coalescing operator
+  text <- text %||% "Bispebjerg og Frederiksberg Hospital"
 
   # Create footer rectangle positioned at bottom with specified height
   footer_rect <- grid::rectGrob(

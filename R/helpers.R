@@ -65,8 +65,9 @@ bfh_save <- function(filename,
     }
 
     dims <- presets[[preset]]
-    if (is.null(width)) width <- dims$width
-    if (is.null(height)) height <- dims$height
+    # Modernized with %||% NULL coalescing operator
+    width <- width %||% dims$width
+    height <- height %||% dims$height
   }
 
   # Save the plot
@@ -291,6 +292,7 @@ add_bfh_color_bar <- function(plot,
 #'   - fill: Legend title for fill aesthetic (uppercase)
 #' @return A ggplot2 labels object
 #' @export
+#' @importFrom purrr map
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -324,8 +326,8 @@ bfh_labs <- function(...) {
   # Labels that should NOT be uppercased
   keep_as_is <- c("title")
 
-  # Convert character arguments to uppercase, except title
-  args <- lapply(names(args), function(name) {
+  # Modernized with purrr::map() for functional iteration
+  args <- purrr::map(names(args), function(name) {
     value <- args[[name]]
 
     if (is.character(value) && !name %in% keep_as_is) {

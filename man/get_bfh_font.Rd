@@ -4,7 +4,7 @@
 \alias{get_bfh_font}
 \title{Get BFH font family}
 \usage{
-get_bfh_font(check_installed = TRUE, silent = FALSE)
+get_bfh_font(check_installed = TRUE, silent = FALSE, force_refresh = FALSE)
 }
 \arguments{
 \item{check_installed}{Logical. If TRUE, checks if fonts are actually installed.
@@ -12,18 +12,25 @@ Default is TRUE.}
 
 \item{silent}{Logical. If TRUE, suppresses informational messages.
 Default is FALSE.}
+
+\item{force_refresh}{Logical. If TRUE, bypasses cache and re-checks fonts.
+Default is FALSE.}
 }
 \value{
 Character string with font family name
 }
 \description{
 Returns the best available font for BFH plots with automatic fallback.
+Results are cached for the session to improve performance.
 Priority order: Mari/Mari Office → Roboto → Arial → sans
 }
 \examples{
-# Get best available font
+# Get best available font (cached after first call)
 font <- get_bfh_font()
 
 # Use in theme
 theme_bfh(base_family = get_bfh_font())
+
+# Force refresh cache if fonts change
+font <- get_bfh_font(force_refresh = TRUE)
 }
