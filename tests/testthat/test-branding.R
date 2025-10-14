@@ -30,25 +30,68 @@ test_that("add_bfh_logo validates file exists", {
   )
 })
 
-test_that("add_bfh_logo blocks path traversal attempts", {
+test_that("add_bfh_logo enforces optional root restriction", {
   skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
 
   p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
 
-  # Test path traversal patterns
-  expect_error(
-    add_bfh_logo(p, "../../../etc/passwd"),
-    "Path traversal patterns"
+  root_dir <- tempfile("bfh-logo-root")
+  dir.create(root_dir, recursive = TRUE, showWarnings = FALSE)
+  on.exit(unlink(root_dir, recursive = TRUE), add = TRUE)
+
+  inside_logo <- file.path(root_dir, "logo-inside.png")
+  file.copy(test_logo_path, inside_logo, overwrite = TRUE)
+
+  original_option <- getOption("BFHtheme.logo_root")
+  on.exit(options(BFHtheme.logo_root = original_option), add = TRUE)
+  options(BFHtheme.logo_root = root_dir)
+
+  expect_s3_class(
+    add_bfh_logo(p, inside_logo),
+    "ggplot"
   )
 
   expect_error(
-    add_bfh_logo(p, "~/secret/file.png"),
-    "Path traversal patterns"
+    add_bfh_logo(p, test_logo_path),
+    "allowed root"
+  )
+})
+
+test_that("add_bfh_logo accepts normalized shortcuts", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  # Home directory shortcut
+  home_logo <- tempfile(pattern = "bfh-logo-", tmpdir = path.expand("~"), fileext = ".png")
+  on.exit(unlink(home_logo), add = TRUE)
+  file.copy(test_logo_path, home_logo, overwrite = TRUE)
+
+  expect_s3_class(
+    add_bfh_logo(p, file.path("~", basename(home_logo))),
+    "ggplot"
   )
 
-  expect_error(
-    add_bfh_logo(p, "../logo.png"),
-    "Path traversal patterns"
+  # Relative parent reference
+  original_wd <- getwd()
+  temp_root <- tempfile("bfh-relative")
+  dir.create(temp_root, recursive = TRUE, showWarnings = FALSE)
+  nested_dir <- file.path(temp_root, "nested")
+  dir.create(nested_dir, showWarnings = FALSE)
+  parent_logo <- file.path(temp_root, "logo-relative.png")
+  file.copy(test_logo_path, parent_logo, overwrite = TRUE)
+
+  on.exit(unlink(parent_logo), add = TRUE)
+  on.exit(unlink(temp_root, recursive = TRUE), add = TRUE)
+  on.exit(setwd(original_wd), add = TRUE)
+
+  setwd(nested_dir)
+
+  expect_s3_class(
+    add_bfh_logo(p, "../logo-relative.png"),
+    "ggplot"
   )
 })
 
