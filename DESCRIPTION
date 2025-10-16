@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: c(
     person(
       "Johan", "Reventlow",
-      email = "your.email@bfh.ch",
+      email = "johan.reventlow@regionh.dk",
       role = c("aut", "cre")
     )
   )
@@ -13,7 +13,9 @@ Description: Provides comprehensive theming support for ggplot2 graphics
     following Bispebjerg og Frederiksberg Hospital and Region Hovedstaden
     visual identity guidelines. Includes color palettes for both Hospital
     and Region H branding, themes, scale functions, and helper utilities
-    for creating consistent and professional visualizations.
+    for creating consistent and professional visualizations. Supports
+    automatic font fallback with Roboto via 'showtext' package for
+    external users without access to proprietary BFH fonts.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

@@ -67,7 +67,7 @@ bfh_cols("regionh_primary", "regionh_blue")
 }
 
 \author{
-\strong{Maintainer}: Johan Reventlow \email{your.email@bfh.ch}
+\strong{Maintainer}: Johan Reventlow \email{johan.reventlow@regionh.dk}
 
 }
 \keyword{internal}

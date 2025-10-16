@@ -13,6 +13,10 @@ the recommended open-source fallback when Mari is unavailable.
 \details{
 No files are downloaded or installed automatically; the function only
 provides guidance that you can follow manually.
+
+**Note:** If you install the `showtext` package, BFHtheme will automatically
+download and use Roboto from Google Fonts when needed - no manual installation
+required!
 }
 \examples{
 \dontrun{

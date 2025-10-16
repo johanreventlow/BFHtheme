@@ -7,6 +7,7 @@
 #' @param x First value
 #' @param y Second value to use if x is NULL
 #' @return x if not NULL, otherwise y
+#' @name null-coalesce
 #' @keywords internal
 #' @examples
 #' \dontrun{

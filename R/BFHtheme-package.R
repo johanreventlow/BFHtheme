@@ -62,3 +62,36 @@
 ## usethis namespace: start
 ## usethis namespace: end
 NULL
+
+# Package startup message
+.onAttach <- function(libname, pkgname) {
+  # Check font availability
+  has_mari <- FALSE
+  has_showtext <- requireNamespace("showtext", quietly = TRUE)
+
+  if (requireNamespace("systemfonts", quietly = TRUE)) {
+    available_fonts <- systemfonts::system_fonts()$family
+    has_mari <- any(c("Mari", "Mari Office") %in% available_fonts)
+  } else if (requireNamespace("extrafont", quietly = TRUE)) {
+    available_fonts <- extrafont::fonts()
+    has_mari <- any(c("Mari", "Mari Office") %in% available_fonts)
+  }
+
+  # Show helpful message if Mari not found and showtext not installed
+  if (!has_mari && !has_showtext) {
+    packageStartupMessage(
+      "BFHtheme loaded! \n",
+      "Note: Mari font not detected. For best results, install 'showtext' package:\n",
+      "  install.packages('showtext')\n",
+      "This will automatically load Roboto font from Google Fonts."
+    )
+  } else if (!has_mari && has_showtext) {
+    packageStartupMessage(
+      "BFHtheme loaded! \n",
+      "Note: Mari font not detected, but showtext is available.\n",
+      "Roboto will be auto-loaded from Google Fonts when needed."
+    )
+  } else {
+    packageStartupMessage("BFHtheme loaded!")
+  }
+}

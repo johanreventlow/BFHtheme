@@ -10,9 +10,18 @@
 #'
 #' @details
 #' When `systemfonts` (preferred) or `extrafont` is installed the function checks
-#' actual system availability. Results are cached in the package environment; use
-#' [clear_bfh_font_cache()] or set `force_refresh = TRUE` after installing new
-#' fonts.
+#' actual system availability. If Roboto is not found on the system but `showtext`
+#' is installed, the function will automatically download and load Roboto from
+#' Google Fonts.
+#'
+#' Results are cached in the package environment; use [clear_bfh_font_cache()]
+#' or set `force_refresh = TRUE` after installing new fonts.
+#'
+#' **Font availability notes:**
+#' - **Mari fonts**: Only available on BFH employee computers (proprietary)
+#' - **Roboto**: Free open-source font, auto-loaded via `showtext` if available
+#' - **Arial**: System font on most platforms
+#' - **sans**: Universal fallback (system default)
 #'
 #' @param check_installed Logical. If `TRUE` (default) verify fonts are installed.
 #'   Set to `FALSE` to simply return the highest-priority font name.
@@ -34,6 +43,15 @@
 #'
 #' # Force refresh cache if fonts change
 #' font <- get_bfh_font(force_refresh = TRUE)
+#'
+#' # For external users without Mari fonts:
+#' # Install showtext for automatic Roboto loading
+#' \dontrun{
+#' install.packages("showtext")
+#' library(ggplot2)
+#' ggplot(mtcars, aes(wt, mpg)) + geom_point() + theme_bfh()
+#' # Roboto will be auto-loaded via Google Fonts if not installed
+#' }
 get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh = FALSE) {
 
   # Font priority list
@@ -86,7 +104,24 @@ get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh =
     }
   }
 
-  # If no font checking available or no fonts found, use sans
+  # If Roboto not found but showtext is available, try loading from Google Fonts
+  if (is.null(selected_font) || selected_font %in% c("Arial", "sans")) {
+    if (requireNamespace("showtext", quietly = TRUE)) {
+      tryCatch({
+        showtext::font_add_google("Roboto", "Roboto")
+        showtext::showtext_auto()
+        selected_font <- "Roboto"
+        if (!silent) message("Loaded Roboto font via Google Fonts (showtext)")
+      }, error = function(e) {
+        # Silently fall back to next available font
+        if (is.null(selected_font)) {
+          selected_font <<- "sans"
+        }
+      })
+    }
+  }
+
+  # Final fallback to sans if nothing else worked
   if (is.null(selected_font)) {
     selected_font <- "sans"
     if (!silent) message("Using fallback font: sans")
@@ -198,6 +233,10 @@ check_bfh_fonts <- function() {
 #' @details
 #' No files are downloaded or installed automatically; the function only
 #' provides guidance that you can follow manually.
+#'
+#' **Note:** If you install the `showtext` package, BFHtheme will automatically
+#' download and use Roboto from Google Fonts when needed - no manual installation
+#' required!
 #'
 #' @export
 #' @seealso [check_bfh_fonts()]

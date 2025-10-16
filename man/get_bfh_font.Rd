@@ -25,9 +25,18 @@ Mari → Mari Office → Roboto → Arial → sans.
 }
 \details{
 When `systemfonts` (preferred) or `extrafont` is installed the function checks
-actual system availability. Results are cached in the package environment; use
-[clear_bfh_font_cache()] or set `force_refresh = TRUE` after installing new
-fonts.
+actual system availability. If Roboto is not found on the system but `showtext`
+is installed, the function will automatically download and load Roboto from
+Google Fonts.
+
+Results are cached in the package environment; use [clear_bfh_font_cache()]
+or set `force_refresh = TRUE` after installing new fonts.
+
+**Font availability notes:**
+- **Mari fonts**: Only available on BFH employee computers (proprietary)
+- **Roboto**: Free open-source font, auto-loaded via `showtext` if available
+- **Arial**: System font on most platforms
+- **sans**: Universal fallback (system default)
 }
 \examples{
 # Get best available font (cached after first call)
@@ -38,6 +47,15 @@ theme_bfh(base_family = get_bfh_font())
 
 # Force refresh cache if fonts change
 font <- get_bfh_font(force_refresh = TRUE)
+
+# For external users without Mari fonts:
+# Install showtext for automatic Roboto loading
+\dontrun{
+install.packages("showtext")
+library(ggplot2)
+ggplot(mtcars, aes(wt, mpg)) + geom_point() + theme_bfh()
+# Roboto will be auto-loaded via Google Fonts if not installed
+}
 }
 \seealso{
 [check_bfh_fonts()], [set_bfh_fonts()], [set_bfh_defaults()]

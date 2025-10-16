@@ -26,6 +26,16 @@ devtools::install_local("/path/to/BFHtheme")
 # devtools::install_github("yourusername/BFHtheme")
 ```
 
+### Recommended: Install showtext for Font Support
+
+For best typography results, especially for external users without access to BFH's proprietary Mari font:
+
+```r
+install.packages("showtext")
+```
+
+This enables automatic Roboto font loading from Google Fonts. See [Typography](#typography) section for details.
+
 **Note:** Efter installation, genstart din R session for at sikre pakken er korrekt loaded.
 
 ## Quick Start
@@ -217,17 +227,60 @@ ggplot(data, aes(x, y, color = group)) +
 
 ## Typography
 
-The default font is "sans". To use custom fonts (e.g., BFH's official typeface):
+### Font Support
+
+BFHtheme automatically selects the best available font using this priority order:
+
+1. **Mari** (BFH official font - available on BFH employee computers)
+2. **Mari Office** (alternative name on some systems)
+3. **Roboto** (free open-source alternative)
+4. **Arial** (system fallback)
+5. **sans** (universal fallback)
+
+### For External Users (Without Mari Font)
+
+**Recommended: Install `showtext` package for automatic Roboto loading:**
 
 ```r
-# Install and load the font (example with showtext package)
+# Install showtext
+install.packages("showtext")
+
+# Use BFHtheme - Roboto will be auto-loaded from Google Fonts if needed
+library(BFHtheme)
+library(ggplot2)
+
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_bfh()  # Roboto automatically loaded if Mari not available
+```
+
+**Alternative: Manual Roboto installation**
+
+```r
+# Check which fonts are available
+check_bfh_fonts()
+
+# Get installation instructions
+install_roboto_font()
+
+# After installing Roboto, clear cache and verify
+clear_bfh_font_cache()
+check_bfh_fonts()
+```
+
+**For custom fonts:**
+
+```r
+# Example with showtext package
 library(showtext)
 font_add("YourFont", "path/to/font.ttf")
 showtext_auto()
 
 # Use in theme
-set_bfh_defaults(base_family = "YourFont")
+theme_bfh(base_family = "YourFont")
 ```
+
+**Note:** Mari fonts are proprietary and only available on BFH employee computers. External users and collaborators should use Roboto (free, open-source, Apache 2.0 licensed) which provides excellent visual compatibility.
 
 ## Package Structure
 
