@@ -65,31 +65,29 @@ NULL
 
 # Package startup message
 .onAttach <- function(libname, pkgname) {
-  # Check font availability
+  # Check font availability using modern systemfonts
   has_mari <- FALSE
-  has_showtext <- requireNamespace("showtext", quietly = TRUE)
 
   if (requireNamespace("systemfonts", quietly = TRUE)) {
-    available_fonts <- systemfonts::system_fonts()$family
-    has_mari <- any(c("Mari", "Mari Office") %in% available_fonts)
-  } else if (requireNamespace("extrafont", quietly = TRUE)) {
-    available_fonts <- extrafont::fonts()
-    has_mari <- any(c("Mari", "Mari Office") %in% available_fonts)
+    # Check for Mari fonts using match_fonts (modern API)
+    mari_result <- tryCatch({
+      systemfonts::match_fonts("Mari")
+    }, error = function(e) NULL)
+
+    has_mari <- !is.null(mari_result) &&
+                !is.null(mari_result$path) &&
+                !is.na(mari_result$path) &&
+                nzchar(mari_result$path)
   }
 
-  # Show helpful message if Mari not found and showtext not installed
-  if (!has_mari && !has_showtext) {
+  # Show helpful message if Mari not found
+  if (!has_mari) {
     packageStartupMessage(
-      "BFHtheme loaded! \n",
-      "Note: Mari font not detected. For best results, install 'showtext' package:\n",
-      "  install.packages('showtext')\n",
-      "This will automatically load Roboto font from Google Fonts."
-    )
-  } else if (!has_mari && has_showtext) {
-    packageStartupMessage(
-      "BFHtheme loaded! \n",
-      "Note: Mari font not detected, but showtext is available.\n",
-      "Roboto will be auto-loaded from Google Fonts when needed."
+      "BFHtheme loaded!\n",
+      "Note: Mari font not detected. For best font rendering:\n",
+      "  - Install Roboto (https://fonts.google.com/specimen/Roboto)\n",
+      "  - Or use: use_bfh_showtext() to load fonts via showtext\n",
+      "  - See: ?set_bfh_graphics for device recommendations"
     )
   } else {
     packageStartupMessage("BFHtheme loaded!")

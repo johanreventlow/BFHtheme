@@ -9,19 +9,21 @@
 #' Mari → Mari Office → Roboto → Arial → sans.
 #'
 #' @details
-#' When `systemfonts` (preferred) or `extrafont` is installed the function checks
-#' actual system availability. If Roboto is not found on the system but `showtext`
-#' is installed, the function will automatically download and load Roboto from
-#' Google Fonts.
+#' When `systemfonts` package is installed, the function uses
+#' `systemfonts::match_font()` to robustly check font availability on your system.
 #'
 #' Results are cached in the package environment; use [clear_bfh_font_cache()]
 #' or set `force_refresh = TRUE` after installing new fonts.
 #'
 #' **Font availability notes:**
 #' - **Mari fonts**: Only available on BFH employee computers (proprietary)
-#' - **Roboto**: Free open-source font, auto-loaded via `showtext` if available
+#' - **Roboto**: Free open-source font (install via OS or use `use_bfh_showtext()`)
 #' - **Arial**: System font on most platforms
 #' - **sans**: Universal fallback (system default)
+#'
+#' **For embedding fonts in outputs:** Use modern graphics devices like
+#' `ragg::agg_png()`, `svglite::svglite()`, or `grDevices::cairo_pdf()`.
+#' See `set_bfh_graphics()` for recommended device setup.
 #'
 #' @param check_installed Logical. If `TRUE` (default) verify fonts are installed.
 #'   Set to `FALSE` to simply return the highest-priority font name.
@@ -75,49 +77,31 @@ get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh =
     return(cached_font)
   }
 
-  # Check which fonts are available (vectorized for performance)
+  # Modern approach: Use systemfonts::match_font() for robust detection
   selected_font <- NULL
 
   if (requireNamespace("systemfonts", quietly = TRUE)) {
-    # Use systemfonts package for robust checking
-    available_fonts <- systemfonts::system_fonts()$family
+    # Try each font in priority order using match_fonts (modern API)
+    for (font_name in fonts) {
+      if (font_name == "sans") {
+        # Always accept sans as final fallback
+        selected_font <- "sans"
+        break
+      }
 
-    # Vectorized matching - much faster than loops
-    matched_idx <- match(fonts, available_fonts, nomatch = 0L)
-    first_match <- which(matched_idx > 0)[1]
+      match_result <- tryCatch({
+        systemfonts::match_fonts(font_name)
+      }, error = function(e) NULL)
 
-    if (!is.na(first_match)) {
-      selected_font <- fonts[first_match]
-      if (!silent) message("Using font: ", selected_font)
-    }
-  } else if (requireNamespace("extrafont", quietly = TRUE)) {
-    # Fallback: try with extrafont if available
-    available_fonts <- extrafont::fonts()
-
-    # Vectorized matching
-    matched_idx <- match(fonts, available_fonts, nomatch = 0L)
-    first_match <- which(matched_idx > 0)[1]
-
-    if (!is.na(first_match)) {
-      selected_font <- fonts[first_match]
-      if (!silent) message("Using font: ", selected_font)
-    }
-  }
-
-  # If Roboto not found but showtext is available, try loading from Google Fonts
-  if (is.null(selected_font) || selected_font %in% c("Arial", "sans")) {
-    if (requireNamespace("showtext", quietly = TRUE)) {
-      tryCatch({
-        showtext::font_add_google("Roboto", "Roboto")
-        showtext::showtext_auto()
-        selected_font <- "Roboto"
-        if (!silent) message("Loaded Roboto font via Google Fonts (showtext)")
-      }, error = function(e) {
-        # Silently fall back to next available font
-        if (is.null(selected_font)) {
-          selected_font <<- "sans"
-        }
-      })
+      # Check if font was successfully matched (has valid path)
+      if (!is.null(match_result) &&
+          !is.null(match_result$path) &&
+          !is.na(match_result$path) &&
+          nzchar(match_result$path)) {
+        selected_font <- font_name
+        if (!silent) message("Using font: ", selected_font)
+        break
+      }
     }
   }
 
@@ -183,25 +167,19 @@ check_bfh_fonts <- function() {
   cat("\n=== BFH Font Availability ===\n\n")
 
   if (requireNamespace("systemfonts", quietly = TRUE)) {
-    available_fonts <- systemfonts::system_fonts()$family
+    # Use match_fonts() for robust detection (same as get_bfh_font())
+    for (i in seq_along(fonts_to_check)) {
+      font_name <- fonts_to_check[i]
+      match_result <- tryCatch({
+        systemfonts::match_fonts(font_name)
+      }, error = function(e) NULL)
 
-    # Vectorized matching - much faster than loops
-    results_vec <- fonts_to_check %in% available_fonts
-    names(results_vec) <- names(fonts_to_check)
-    results <- results_vec
-
-    # Display results
-    statuses <- ifelse(results, "\u2713 Available", "\u2717 Not found")
-    output <- sprintf("%-15s: %s", names(fonts_to_check), statuses)
-    cat(paste(output, collapse = "\n"), "\n")
-
-  } else if (requireNamespace("extrafont", quietly = TRUE)) {
-    available_fonts <- extrafont::fonts()
-
-    # Vectorized matching
-    results_vec <- fonts_to_check %in% available_fonts
-    names(results_vec) <- names(fonts_to_check)
-    results <- results_vec
+      # Check if font was successfully matched
+      results[i] <- !is.null(match_result) &&
+                    !is.null(match_result$path) &&
+                    !is.na(match_result$path) &&
+                    nzchar(match_result$path)
+    }
 
     # Display results
     statuses <- ifelse(results, "\u2713 Available", "\u2717 Not found")
@@ -209,7 +187,7 @@ check_bfh_fonts <- function() {
     cat(paste(output, collapse = "\n"), "\n")
 
   } else {
-    cat("Install 'systemfonts' or 'extrafont' package to check fonts:\n")
+    cat("Install 'systemfonts' package to check fonts:\n")
     cat("  install.packages('systemfonts')\n\n")
     results[] <- NA
   }
@@ -218,7 +196,8 @@ check_bfh_fonts <- function() {
 
   if (!any(results[1:2], na.rm = TRUE)) {
     cat("NOTE: Mari fonts not found. These are installed on BFH employee computers.\n")
-    cat("For external users, Roboto is recommended.\n\n")
+    cat("For external users, Roboto is recommended.\n")
+    cat("See ?set_bfh_graphics for device recommendations.\n\n")
   }
 
   invisible(results)
@@ -350,4 +329,145 @@ set_bfh_fonts <- function(use_showtext = FALSE) {
 
   message("BFH fonts set as default: ", font)
   invisible(font)
+}
+
+#' Setup Modern Graphics Devices for BFH Plots
+#'
+#' @description
+#' Configures recommended graphics devices for high-quality BFH plots with
+#' proper font embedding. Sets up `ragg` for raster output and `svglite` for
+#' vector graphics when used in knitr/quarto documents.
+#'
+#' @details
+#' This function sets knitr chunk defaults to use modern graphics devices:
+#' - **PNG/JPEG:** `ragg::agg_png()` - high-quality raster with font support
+#' - **PDF:** Recommend using `ggsave()` with `device = grDevices::cairo_pdf`
+#' - **SVG:** Recommend using `ggsave()` with `device = svglite::svglite`
+#'
+#' These devices work seamlessly with system fonts via `systemfonts`,
+#' avoiding the need for PostScript font databases or `extrafont`.
+#'
+#' @param dpi Resolution for raster graphics (default: 300 for print quality)
+#'
+#' @return Invisibly returns `TRUE`.
+#' @export
+#' @seealso [get_bfh_font()], [bfh_save()]
+#' @family BFH fonts
+#' @examples
+#' \dontrun{
+#' # Setup at the start of your analysis
+#' library(BFHtheme)
+#' set_bfh_graphics()
+#'
+#' # Now all knitr chunks will use high-quality devices
+#' # For manual saving:
+#' p <- ggplot(mtcars, aes(wt, mpg)) + geom_point() + theme_bfh()
+#' ggsave("plot.pdf", p, device = grDevices::cairo_pdf)
+#' ggsave("plot.svg", p, device = svglite::svglite)
+#' }
+set_bfh_graphics <- function(dpi = 300) {
+  # Check if we're in a knitr context
+  if (requireNamespace("knitr", quietly = TRUE)) {
+    # Use ragg for high-quality raster output
+    if (requireNamespace("ragg", quietly = TRUE)) {
+      knitr::opts_chunk$set(
+        dev = "ragg_png",
+        dpi = dpi
+      )
+      message("knitr device set to ragg_png (dpi = ", dpi, ")")
+    } else {
+      message("Install 'ragg' package for best raster quality:\n",
+              "  install.packages('ragg')")
+    }
+  }
+
+  # Print recommendations for manual saving
+  message("\nRecommended devices for ggsave():")
+  message("  PDF: ggsave('plot.pdf', device = grDevices::cairo_pdf)")
+  if (requireNamespace("svglite", quietly = TRUE)) {
+    message("  SVG: ggsave('plot.svg', device = svglite::svglite)")
+  } else {
+    message("  SVG: Install 'svglite' for vector graphics")
+  }
+  if (requireNamespace("ragg", quietly = TRUE)) {
+    message("  PNG: ggsave('plot.png', device = ragg::agg_png, dpi = ", dpi, ")")
+  }
+
+  invisible(TRUE)
+}
+
+#' Enable Showtext for Font Embedding
+#'
+#' @description
+#' Explicitly enables `showtext` for embedding fonts in graphics when system
+#' fonts are not available or when you need to embed custom fonts.
+#'
+#' @details
+#' **When to use this:**
+#' - Deploying to servers without Mari fonts (e.g., Posit Connect)
+#' - Need to embed custom fonts in PDFs
+#' - System fonts not rendering correctly
+#'
+#' **Note:** This is opt-in by design. Most users should rely on system fonts
+#' with modern devices (`ragg`, `svglite`, `cairo_pdf`).
+#'
+#' @param font_paths Named list with paths to font files (regular, bold, italic).
+#'   If NULL, attempts to load Roboto from Google Fonts.
+#' @param family Font family name to register (default: "Roboto")
+#'
+#' @return Invisibly returns the font family name.
+#' @export
+#' @seealso [get_bfh_font()], [set_bfh_graphics()]
+#' @family BFH fonts
+#' @examples
+#' \dontrun{
+#' # Option 1: Load Roboto from Google Fonts
+#' use_bfh_showtext()
+#'
+#' # Option 2: Load custom fonts from files
+#' use_bfh_showtext(
+#'   font_paths = list(
+#'     regular = "path/to/Mari-Regular.ttf",
+#'     bold = "path/to/Mari-Bold.ttf",
+#'     italic = "path/to/Mari-Italic.ttf"
+#'   ),
+#'   family = "Mari"
+#' )
+#' }
+use_bfh_showtext <- function(font_paths = NULL, family = "Roboto") {
+  if (!requireNamespace("showtext", quietly = TRUE)) {
+    stop("Install 'showtext' package:\n  install.packages('showtext')",
+         call. = FALSE)
+  }
+
+  if (is.null(font_paths)) {
+    # Load from Google Fonts
+    tryCatch({
+      showtext::font_add_google(family, family)
+      message("Loaded ", family, " from Google Fonts via showtext")
+    }, error = function(e) {
+      stop("Could not load ", family, " from Google Fonts: ", e$message,
+           call. = FALSE)
+    })
+  } else {
+    # Load from local files
+    if (!all(c("regular") %in% names(font_paths))) {
+      stop("font_paths must contain at least 'regular' entry", call. = FALSE)
+    }
+
+    showtext::font_add(
+      family = family,
+      regular = font_paths$regular,
+      bold = font_paths$bold %||% font_paths$regular,
+      italic = font_paths$italic %||% font_paths$regular,
+      bolditalic = font_paths$bolditalic %||% font_paths$regular
+    )
+    message("Loaded ", family, " from local files via showtext")
+  }
+
+  # Enable showtext
+  showtext::showtext_auto()
+  message("showtext enabled - fonts will be embedded in graphics")
+
+  invisible(family)
 }

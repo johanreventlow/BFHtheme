@@ -31,6 +31,8 @@ Other BFH fonts:
 \code{\link{clear_bfh_font_cache}()},
 \code{\link{get_bfh_font}()},
 \code{\link{set_bfh_fonts}()},
-\code{\link{setup_bfh_fonts}()}
+\code{\link{set_bfh_graphics}()},
+\code{\link{setup_bfh_fonts}()},
+\code{\link{use_bfh_showtext}()}
 }
 \concept{BFH fonts}

@@ -24,19 +24,21 @@ result to avoid repeated system queries. The priority order is:
 Mari → Mari Office → Roboto → Arial → sans.
 }
 \details{
-When `systemfonts` (preferred) or `extrafont` is installed the function checks
-actual system availability. If Roboto is not found on the system but `showtext`
-is installed, the function will automatically download and load Roboto from
-Google Fonts.
+When `systemfonts` package is installed, the function uses
+`systemfonts::match_font()` to robustly check font availability on your system.
 
 Results are cached in the package environment; use [clear_bfh_font_cache()]
 or set `force_refresh = TRUE` after installing new fonts.
 
 **Font availability notes:**
 - **Mari fonts**: Only available on BFH employee computers (proprietary)
-- **Roboto**: Free open-source font, auto-loaded via `showtext` if available
+- **Roboto**: Free open-source font (install via OS or use `use_bfh_showtext()`)
 - **Arial**: System font on most platforms
 - **sans**: Universal fallback (system default)
+
+**For embedding fonts in outputs:** Use modern graphics devices like
+`ragg::agg_png()`, `svglite::svglite()`, or `grDevices::cairo_pdf()`.
+See `set_bfh_graphics()` for recommended device setup.
 }
 \examples{
 # Get best available font (cached after first call)
@@ -65,6 +67,8 @@ Other BFH fonts:
 \code{\link{clear_bfh_font_cache}()},
 \code{\link{install_roboto_font}()},
 \code{\link{set_bfh_fonts}()},
-\code{\link{setup_bfh_fonts}()}
+\code{\link{set_bfh_graphics}()},
+\code{\link{setup_bfh_fonts}()},
+\code{\link{use_bfh_showtext}()}
 }
 \concept{BFH fonts}
