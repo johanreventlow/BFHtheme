@@ -10,25 +10,13 @@
 #' coordinates based on the selected corner. For packaged logos, see [add_logo()]
 #' and [get_bfh_logo()].
 #'
-#' @section Security:
-#' This function implements multiple security layers to ensure safe file handling:
-#'
-#' **Path Normalization:**
-#' File paths are normalized and verified twice to prevent path traversal attacks
-#' and ensure path stability. This guards against tampering attempts where a path
-#' might resolve differently on subsequent calls.
-#'
-#' **Root Directory Restriction (Optional):**
-#' You can restrict logo loading to a specific directory tree by setting:
+#' **Security:** File paths are normalized and verified to prevent tampering.
+#' For additional security, you can restrict logo loading to a specific directory:
+#' ```r
+#' options(BFHtheme.logo_root = "/safe/logo/directory")
 #' ```
-#' options(BFHtheme.logo_root = "/safe/directory")
-#' ```
-#' When set, only logos within this directory (or subdirectories) can be loaded.
-#' This is useful in multi-user environments or when processing untrusted input.
-#'
-#' **File Integrity Checks:**
-#' Files are verified to be readable and non-empty before processing, preventing
-#' errors from corrupted or inaccessible files.
+#' When set, only logos within this directory (or subdirectories) will be allowed.
+#' File size and readability are also verified before processing.
 #'
 #' @param plot A ggplot2 object.
 #' @param logo_path Path to a PNG or JPEG logo file.
@@ -52,12 +40,12 @@
 #'   geom_point() +
 #'   theme_bfh()
 #'
-#' # Option 1: Use packaged logo via get_bfh_logo()
-#' logo_path <- get_bfh_logo(size = "web", variant = "color")
+#' # Option 1: Use packaged BFH logo (recommended)
+#' logo_path <- get_bfh_logo("web")
 #' add_bfh_logo(p, logo_path, position = "topright")
 #'
-#' # Option 2: Use any custom logo file (adjust path as needed)
-#' # add_bfh_logo(p, "/path/to/your/logo.png", position = "topright")
+#' # Option 2: Use custom logo from file system
+#' # add_bfh_logo(p, "/path/to/your/custom/logo.png", position = "bottomright")
 #' }
 add_bfh_logo <- function(plot,
                          logo_path,
@@ -71,8 +59,11 @@ add_bfh_logo <- function(plot,
     stop("logo_path must be a non-empty character string", call. = FALSE)
   }
 
-  # Security Layer 1: Path Normalization
-  # Resolve path shortcuts (~ and ..) to absolute paths and verify file exists
+  # Validate position parameter using centralized validation
+  position <- validate_choice(position, "position", c("topleft", "topright", "bottomleft", "bottomright"))
+
+  # === Security Layer 1: Path Normalization ===
+  # Normalize path (allowing shortcuts like ~ or ..) and ensure it resolves
   normalized_path <- tryCatch(
     normalizePath(logo_path, winslash = "/", mustWork = TRUE),
     error = function(e) {
@@ -84,9 +75,9 @@ add_bfh_logo <- function(plot,
     }
   )
 
-  # Security Layer 2: Double Verification
-  # Re-normalize to ensure path stability and guard against TOCTOU attacks
-  # (Time-Of-Check-Time-Of-Use) where a path might resolve differently
+  # === Security Layer 2: Tampering Protection ===
+  # Re-normalize the resolved path to ensure stability and verify path hasn't changed
+  # This catches symbolic link attacks and path confusion exploits
   normalized_verification <- tryCatch(
     normalizePath(normalized_path, winslash = "/", mustWork = TRUE),
     error = function(e) {
@@ -98,9 +89,9 @@ add_bfh_logo <- function(plot,
     stop("Invalid file path: ", logo_path, call. = FALSE)
   }
 
-  # Security Layer 3: Optional Root Directory Restriction
-  # Restrict file access to a specific directory tree for sandboxing
-  # Enable via: options(BFHtheme.logo_root = "/safe/directory")
+  # === Security Layer 3: Optional Root Directory Restriction ===
+  # Users can restrict logo loading to specific directory via options(BFHtheme.logo_root = "/path")
+  # This provides sandboxing for high-security applications
   allowed_root <- getOption("BFHtheme.logo_root")
   if (!is.null(allowed_root)) {
     normalized_root <- tryCatch(
@@ -116,24 +107,17 @@ add_bfh_logo <- function(plot,
     }
   }
 
-  # Security Layer 4: File Integrity Check
-  # Verify file is readable and contains data before processing
+  # === Security Layer 4: File Integrity Checks ===
+  # Verify file is readable and has content before processing
   file_info <- file.info(normalized_path)
   if (is.na(file_info$size) || file_info$size == 0) {
     stop("Logo file is empty or unreadable", call. = FALSE)
   }
 
-  # Validate numeric parameters using standardized validation
-  size <- validate_numeric_range(size, "size", 0, 1, exclusive_min = TRUE)
+  # Validate numeric parameters using centralized validation
+  size <- validate_numeric_range(size, "size", 0.001, 1)
   alpha <- validate_numeric_range(alpha, "alpha", 0, 1)
   padding <- validate_numeric_range(padding, "padding", 0, 1)
-
-  # Validate position choice
-  position <- validate_choice(
-    position,
-    "position",
-    c("topleft", "topright", "bottomleft", "bottomright")
-  )
 
   logo_type <- detect_logo_image_type(normalized_path, file_info$size)
 
@@ -181,7 +165,7 @@ add_bfh_logo <- function(plot,
   logo_height_npc <- size * aspect_ratio
 
   # Determine position parameters med korrekte dimensioner
-  # Position is already validated via validate_choice()
+  # Position is already validated, so we can safely use switch()
   pos <- switch(position,
     topleft = list(
       x = grid::unit(padding + logo_width_npc/2, "npc"),

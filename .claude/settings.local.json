@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git push -u origin docs/fix-add-bfh-logo-example)"
+      "Bash(git push -u origin docs/fix-add-bfh-logo-example)",
+      "Bash(gh issue close:*)",
+      "Bash(gh issue list:*)",
+      "Bash(git commit:*)",
+      "Bash(find:*)",
+      "Bash(awk:*)",
+      "Bash(gh:*)",
+      "Bash(Rscript:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Read(//Users/johanreventlow/Documents/R/**)",
+      "Bash(gemini -p \"\nUdfør en grundig kode review af hele BFHtheme-projektet med fokus på:\n\n1. **Dokumentation**\n   - Mangel på Roxygen docs\n   - Manglende beskrivelser af funktioner\n   - Uklare eller uupdaterede README/CONTRIBUTING filer\n   - Missing vignettes eller guides\n   - Dårligt dokumenterede exports\n\n2. **Test Coverage**\n   - Funktioner uden tests\n   - Dårlig eller manglende edge case testing\n   - Missing integration tests\n   - Fragmented test struktur\n   - Udeklarerede test dependencies\n\n3. **Overflødige/Dead Code**\n   - Funktioner der ikke bruges\n   - Duplicate funktionalitet\n   - Kommenteret-ud kode\n   - Unused variables\n   - Legacy mønstre der ikke længere bruges\n\n4. **Kode Kvalitet**\n   - Anti-patterns\n   - Inkonsistent stil eller naming\n   - Memory leaks eller performance issues\n   - Fejlhåndtering gaps\n\nGiv konkrete recommendations med fil-stier og linjenumre hvor relevant. Prioritér hvad der påvirker package usability og maintainability mest.\n\")"
     ],
     "deny": [],
     "ask": []

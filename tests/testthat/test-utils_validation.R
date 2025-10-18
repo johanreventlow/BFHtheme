@@ -272,3 +272,95 @@ test_that("validation helpers catch multiple invalid arguments correctly", {
     "discrete must be a single logical value"
   )
 })
+
+# === Tests for validate_numeric_range() ===
+
+test_that("validate_numeric_range accepts values within range", {
+  expect_equal(BFHtheme:::validate_numeric_range(0.5, "size", 0, 1), 0.5)
+  expect_equal(BFHtheme:::validate_numeric_range(0, "size", 0, 1), 0)
+  expect_equal(BFHtheme:::validate_numeric_range(1, "size", 0, 1), 1)
+  expect_equal(BFHtheme:::validate_numeric_range(-5, "value", -10, 0), -5)
+})
+
+test_that("validate_numeric_range rejects values outside range", {
+  expect_error(
+    BFHtheme:::validate_numeric_range(1.5, "size", 0, 1),
+    "size must be between"
+  )
+
+  expect_error(
+    BFHtheme:::validate_numeric_range(-0.1, "alpha", 0, 1),
+    "alpha must be between"
+  )
+})
+
+test_that("validate_numeric_range rejects non-numeric inputs", {
+  expect_error(
+    BFHtheme:::validate_numeric_range("0.5", "size", 0, 1),
+    "size must be a single numeric value"
+  )
+
+  expect_error(
+    BFHtheme:::validate_numeric_range(c(0.5, 0.6), "size", 0, 1),
+    "size must be a single numeric value"
+  )
+})
+
+test_that("validate_numeric_range handles NULL based on allow_null parameter", {
+  expect_equal(BFHtheme:::validate_numeric_range(NULL, "size", 0, 1, allow_null = TRUE), NULL)
+
+  expect_error(
+    BFHtheme:::validate_numeric_range(NULL, "size", 0, 1, allow_null = FALSE),
+    "size cannot be NULL"
+  )
+})
+
+# === Tests for validate_choice() ===
+
+test_that("validate_choice accepts valid choices", {
+  expect_equal(
+    BFHtheme:::validate_choice("topleft", "position", c("topleft", "topright", "bottomleft")),
+    "topleft"
+  )
+
+  expect_equal(
+    BFHtheme:::validate_choice("color", "variant", c("color", "grey", "mark")),
+    "color"
+  )
+})
+
+test_that("validate_choice rejects invalid choices", {
+  expect_error(
+    BFHtheme:::validate_choice("invalid", "position", c("topleft", "topright")),
+    "position must be one of"
+  )
+
+  expect_error(
+    BFHtheme:::validate_choice("blue", "color", c("red", "green")),
+    "color must be one of"
+  )
+})
+
+test_that("validate_choice rejects non-character inputs", {
+  expect_error(
+    BFHtheme:::validate_choice(1, "position", c("topleft", "topright")),
+    "position must be a single character value"
+  )
+
+  expect_error(
+    BFHtheme:::validate_choice(c("a", "b"), "choice", c("a", "b", "c")),
+    "choice must be a single character value"
+  )
+})
+
+test_that("validate_choice handles NULL based on allow_null parameter", {
+  expect_equal(
+    BFHtheme:::validate_choice(NULL, "position", c("topleft", "topright"), allow_null = TRUE),
+    NULL
+  )
+
+  expect_error(
+    BFHtheme:::validate_choice(NULL, "position", c("topleft", "topright"), allow_null = FALSE),
+    "position cannot be NULL"
+  )
+})

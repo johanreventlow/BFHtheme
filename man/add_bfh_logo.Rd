@@ -40,29 +40,15 @@ The helper reads PNG or JPEG files supplied via `logo_path`. Aspect ratio is
 preserved automatically, and the logo is positioned using absolute
 coordinates based on the selected corner. For packaged logos, see [add_logo()]
 and [get_bfh_logo()].
-}
-\section{Security}{
 
-This function implements multiple security layers to ensure safe file handling:
-
-**Path Normalization:**
-File paths are normalized and verified twice to prevent path traversal attacks
-and ensure path stability. This guards against tampering attempts where a path
-might resolve differently on subsequent calls.
-
-**Root Directory Restriction (Optional):**
-You can restrict logo loading to a specific directory tree by setting:
+**Security:** File paths are normalized and verified to prevent tampering.
+For additional security, you can restrict logo loading to a specific directory:
+```r
+options(BFHtheme.logo_root = "/safe/logo/directory")
 ```
-options(BFHtheme.logo_root = "/safe/directory")
-```
-When set, only logos within this directory (or subdirectories) can be loaded.
-This is useful in multi-user environments or when processing untrusted input.
-
-**File Integrity Checks:**
-Files are verified to be readable and non-empty before processing, preventing
-errors from corrupted or inaccessible files.
+When set, only logos within this directory (or subdirectories) will be allowed.
+File size and readability are also verified before processing.
 }
-
 \examples{
 \dontrun{
 library(ggplot2)
@@ -70,12 +56,12 @@ p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point() +
   theme_bfh()
 
-# Option 1: Use packaged logo via get_bfh_logo()
-logo_path <- get_bfh_logo(size = "web", variant = "color")
+# Option 1: Use packaged BFH logo (recommended)
+logo_path <- get_bfh_logo("web")
 add_bfh_logo(p, logo_path, position = "topright")
 
-# Option 2: Use any custom logo file (adjust path as needed)
-# add_bfh_logo(p, "/path/to/your/logo.png", position = "topright")
+# Option 2: Use custom logo from file system
+# add_bfh_logo(p, "/path/to/your/custom/logo.png", position = "bottomright")
 }
 }
 \seealso{

@@ -7,25 +7,24 @@
 validate_choice(value, name, choices, allow_null = FALSE)
 }
 \arguments{
-\item{value}{Value to validate (typically character string)}
+\item{value}{Value to validate}
 
 \item{name}{Character string naming the argument (for error messages)}
 
-\item{choices}{Character vector of allowed choices}
+\item{choices}{Character vector of allowed values}
 
-\item{allow_null}{Logical. If TRUE, NULL values are allowed (default: FALSE)}
+\item{allow_null}{Logical; allow NULL values? Defaults to FALSE}
 }
 \value{
-The validated value (unchanged if valid), or NULL if allow_null = TRUE
+The validated value (unchanged if valid)
 }
 \description{
-Ensures that a value is one of a predefined set of choices.
+Ensures that a value is one of the allowed choices.
 }
 \examples{
 \dontrun{
-validate_choice("topleft", "position", c("topleft", "topright"))  # Returns "topleft"
-validate_choice("middle", "position", c("top", "bottom"))         # Error
-validate_choice(NULL, "position", c("top", "bottom"), allow_null = TRUE)  # Returns NULL
+validate_choice("topright", "position", c("topleft", "topright", "bottomleft", "bottomright"))
+validate_choice("invalid", "position", c("topleft", "topright"))  # Error
 }
 }
 \keyword{internal}
