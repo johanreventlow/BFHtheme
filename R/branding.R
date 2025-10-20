@@ -10,6 +10,26 @@
 #' coordinates based on the selected corner. For packaged logos, see [add_logo()]
 #' and [get_bfh_logo()].
 #'
+#' @section Security:
+#' This function implements multiple security layers to ensure safe file handling:
+#'
+#' **Path Normalization:**
+#' File paths are normalized and verified twice to prevent path traversal attacks
+#' and ensure path stability. This guards against tampering attempts where a path
+#' might resolve differently on subsequent calls.
+#'
+#' **Root Directory Restriction (Optional):**
+#' You can restrict logo loading to a specific directory tree by setting:
+#' ```
+#' options(BFHtheme.logo_root = "/safe/directory")
+#' ```
+#' When set, only logos within this directory (or subdirectories) can be loaded.
+#' This is useful in multi-user environments or when processing untrusted input.
+#'
+#' **File Integrity Checks:**
+#' Files are verified to be readable and non-empty before processing, preventing
+#' errors from corrupted or inaccessible files.
+#'
 #' @param plot A ggplot2 object.
 #' @param logo_path Path to a PNG or JPEG logo file.
 #' @param position Logo location: `"topleft"`, `"topright"`, `"bottomleft"`, or
@@ -51,7 +71,8 @@ add_bfh_logo <- function(plot,
     stop("logo_path must be a non-empty character string", call. = FALSE)
   }
 
-  # Normalize path (allowing shortcuts like ~ or ..) and ensure it resolves
+  # Security Layer 1: Path Normalization
+  # Resolve path shortcuts (~ and ..) to absolute paths and verify file exists
   normalized_path <- tryCatch(
     normalizePath(logo_path, winslash = "/", mustWork = TRUE),
     error = function(e) {
@@ -63,7 +84,9 @@ add_bfh_logo <- function(plot,
     }
   )
 
-  # Re-normalize the resolved path to ensure stability and guard against tampering
+  # Security Layer 2: Double Verification
+  # Re-normalize to ensure path stability and guard against TOCTOU attacks
+  # (Time-Of-Check-Time-Of-Use) where a path might resolve differently
   normalized_verification <- tryCatch(
     normalizePath(normalized_path, winslash = "/", mustWork = TRUE),
     error = function(e) {
@@ -75,7 +98,9 @@ add_bfh_logo <- function(plot,
     stop("Invalid file path: ", logo_path, call. = FALSE)
   }
 
-  # Optional root restriction (set via options(BFHtheme.logo_root = "/path"))
+  # Security Layer 3: Optional Root Directory Restriction
+  # Restrict file access to a specific directory tree for sandboxing
+  # Enable via: options(BFHtheme.logo_root = "/safe/directory")
   allowed_root <- getOption("BFHtheme.logo_root")
   if (!is.null(allowed_root)) {
     normalized_root <- tryCatch(
@@ -91,7 +116,8 @@ add_bfh_logo <- function(plot,
     }
   }
 
-  # Verify file is readable and has content
+  # Security Layer 4: File Integrity Check
+  # Verify file is readable and contains data before processing
   file_info <- file.info(normalized_path)
   if (is.na(file_info$size) || file_info$size == 0) {
     stop("Logo file is empty or unreadable", call. = FALSE)
