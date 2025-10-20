@@ -32,8 +32,12 @@
 #'   geom_point() +
 #'   theme_bfh()
 #'
-#' # Add logo (you need to provide the path to your logo file)
-#' add_bfh_logo(p, "path/to/bfh_logo.png", position = "topright")
+#' # Option 1: Use packaged logo via get_bfh_logo()
+#' logo_path <- get_bfh_logo(size = "web", variant = "color")
+#' add_bfh_logo(p, logo_path, position = "topright")
+#'
+#' # Option 2: Use any custom logo file (adjust path as needed)
+#' # add_bfh_logo(p, "/path/to/your/logo.png", position = "topright")
 #' }
 add_bfh_logo <- function(plot,
                          logo_path,
