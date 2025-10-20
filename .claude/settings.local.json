@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push -u origin docs/fix-add-bfh-logo-example)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
