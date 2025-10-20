@@ -93,6 +93,67 @@ git commit -m "beskrivelse"
 
 Undtagelse: Simple operationer (`git status`, `git diff`, `git log`)
 
+### 2.3.1 Windows Environment & GitHub API Integration
+
+**Når du arbejder på Windows uden direkte GitHub CLI adgang:**
+
+GitHub CLI (`gh`) er ofte ikke tilgængelig på managed Windows systemer (IT-administreret). I stedet bruges **GitHub REST API via curl** til issue management.
+
+**Setup (én gang):**
+```bash
+# Gem GitHub Personal Access Token i git config
+git config --global github.token ghp_YOUR_TOKEN_HERE
+```
+
+**GitHub API Operationer:**
+
+```bash
+# Hent token fra config
+GITHUB_TOKEN=$(git config --global github.token)
+
+# Hent issue information
+curl -s -H "Authorization: token $GITHUB_TOKEN" \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/johanreventlow/BFHtheme/issues/25
+
+# Kommenter på issue
+curl -s -X POST \
+  -H "Authorization: token $GITHUB_TOKEN" \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/johanreventlow/BFHtheme/issues/25/comments \
+  -d '{"body":"Issue resolved message"}'
+
+# Luk issue
+curl -s -X PATCH \
+  -H "Authorization: token $GITHUB_TOKEN" \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/johanreventlow/BFHtheme/issues/25 \
+  -d '{"state":"closed"}'
+```
+
+**Git Workflow på Windows:**
+
+```bash
+# Standard git operationer fungerer normalt via Bash tool
+git status
+git checkout -b feature/branch-name
+git add file.R
+git commit -m "beskrivelse"
+git push -u origin feature/branch-name
+
+# Merge workflow (efter godkendelse)
+git checkout main
+git pull origin main
+git merge feature/branch-name --no-edit
+git push origin main
+```
+
+**Vigtigt:**
+- Git virker via standard bash kommandoer
+- GitHub CLI (`gh`) er IKKE tilgængelig - brug curl + GitHub API i stedet
+- Token skal gemmes i git config for at kunne genbruges
+- Alle git operationer skal bruge Bash tool (IKKE find, grep, cat - brug dedikerede tools til det)
+
 ### 2.4 Code Quality Standards
 
 * **Danske kommentarer**, engelske funktionsnavne
