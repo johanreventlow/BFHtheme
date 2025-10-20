@@ -98,6 +98,141 @@ test_that("validate_logical_argument uses custom argument name in error messages
   )
 })
 
+# === Tests for validate_numeric_range() ===
+
+test_that("validate_numeric_range accepts valid numeric values within range", {
+  # Valid inputs should pass through unchanged
+  expect_equal(validate_numeric_range(0.5, "size", 0, 1), 0.5)
+  expect_equal(validate_numeric_range(0, "alpha", 0, 1), 0)
+  expect_equal(validate_numeric_range(1, "padding", 0, 1), 1)
+  expect_equal(validate_numeric_range(12, "base_size", 6, 24), 12)
+})
+
+test_that("validate_numeric_range accepts NULL when allow_null = TRUE", {
+  expect_null(validate_numeric_range(NULL, "size", 0, 1, allow_null = TRUE))
+})
+
+test_that("validate_numeric_range rejects values below minimum", {
+  expect_error(
+    validate_numeric_range(-0.1, "size", 0, 1),
+    "size must be between 0 and 1"
+  )
+  expect_error(
+    validate_numeric_range(5, "base_size", 6, 24),
+    "base_size must be between 6 and 24"
+  )
+})
+
+test_that("validate_numeric_range rejects values above maximum", {
+  expect_error(
+    validate_numeric_range(1.5, "alpha", 0, 1),
+    "alpha must be between 0 and 1"
+  )
+  expect_error(
+    validate_numeric_range(30, "base_size", 6, 24),
+    "base_size must be between 6 and 24"
+  )
+})
+
+test_that("validate_numeric_range rejects non-numeric inputs", {
+  expect_error(
+    validate_numeric_range("0.5", "size", 0, 1),
+    "size must be numeric"
+  )
+  expect_error(
+    validate_numeric_range(TRUE, "alpha", 0, 1),
+    "alpha must be numeric"
+  )
+})
+
+test_that("validate_numeric_range rejects NULL when allow_null = FALSE", {
+  expect_error(
+    validate_numeric_range(NULL, "size", 0, 1, allow_null = FALSE),
+    "size must be numeric"
+  )
+})
+
+test_that("validate_numeric_range rejects NA", {
+  expect_error(
+    validate_numeric_range(NA_real_, "size", 0, 1),
+    "size must be numeric"
+  )
+})
+
+test_that("validate_numeric_range rejects vectors with multiple elements", {
+  expect_error(
+    validate_numeric_range(c(0.5, 0.6), "size", 0, 1),
+    "size must be a single numeric value"
+  )
+})
+
+test_that("validate_numeric_range handles exclusive bounds correctly", {
+  # Test exclusive_min
+  expect_equal(validate_numeric_range(0.1, "size", 0, 1, exclusive_min = TRUE), 0.1)
+  expect_error(
+    validate_numeric_range(0, "size", 0, 1, exclusive_min = TRUE),
+    "size must be greater than 0"
+  )
+
+  # Test exclusive_max
+  expect_equal(validate_numeric_range(0.9, "size", 0, 1, exclusive_max = TRUE), 0.9)
+  expect_error(
+    validate_numeric_range(1, "size", 0, 1, exclusive_max = TRUE),
+    "size must be less than 1"
+  )
+})
+
+# === Tests for validate_choice() ===
+
+test_that("validate_choice accepts valid choices", {
+  expect_equal(validate_choice("topleft", "position", c("topleft", "topright", "bottomleft", "bottomright")), "topleft")
+  expect_equal(validate_choice("web", "size", c("web", "print", "presentation")), "web")
+})
+
+test_that("validate_choice accepts NULL when allow_null = TRUE", {
+  expect_null(validate_choice(NULL, "position", c("top", "bottom"), allow_null = TRUE))
+})
+
+test_that("validate_choice rejects invalid choices", {
+  expect_error(
+    validate_choice("middle", "position", c("top", "bottom")),
+    "position must be one of: top, bottom"
+  )
+  expect_error(
+    validate_choice("large", "size", c("small", "medium")),
+    "size must be one of: small, medium"
+  )
+})
+
+test_that("validate_choice rejects NULL when allow_null = FALSE", {
+  expect_error(
+    validate_choice(NULL, "position", c("top", "bottom"), allow_null = FALSE),
+    "position must be one of: top, bottom"
+  )
+})
+
+test_that("validate_choice rejects non-character inputs", {
+  expect_error(
+    validate_choice(1, "position", c("top", "bottom")),
+    "position must be a character string"
+  )
+})
+
+test_that("validate_choice rejects vectors with multiple elements", {
+  expect_error(
+    validate_choice(c("top", "bottom"), "position", c("top", "bottom", "middle")),
+    "position must be a single value"
+  )
+})
+
+test_that("validate_choice handles case sensitivity", {
+  # Default is case-sensitive
+  expect_error(
+    validate_choice("TopLeft", "position", c("topleft", "topright")),
+    "position must be one of: topleft, topright"
+  )
+})
+
 # === Integration tests ===
 
 test_that("validation helpers work together in typical scale function pattern", {

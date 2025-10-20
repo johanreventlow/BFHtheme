@@ -123,17 +123,17 @@ add_bfh_logo <- function(plot,
     stop("Logo file is empty or unreadable", call. = FALSE)
   }
 
-  if (!is.numeric(size) || size <= 0 || size > 1) {
-    stop("size must be a number between 0 and 1 (exclusive of 0)", call. = FALSE)
-  }
+  # Validate numeric parameters using standardized validation
+  size <- validate_numeric_range(size, "size", 0, 1, exclusive_min = TRUE)
+  alpha <- validate_numeric_range(alpha, "alpha", 0, 1)
+  padding <- validate_numeric_range(padding, "padding", 0, 1)
 
-  if (!is.numeric(alpha) || alpha < 0 || alpha > 1) {
-    stop("alpha must be a number between 0 and 1", call. = FALSE)
-  }
-
-  if (!is.numeric(padding) || padding < 0 || padding > 1) {
-    stop("padding must be a number between 0 and 1", call. = FALSE)
-  }
+  # Validate position choice
+  position <- validate_choice(
+    position,
+    "position",
+    c("topleft", "topright", "bottomleft", "bottomright")
+  )
 
   logo_type <- detect_logo_image_type(normalized_path, file_info$size)
 
@@ -181,6 +181,7 @@ add_bfh_logo <- function(plot,
   logo_height_npc <- size * aspect_ratio
 
   # Determine position parameters med korrekte dimensioner
+  # Position is already validated via validate_choice()
   pos <- switch(position,
     topleft = list(
       x = grid::unit(padding + logo_width_npc/2, "npc"),
@@ -197,8 +198,7 @@ add_bfh_logo <- function(plot,
     bottomright = list(
       x = grid::unit(1 - padding - logo_width_npc/2, "npc"),
       y = grid::unit(padding + logo_height_npc/2, "npc")
-    ),
-    stop("position must be one of: topleft, topright, bottomleft, bottomright", call. = FALSE)
+    )
   )
 
   # Convert to raster with position applied og korrekt aspect ratio
