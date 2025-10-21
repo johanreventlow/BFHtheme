@@ -84,3 +84,19 @@ test_that("all theme variants work with ggplot2", {
   expect_s3_class(p3, "gg")
   expect_s3_class(p4, "gg")
 })
+
+test_that("theme_bfh y-axis labels are left-aligned", {
+  theme <- theme_bfh()
+
+  # Verificer at axis.text.y har hjust = 0 (venstrestillet)
+  expect_equal(theme$axis.text.y$hjust, 0)
+})
+
+test_that("all theme variants have left-aligned y-axis labels", {
+  # Test alle variants
+  expect_equal(theme_bfh()$axis.text.y$hjust, 0)
+  expect_equal(theme_bfh_minimal()$axis.text.y$hjust, 0)
+  expect_equal(theme_bfh_print()$axis.text.y$hjust, 0)
+  expect_equal(theme_bfh_presentation()$axis.text.y$hjust, 0)
+  expect_equal(theme_bfh_dark()$axis.text.y$hjust, 0)
+})
