@@ -56,6 +56,7 @@ ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
 
 Other BFH scales: 
 \code{\link{scale_fill_bfh_continuous}()},
-\code{\link{scale_fill_bfh_discrete}()}
+\code{\link{scale_fill_bfh_discrete}()},
+\code{\link{scale_position_bfh}}
 }
 \concept{BFH scales}

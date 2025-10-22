@@ -301,6 +301,151 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
   theme_bfh()
 ```
 
+### Uppercase Axis Tick Labels
+
+For complete typographic consistency, use the position scale functions to
+convert axis tick labels (the actual values on the axes) to uppercase. This
+is particularly useful for date labels and categorical data:
+
+```{r uppercase-axis-labels}
+# Discrete/categorical data with uppercase labels
+ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
+  geom_boxplot() +
+  scale_x_discrete_bfh() +  # "4" becomes "4", but categories like "low" become "LOW"
+  bfh_labs(
+    title = "Fuel efficiency by cylinder count",
+    x = "cylinders",
+    y = "miles per gallon"
+  ) +
+  theme_bfh()
+
+# Date data with uppercase month labels
+df <- data.frame(
+  date = seq.Date(as.Date("2023-01-01"), as.Date("2023-12-31"), by = "month"),
+  value = rnorm(12, mean = 100, sd = 10)
+)
+
+ggplot(df, aes(x = date, y = value)) +
+  geom_line(color = bfh_cols("hospital_primary"), linewidth = 1) +
+  scale_x_date_bfh(date_labels = "%b %Y") +  # "Jan 2023" becomes "JAN 2023"
+  scale_y_continuous_bfh() +
+  bfh_labs(
+    title = "Monthly trends",
+    x = "month",
+    y = "value"
+  ) +
+  theme_bfh()
+```
+
+The available position scale functions with uppercase support are:
+
+- `scale_x_continuous_bfh()` / `scale_y_continuous_bfh()` - For numeric axes
+- `scale_x_discrete_bfh()` / `scale_y_discrete_bfh()` - For categorical data
+- `scale_x_date_bfh()` / `scale_y_date_bfh()` - For date axes
+- `scale_x_datetime_bfh()` / `scale_y_datetime_bfh()` - For datetime axes
+
+All functions accept a custom `labels` argument if you need different formatting.
+
+### Advanced: Integration with scales Package
+
+The BFH position scales integrate seamlessly with the `scales` package for
+even smarter formatting. You can use `breaks_pretty()` for intelligent break
+positioning and any `label_*()` function—output is automatically uppercased:
+
+```{r scales-integration}
+library(scales)
+
+# Use label_date_short() for compact, hierarchical labels
+ggplot(df, aes(x = date, y = value)) +
+  geom_line(color = bfh_cols("hospital_primary"), linewidth = 1) +
+  scale_x_date_bfh(
+    breaks = breaks_pretty(n = 8),           # Smart break positioning
+    labels = label_date_short()              # Compact labels (auto-uppercased)
+  ) +
+  bfh_labs(
+    title = "Compact date labels with breaks_pretty",
+    x = "date",
+    y = "value"
+  ) +
+  theme_bfh()
+
+# Combine custom formatting with breaks
+ggplot(df, aes(x = date, y = value)) +
+  geom_line(color = bfh_cols("hospital_blue"), linewidth = 1) +
+  scale_x_date_bfh(
+    breaks = breaks_width("2 months"),       # Break every 2 months
+    labels = label_date("%B")                # Full month names (uppercased)
+  ) +
+  bfh_labs(
+    title = "Full month names with custom breaks",
+    x = "month",
+    y = "value"
+  ) +
+  theme_bfh()
+```
+
+**Useful scales functions:**
+
+- `breaks_pretty(n)` - Pretty breaks with desired count
+- `breaks_width("2 weeks")` - Breaks at regular intervals
+- `label_date("%b %Y")` - Custom date format
+- `label_date_short()` - Compact hierarchical labels
+- `label_time()` - Time formatting
+
+### Best Practice: label_date_short() for Space Efficiency
+
+The `label_date_short()` function is particularly powerful for time series with
+many data points. It creates a hierarchical labeling system that only shows
+what has changed, dramatically reducing horizontal space requirements:
+
+```{r label-date-short-example}
+# Standard labels - repetitive and space-consuming
+ggplot(df, aes(x = date, y = value)) +
+  geom_line(color = bfh_cols("hospital_primary"), linewidth = 1) +
+  scale_x_date_bfh(
+    date_breaks = "2 months",
+    labels = label_date("%b %Y")  # "JAN. 2023", "MAR. 2023", etc.
+  ) +
+  bfh_labs(title = "Standard labels", x = "date", y = "value") +
+  theme_bfh() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotation needed!
+
+# label_date_short() - compact and hierarchical
+ggplot(df, aes(x = date, y = value)) +
+  geom_line(color = bfh_cols("hospital_primary"), linewidth = 1) +
+  scale_x_date_bfh(
+    date_breaks = "2 months",
+    labels = label_date_short()  # Shows year only when it changes
+  ) +
+  bfh_labs(title = "Compact hierarchical labels", x = "date", y = "value") +
+  theme_bfh()  # No rotation needed!
+```
+
+**Recommended combinations based on data duration:**
+
+```{r eval=FALSE}
+# Short time series (< 1 year)
+scale_x_date_bfh()  # Default is fine
+
+# Medium time series (1-3 years)
+scale_x_date_bfh(
+  breaks = breaks_pretty(n = 6),
+  labels = label_date_short()
+)
+
+# Long time series (> 3 years)
+scale_x_date_bfh(
+  breaks = breaks_pretty(n = 8),
+  labels = label_date_short()
+)
+
+# Weekly data
+scale_x_date_bfh(
+  breaks = breaks_width("2 weeks"),
+  labels = label_date_short()
+)
+```
+
 ### Custom Text Elements
 
 Layer additional annotations for storytelling while staying within the BFH

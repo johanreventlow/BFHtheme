@@ -35,6 +35,7 @@ ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) +
 
 Other BFH scales: 
 \code{\link{scale_bfh}},
-\code{\link{scale_fill_bfh_continuous}()}
+\code{\link{scale_fill_bfh_continuous}()},
+\code{\link{scale_position_bfh}}
 }
 \concept{BFH scales}

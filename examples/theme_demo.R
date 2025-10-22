@@ -9,7 +9,7 @@ devtools::load_all()
 
 # Lav tidsseriedata
 set.seed(123)
-dates <- seq(as.Date("2020-01-01"), as.Date("2024-12-31"), by = "month")
+dates <- seq(as.Date("2020-01-01"), as.Date("2021-12-31"), by = "month")
 n_months <- length(dates)
 
 # Simuler 3 forskellige afdelinger
@@ -29,15 +29,19 @@ time_data <- data.frame(
 # Lav tidsserieplot med Hospital branding
 ggplot(time_data, aes(x = dato, y = antal_patienter, color = afdeling)) +
   geom_line(linewidth = 1.2) +
-  theme_bfh() +
   scale_color_bfh(palette = "hospital") +
+  scale_x_datetime_bfh(breaks = scales::breaks_pretty(n = 8)) +
   bfh_labs(
     title = "Patientforløb over tid",
     subtitle = "Bispebjerg og Frederiksberg Hospital",
+    caption = "Produceret okt 2025, \
+    Afdeling for Kvalitet og Uddannelse, \
+    Bispebjerg og Frederiksberg Hospital",
     x = "Indlæggelsesdato",
     y = "Antal patienter",
     color = ""
   ) +
+  theme_bfh() +
   theme(legend.position = "none")
 
 

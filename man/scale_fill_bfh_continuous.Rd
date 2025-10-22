@@ -35,6 +35,7 @@ ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
 
 Other BFH scales: 
 \code{\link{scale_bfh}},
-\code{\link{scale_fill_bfh_discrete}()}
+\code{\link{scale_fill_bfh_discrete}()},
+\code{\link{scale_position_bfh}}
 }
 \concept{BFH scales}

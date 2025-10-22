@@ -137,3 +137,198 @@ scale_color_bfh_discrete <- function(palette = "main", reverse = FALSE, ...) {
 #' @rdname scale_fill_bfh_discrete
 #' @export
 scale_colour_bfh_discrete <- scale_color_bfh_discrete
+
+# Position scale functions with uppercase labels --------------------------------
+
+#' BFH Position Scales with Uppercase Labels
+#'
+#' @description
+#' Position scale functions that automatically convert axis tick labels to
+#' uppercase, following BFH typography guidelines. These functions wrap
+#' ggplot2's standard position scales and apply uppercase transformation
+#' to all axis labels.
+#'
+#' @details
+#' These functions are particularly useful for maintaining consistent
+#' typographic style across plots. The uppercase transformation is applied
+#' via the `labels` argument, which accepts a function that formats the
+#' axis breaks.
+#'
+#' For date and datetime scales, **the default is [scales::label_date_short()]**
+#' which creates compact, hierarchical labels that only show what has changed
+#' (e.g., year only appears when it changes). This minimizes horizontal space
+#' on the x-axis. All output is automatically converted to uppercase.
+#'
+#' ## Default Behavior (label_date_short)
+#'
+#' By default, date/datetime scales use `label_date_short()` which produces:
+#' ```
+#' JAN. | FEB. | MAR. | ... | DEC. | JAN. | FEB. | ...
+#' 2023                              2024
+#' ```
+#' Instead of the repetitive:
+#' ```
+#' JAN. 2023 | FEB. 2023 | MAR. 2023 | ... | JAN. 2024 | FEB. 2024 | ...
+#' ```
+#'
+#' ## Integration with scales package
+#'
+#' The date/datetime scales integrate seamlessly with the `scales` package.
+#' You can override the default or use `breaks_pretty()` for intelligent
+#' break positioning:
+#'
+#' ```r
+#' # Use default (label_date_short with smart breaks)
+#' scale_x_date_bfh()
+#'
+#' # Add custom breaks
+#' scale_x_date_bfh(breaks = scales::breaks_pretty(n = 6))
+#'
+#' # Override with custom label format
+#' scale_x_date_bfh(labels = scales::label_date("%B %Y"))  # Full month names
+#'
+#' # Combine custom breaks and labels
+#' scale_x_date_bfh(
+#'   breaks = scales::breaks_pretty(n = 8),
+#'   labels = scales::label_date("%b %d")
+#' )
+#' ```
+#'
+#' @param ... Additional arguments passed to the underlying ggplot2 scale
+#'   function. Common arguments include `breaks`, `limits`, `expand`, etc.
+#' @param labels Label formatting function. For date/datetime scales, defaults
+#'   to `scales::label_date_short()` which creates compact, hierarchical labels.
+#'   For other scales, defaults to `toupper`. You can pass any `scales::label_*()`
+#'   function (e.g., `label_date("%B %Y")`, `label_time()`) and output will be
+#'   uppercased automatically. Set to `NULL` or `waiver()` to use ggplot2 defaults.
+#' @param date_labels Date format string using standard strftime format codes.
+#'   Only applicable to date/datetime scales when using custom label functions.
+#'   Defaults to `"%b %Y"`. **Note:** This parameter is ignored when using the
+#'   default `label_date_short()`. To use custom formats, override the `labels`
+#'   parameter: `labels = scales::label_date(format = "your_format")`.
+#' @return A ggplot2 scale object.
+#' @name scale_position_bfh
+#' @family BFH scales
+#' @seealso [ggplot2::scale_x_continuous()], [ggplot2::scale_x_discrete()],
+#'   [ggplot2::scale_x_date()], [bfh_labs()], [scales::label_date()],
+#'   [scales::label_date_short()], [scales::breaks_pretty()]
+#' @export
+#'
+#' @importFrom ggplot2 scale_x_continuous scale_y_continuous scale_x_discrete scale_y_discrete scale_x_date scale_y_date scale_x_datetime scale_y_datetime
+#' @examples
+#' \dontrun{
+#' library(ggplot2)
+#'
+#' # Continuous scale with uppercase labels
+#' ggplot(mtcars, aes(wt, mpg)) +
+#'   geom_point() +
+#'   scale_x_continuous_bfh() +
+#'   theme_bfh()
+#'
+#' # Discrete scale with uppercase labels
+#' ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
+#'   geom_boxplot() +
+#'   scale_x_discrete_bfh() +
+#'   theme_bfh()
+#'
+#' # Date scale with default label_date_short() (compact hierarchical labels)
+#' df <- data.frame(
+#'   date = seq.Date(as.Date("2023-01-01"), as.Date("2024-12-31"), by = "month"),
+#'   value = rnorm(24)
+#' )
+#' ggplot(df, aes(date, value)) +
+#'   geom_line() +
+#'   scale_x_date_bfh() +  # Uses label_date_short() by default!
+#'   theme_bfh()
+#'
+#' # Add custom breaks for better positioning
+#' ggplot(df, aes(date, value)) +
+#'   geom_line() +
+#'   scale_x_date_bfh(breaks = scales::breaks_pretty(n = 8)) +
+#'   theme_bfh()
+#'
+#' # Override with custom label format
+#' ggplot(df, aes(date, value)) +
+#'   geom_line() +
+#'   scale_x_date_bfh(labels = scales::label_date("%B %Y")) +  # Full month names
+#'   theme_bfh()
+#' }
+scale_x_continuous_bfh <- function(..., labels = toupper) {
+  ggplot2::scale_x_continuous(labels = labels, ...)
+}
+
+#' @rdname scale_position_bfh
+#' @export
+scale_y_continuous_bfh <- function(..., labels = toupper) {
+  ggplot2::scale_y_continuous(labels = labels, ...)
+}
+
+#' @rdname scale_position_bfh
+#' @export
+scale_x_discrete_bfh <- function(..., labels = toupper) {
+  ggplot2::scale_x_discrete(labels = labels, ...)
+}
+
+#' @rdname scale_position_bfh
+#' @export
+scale_y_discrete_bfh <- function(..., labels = toupper) {
+  ggplot2::scale_y_discrete(labels = labels, ...)
+}
+
+#' @rdname scale_position_bfh
+#' @export
+scale_x_date_bfh <- function(...,
+                              date_labels = "%b %Y",
+                              labels = scales::label_date_short()) {
+  # Wrap labels function with uppercase converter
+  labels_upper <- .uppercase_label_wrapper(labels)
+  ggplot2::scale_x_date(labels = labels_upper, ...)
+}
+
+#' @rdname scale_position_bfh
+#' @export
+scale_y_date_bfh <- function(...,
+                              date_labels = "%b %Y",
+                              labels = scales::label_date_short()) {
+  # Wrap labels function with uppercase converter
+  labels_upper <- .uppercase_label_wrapper(labels)
+  ggplot2::scale_y_date(labels = labels_upper, ...)
+}
+
+#' @rdname scale_position_bfh
+#' @export
+scale_x_datetime_bfh <- function(...,
+                                  date_labels = "%b %Y",
+                                  labels = scales::label_date_short()) {
+  # Wrap labels function with uppercase converter
+  labels_upper <- .uppercase_label_wrapper(labels)
+  ggplot2::scale_x_datetime(labels = labels_upper, ...)
+}
+
+#' @rdname scale_position_bfh
+#' @export
+scale_y_datetime_bfh <- function(...,
+                                  date_labels = "%b %Y",
+                                  labels = scales::label_date_short()) {
+  # Wrap labels function with uppercase converter
+  labels_upper <- .uppercase_label_wrapper(labels)
+  ggplot2::scale_y_datetime(labels = labels_upper, ...)
+}
+
+# Internal helper: Wrap scales package label functions with uppercase
+# This allows us to use scales::label_date(), label_date_short(), etc.
+# and automatically uppercase the output
+#
+# @param label_fn A labeling function (e.g., from scales package)
+# @return A wrapped function that uppercases the output
+.uppercase_label_wrapper <- function(label_fn) {
+  # Handle NULL and waiver() - pass through unchanged
+  if (is.null(label_fn) || inherits(label_fn, "waiver")) {
+    return(label_fn)
+  }
+
+  # Wrap the function with toupper
+  function(x) {
+    toupper(label_fn(x))
+  }
+}
