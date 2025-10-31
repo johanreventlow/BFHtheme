@@ -19,7 +19,8 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 # Claude Instructions – BFHtheme
 
-@~/.claude/rules/CLAUDE_BOOTSTRAP_WORKFLOW.md
+- Mac: `@~/.claude/rules/CLAUDE_BOOTSTRAP_WORKFLOW.md`
+- Windows: `@C:/Users/jrev0004/.claude/rules/CLAUDE_BOOTSTRAP_WORKFLOW.md`
 
 ---
 
