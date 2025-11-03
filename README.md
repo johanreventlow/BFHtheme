@@ -328,12 +328,23 @@ source(system.file("examples/basic_usage.R", package = "BFHtheme"))
 
 ## Contributing
 
-Issues and pull requests are managed through GitHub Issues. Please follow these guidelines:
+We welcome contributions to BFHtheme! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines including:
 
+- **[Package Architecture](CONTRIBUTING.md#package-architecture)** - Understand the module structure and where to add new code
+- **[Utility Helper Conventions](CONTRIBUTING.md#utility-helper-conventions)** - Learn how to use `%||%` operator and validation helpers
+- **[Caching Strategy](CONTRIBUTING.md#caching-strategy)** - Understand session-level caching for fonts and palettes
+- **Development Workflow** - Test-driven development process
+- **Code Style Guidelines** - Naming conventions and coding patterns
+- **Testing Requirements** - Coverage goals and test patterns
+
+Quick checklist:
 1. Check existing issues before creating a new one
-2. Provide clear descriptions and reproducible examples
-3. Follow the existing code style
-4. Update documentation as needed
+2. Read the [Package Architecture](CONTRIBUTING.md#package-architecture) section to understand the codebase
+3. Use [utility helpers](CONTRIBUTING.md#utility-helper-conventions) for validation (`validate_*()` functions and `%||%` operator)
+4. Understand [caching behavior](CONTRIBUTING.md#caching-strategy) and when to clear caches (`clear_bfh_font_cache()`, `clear_bfh_pal_cache()`)
+5. Follow the existing code style (snake_case, input validation, `call. = FALSE` in errors)
+6. Write tests for new features (≥90% coverage goal)
+7. Update documentation as needed (`devtools::document()`)
 
 ## License
 
