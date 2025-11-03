@@ -653,3 +653,137 @@ test_that("datetime scales work with scales::label_time()", {
   expect_true(all(result == toupper(result)))
   expect_true(all(grepl("\\d{2}:\\d{2}:\\d{2}", result)))
 })
+
+# === date_labels Parameter Tests (Issue #32 fix) ===
+
+test_that("scale_x_date_bfh respects date_labels parameter", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("scales")
+
+  # Test with "%Y" format
+  scale <- scale_x_date_bfh(date_labels = "%Y")
+
+  test_dates <- as.Date(c("2023-01-01", "2024-01-01"))
+  result <- scale$labels(test_dates)
+
+  # Should return only years (uppercased, though years don't change case)
+  expect_equal(result, c("2023", "2024"))
+})
+
+test_that("scale_x_date_bfh date_labels produces uppercase output", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("scales")
+
+  # Test with month format that shows uppercase
+  scale <- scale_x_date_bfh(date_labels = "%b %Y")
+
+  test_dates <- as.Date(c("2023-01-01", "2023-02-01"))
+  result <- scale$labels(test_dates)
+
+  # Should be uppercase month abbreviations
+  expect_true(all(result == toupper(result)))
+  expect_true(grepl("JAN", result[1]))
+  expect_true(grepl("FEB", result[2]))
+})
+
+test_that("scale_x_date_bfh labels parameter overrides date_labels", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("scales")
+
+  # Provide both labels and date_labels - labels should win
+  scale <- scale_x_date_bfh(
+    labels = scales::label_date("%B %Y"),  # Full month name
+    date_labels = "%Y"  # This should be ignored
+  )
+
+  test_dates <- as.Date(c("2023-01-01", "2023-02-01"))
+  result <- scale$labels(test_dates)
+
+  # Should use labels (full month) not date_labels (year only)
+  expect_true(grepl("JANUAR|JANUARY", result[1]))  # Locale-dependent
+  expect_true(grepl("2023", result[1]))
+  expect_false(result[1] == "2023")  # Not just year
+})
+
+test_that("scale_x_date_bfh default uses label_date_short when both waiver", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("scales")
+
+  # No arguments - should use default label_date_short
+  scale <- scale_x_date_bfh()
+
+  test_dates <- as.Date(c("2023-01-01", "2023-02-01", "2023-03-01"))
+  result <- scale$labels(test_dates)
+
+  # Should be uppercase
+  expect_true(all(result == toupper(result)))
+
+  # Should contain hierarchical labels from label_date_short
+  all_labels <- paste(result, collapse = " ")
+  expect_true(grepl("JAN|FEB|MAR", all_labels))
+  expect_true(grepl("2023", all_labels))
+})
+
+test_that("scale_y_date_bfh respects date_labels parameter", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("scales")
+
+  scale <- scale_y_date_bfh(date_labels = "%Y-%m")
+
+  test_dates <- as.Date(c("2023-01-01", "2023-06-01"))
+  result <- scale$labels(test_dates)
+
+  # Should use custom format
+  expect_equal(result[1], "2023-01")
+  expect_equal(result[2], "2023-06")
+})
+
+test_that("scale_x_datetime_bfh respects date_labels parameter", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("scales")
+
+  scale <- scale_x_datetime_bfh(date_labels = "%Y")
+
+  test_times <- as.POSIXct(c("2023-01-01", "2024-01-01"), tz = "UTC")
+  result <- scale$labels(test_times)
+
+  # Should return only years
+  expect_equal(result, c("2023", "2024"))
+})
+
+test_that("scale_y_datetime_bfh respects date_labels parameter", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("scales")
+
+  scale <- scale_y_datetime_bfh(date_labels = "%b")
+
+  test_times <- as.POSIXct(c("2023-01-01", "2023-02-01"), tz = "UTC")
+  result <- scale$labels(test_times)
+
+  # Should be uppercase month abbreviations
+  expect_true(all(result == toupper(result)))
+  expect_true(grepl("JAN", result[1]))
+  expect_true(grepl("FEB", result[2]))
+})
+
+test_that("date_labels works in complete ggplot workflow", {
+  skip_if_not_installed("ggplot2")
+
+  df <- data.frame(
+    date = seq.Date(as.Date("2023-01-01"), as.Date("2023-12-31"), by = "month"),
+    value = rnorm(12)
+  )
+
+  # Create plot with date_labels
+  p <- ggplot2::ggplot(df, ggplot2::aes(date, value)) +
+    ggplot2::geom_line() +
+    scale_x_date_bfh(date_labels = "%Y")
+
+  expect_s3_class(p, "gg")
+  expect_s3_class(p, "ggplot")
+
+  # Check that scale is present and functional
+  scale <- p$scales$scales[[1]]
+  test_result <- scale$labels(df$date[1:2])
+  expect_equal(test_result, c("2023", "2023"))
+})

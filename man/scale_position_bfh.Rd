@@ -20,45 +20,31 @@ scale_x_discrete_bfh(..., labels = toupper)
 
 scale_y_discrete_bfh(..., labels = toupper)
 
-scale_x_date_bfh(
-  ...,
-  date_labels = "\%b \%Y",
-  labels = scales::label_date_short()
-)
+scale_x_date_bfh(..., date_labels = waiver(), labels = waiver())
 
-scale_y_date_bfh(
-  ...,
-  date_labels = "\%b \%Y",
-  labels = scales::label_date_short()
-)
+scale_y_date_bfh(..., date_labels = waiver(), labels = waiver())
 
-scale_x_datetime_bfh(
-  ...,
-  date_labels = "\%b \%Y",
-  labels = scales::label_date_short()
-)
+scale_x_datetime_bfh(..., date_labels = waiver(), labels = waiver())
 
-scale_y_datetime_bfh(
-  ...,
-  date_labels = "\%b \%Y",
-  labels = scales::label_date_short()
-)
+scale_y_datetime_bfh(..., date_labels = waiver(), labels = waiver())
 }
 \arguments{
 \item{...}{Additional arguments passed to the underlying ggplot2 scale
 function. Common arguments include `breaks`, `limits`, `expand`, etc.}
 
 \item{labels}{Label formatting function. For date/datetime scales, defaults
-to `scales::label_date_short()` which creates compact, hierarchical labels.
-For other scales, defaults to `toupper`. You can pass any `scales::label_*()`
-function (e.g., `label_date("%B %Y")`, `label_time()`) and output will be
-uppercased automatically. Set to `NULL` or `waiver()` to use ggplot2 defaults.}
+to `waiver()` which uses `scales::label_date_short()` for compact,
+hierarchical labels. For other scales, defaults to `toupper`. You can pass
+any `scales::label_*()`function (e.g., `label_date("%B %Y")`, `label_time()`)
+and output will be uppercased automatically. Set to `waiver()` to use the
+`date_labels` parameter for date/datetime scales.}
 
-\item{date_labels}{Date format string using standard strftime format codes.
-Only applicable to date/datetime scales when using custom label functions.
-Defaults to `"%b %Y"`. **Note:** This parameter is ignored when using the
-default `label_date_short()`. To use custom formats, override the `labels`
-parameter: `labels = scales::label_date(format = "your_format")`.}
+\item{date_labels}{Date format string using standard strftime format codes
+(e.g., `"%Y"`, `"%b %Y"`, `"%Y-%m-%d"`). Only applicable to date/datetime
+scales. When `labels = waiver()`, this parameter controls the date format
+via `scales::label_date(format = date_labels)`. Output is automatically
+uppercased. If `labels` is explicitly specified, `date_labels` is ignored.
+Defaults to `waiver()` which uses `label_date_short()`.}
 }
 \value{
 A ggplot2 scale object.
@@ -147,10 +133,22 @@ ggplot(df, aes(date, value)) +
   scale_x_date_bfh(breaks = scales::breaks_pretty(n = 8)) +
   theme_bfh()
 
-# Override with custom label format
+# Override with custom label format using labels parameter
 ggplot(df, aes(date, value)) +
   geom_line() +
   scale_x_date_bfh(labels = scales::label_date("\%B \%Y")) +  # Full month names
+  theme_bfh()
+
+# Or use date_labels parameter for simple format strings
+ggplot(df, aes(date, value)) +
+  geom_line() +
+  scale_x_date_bfh(date_labels = "\%Y") +  # Year only (uppercased)
+  theme_bfh()
+
+# Another date_labels example: custom format
+ggplot(df, aes(date, value)) +
+  geom_line() +
+  scale_x_date_bfh(date_labels = "\%Y-\%m-\%d") +  # ISO date format
   theme_bfh()
 }
 }

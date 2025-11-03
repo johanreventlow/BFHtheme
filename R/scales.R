@@ -197,15 +197,17 @@ scale_colour_bfh_discrete <- scale_color_bfh_discrete
 #' @param ... Additional arguments passed to the underlying ggplot2 scale
 #'   function. Common arguments include `breaks`, `limits`, `expand`, etc.
 #' @param labels Label formatting function. For date/datetime scales, defaults
-#'   to `scales::label_date_short()` which creates compact, hierarchical labels.
-#'   For other scales, defaults to `toupper`. You can pass any `scales::label_*()`
-#'   function (e.g., `label_date("%B %Y")`, `label_time()`) and output will be
-#'   uppercased automatically. Set to `NULL` or `waiver()` to use ggplot2 defaults.
-#' @param date_labels Date format string using standard strftime format codes.
-#'   Only applicable to date/datetime scales when using custom label functions.
-#'   Defaults to `"%b %Y"`. **Note:** This parameter is ignored when using the
-#'   default `label_date_short()`. To use custom formats, override the `labels`
-#'   parameter: `labels = scales::label_date(format = "your_format")`.
+#'   to `waiver()` which uses `scales::label_date_short()` for compact,
+#'   hierarchical labels. For other scales, defaults to `toupper`. You can pass
+#'   any `scales::label_*()`function (e.g., `label_date("%B %Y")`, `label_time()`)
+#'   and output will be uppercased automatically. Set to `waiver()` to use the
+#'   `date_labels` parameter for date/datetime scales.
+#' @param date_labels Date format string using standard strftime format codes
+#'   (e.g., `"%Y"`, `"%b %Y"`, `"%Y-%m-%d"`). Only applicable to date/datetime
+#'   scales. When `labels = waiver()`, this parameter controls the date format
+#'   via `scales::label_date(format = date_labels)`. Output is automatically
+#'   uppercased. If `labels` is explicitly specified, `date_labels` is ignored.
+#'   Defaults to `waiver()` which uses `label_date_short()`.
 #' @return A ggplot2 scale object.
 #' @name scale_position_bfh
 #' @family BFH scales
@@ -214,7 +216,7 @@ scale_colour_bfh_discrete <- scale_color_bfh_discrete
 #'   [scales::label_date_short()], [scales::breaks_pretty()]
 #' @export
 #'
-#' @importFrom ggplot2 scale_x_continuous scale_y_continuous scale_x_discrete scale_y_discrete scale_x_date scale_y_date scale_x_datetime scale_y_datetime
+#' @importFrom ggplot2 scale_x_continuous scale_y_continuous scale_x_discrete scale_y_discrete scale_x_date scale_y_date scale_x_datetime scale_y_datetime waiver
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -247,10 +249,22 @@ scale_colour_bfh_discrete <- scale_color_bfh_discrete
 #'   scale_x_date_bfh(breaks = scales::breaks_pretty(n = 8)) +
 #'   theme_bfh()
 #'
-#' # Override with custom label format
+#' # Override with custom label format using labels parameter
 #' ggplot(df, aes(date, value)) +
 #'   geom_line() +
 #'   scale_x_date_bfh(labels = scales::label_date("%B %Y")) +  # Full month names
+#'   theme_bfh()
+#'
+#' # Or use date_labels parameter for simple format strings
+#' ggplot(df, aes(date, value)) +
+#'   geom_line() +
+#'   scale_x_date_bfh(date_labels = "%Y") +  # Year only (uppercased)
+#'   theme_bfh()
+#'
+#' # Another date_labels example: custom format
+#' ggplot(df, aes(date, value)) +
+#'   geom_line() +
+#'   scale_x_date_bfh(date_labels = "%Y-%m-%d") +  # ISO date format
 #'   theme_bfh()
 #' }
 scale_x_continuous_bfh <- function(..., labels = toupper) {
@@ -278,8 +292,18 @@ scale_y_discrete_bfh <- function(..., labels = toupper) {
 #' @rdname scale_position_bfh
 #' @export
 scale_x_date_bfh <- function(...,
-                              date_labels = "%b %Y",
-                              labels = scales::label_date_short()) {
+                              date_labels = waiver(),
+                              labels = waiver()) {
+  # Handle labels and date_labels interaction
+  if (inherits(labels, "waiver") && !inherits(date_labels, "waiver")) {
+    # User specified date_labels but not labels: use label_date with the format
+    labels <- scales::label_date(format = date_labels)
+  } else if (inherits(labels, "waiver") && inherits(date_labels, "waiver")) {
+    # Neither specified: use BFH default (compact hierarchical labels)
+    labels <- scales::label_date_short()
+  }
+  # If labels was explicitly set, use it as-is (date_labels ignored)
+
   # Wrap labels function with uppercase converter
   labels_upper <- .uppercase_label_wrapper(labels)
   ggplot2::scale_x_date(labels = labels_upper, ...)
@@ -288,8 +312,18 @@ scale_x_date_bfh <- function(...,
 #' @rdname scale_position_bfh
 #' @export
 scale_y_date_bfh <- function(...,
-                              date_labels = "%b %Y",
-                              labels = scales::label_date_short()) {
+                              date_labels = waiver(),
+                              labels = waiver()) {
+  # Handle labels and date_labels interaction
+  if (inherits(labels, "waiver") && !inherits(date_labels, "waiver")) {
+    # User specified date_labels but not labels: use label_date with the format
+    labels <- scales::label_date(format = date_labels)
+  } else if (inherits(labels, "waiver") && inherits(date_labels, "waiver")) {
+    # Neither specified: use BFH default (compact hierarchical labels)
+    labels <- scales::label_date_short()
+  }
+  # If labels was explicitly set, use it as-is (date_labels ignored)
+
   # Wrap labels function with uppercase converter
   labels_upper <- .uppercase_label_wrapper(labels)
   ggplot2::scale_y_date(labels = labels_upper, ...)
@@ -298,8 +332,18 @@ scale_y_date_bfh <- function(...,
 #' @rdname scale_position_bfh
 #' @export
 scale_x_datetime_bfh <- function(...,
-                                  date_labels = "%b %Y",
-                                  labels = scales::label_date_short()) {
+                                  date_labels = waiver(),
+                                  labels = waiver()) {
+  # Handle labels and date_labels interaction
+  if (inherits(labels, "waiver") && !inherits(date_labels, "waiver")) {
+    # User specified date_labels but not labels: use label_date with the format
+    labels <- scales::label_date(format = date_labels)
+  } else if (inherits(labels, "waiver") && inherits(date_labels, "waiver")) {
+    # Neither specified: use BFH default (compact hierarchical labels)
+    labels <- scales::label_date_short()
+  }
+  # If labels was explicitly set, use it as-is (date_labels ignored)
+
   # Wrap labels function with uppercase converter
   labels_upper <- .uppercase_label_wrapper(labels)
   ggplot2::scale_x_datetime(labels = labels_upper, ...)
@@ -308,8 +352,18 @@ scale_x_datetime_bfh <- function(...,
 #' @rdname scale_position_bfh
 #' @export
 scale_y_datetime_bfh <- function(...,
-                                  date_labels = "%b %Y",
-                                  labels = scales::label_date_short()) {
+                                  date_labels = waiver(),
+                                  labels = waiver()) {
+  # Handle labels and date_labels interaction
+  if (inherits(labels, "waiver") && !inherits(date_labels, "waiver")) {
+    # User specified date_labels but not labels: use label_date with the format
+    labels <- scales::label_date(format = date_labels)
+  } else if (inherits(labels, "waiver") && inherits(date_labels, "waiver")) {
+    # Neither specified: use BFH default (compact hierarchical labels)
+    labels <- scales::label_date_short()
+  }
+  # If labels was explicitly set, use it as-is (date_labels ignored)
+
   # Wrap labels function with uppercase converter
   labels_upper <- .uppercase_label_wrapper(labels)
   ggplot2::scale_y_datetime(labels = labels_upper, ...)
