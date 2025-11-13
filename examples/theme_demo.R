@@ -35,7 +35,6 @@ p <- ggplot(time_data, aes(x = dato, y = antal_patienter, color = afdeling)) +
     title = "Patientforløb over tid",
     subtitle = "Bispebjerg og Frederiksberg Hospital",
     caption = "Produceret okt 2025, \
-    Afdeling for Kvalitet og Uddannelse, \
     Bispebjerg og Frederiksberg Hospital",
     x = "Indlæggelsesdato",
     y = "Antal patienter",

@@ -213,6 +213,8 @@ add_bfh_logo <- function(plot,
       height = logo_size,  # 1/15 of canvas height (square)
       hjust = 0,  # Horizontal justification: left
       vjust = 0,  # Vertical justification: bottom
+      halign = 0,  # Horizontal alignment within bounding box
+      valign = 0,  # Vertical alignment within bounding box
       interpolate = TRUE
     )
 }
