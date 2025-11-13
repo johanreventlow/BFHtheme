@@ -198,13 +198,22 @@ add_bfh_logo <- function(plot,
   # Fixed positioning: logo height and width both 1/15 of plot height (square)
   logo_size <- 1/15  # As fraction of plot height
   logo_position_bottom <- 1/15  # Position from bottom
+  left_margin <- logo_size  # Left margin = logo width for proper spacing
+
+  # Calculate left margin: 1/15 of standard plot height (6 inches)
+  # For a 6" plot: 6/15 = 0.4" = 0.4 * 72 = 28.8 points
+  logo_margin_pt <- (1/15) * 6 * 72  # 28.8 points
 
   # Use cowplot::ggdraw() + draw_plot() + draw_image() for precise positioning
   # ggdraw() creates a drawing canvas with relative coordinates (0-1)
-  # draw_plot() places the original plot
-  # draw_image() adds the logo with precise positioning
+  # draw_plot() places the original plot with left margin
+  # draw_image() adds the logo in the left margin space
   cowplot::ggdraw() +
-    cowplot::draw_plot(plot) +
+    cowplot::draw_plot(
+      plot,
+      x = left_margin,  # Offset plot to right by logo width
+      width = 1 - left_margin  # Reduce plot width to accommodate logo
+    ) +
     cowplot::draw_image(
       image = logo,
       x = 0,  # Left edge (in relative coordinates 0-1)
