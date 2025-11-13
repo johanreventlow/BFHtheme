@@ -159,42 +159,54 @@ add_bfh_logo <- function(plot,
     stop("Logo file must be a valid PNG or JPEG image", call. = FALSE)
   )
 
-  # Calculate aspect ratio to preserve logo proportions
-  # Logo array has dimensions [height, width, channels] or [height, width]
-  logo_dims <- dim(logo)
-  logo_height_px <- logo_dims[1]
-  logo_width_px <- logo_dims[2]
-  aspect_ratio <- logo_height_px / logo_width_px
+  # Check if patchwork is available (required for full plot positioning)
+  if (!requireNamespace("patchwork", quietly = TRUE)) {
+    warning(
+      "Package 'patchwork' is required for logo positioning. ",
+      "Install with: install.packages('patchwork'). ",
+      "Returning plot without logo.",
+      call. = FALSE
+    )
+    return(plot)
+  }
 
-  # Fixed positioning: logo height is 1/15 of plot height
-  logo_height_npc <- 1/15
-  logo_width_npc <- logo_height_npc / aspect_ratio  # Preserve aspect ratio
+  # Fixed positioning: logo height and width both 1/15 of plot height (square)
+  logo_size_npc <- 1/15
 
-  # Fixed position: bottom-left corner
-  # - Horizontal: centered at half the logo width (flush with left edge)
-  # - Vertical: 1/15 from bottom + half logo height
-  pos_x <- grid::unit(logo_width_npc / 2, "npc")
-  pos_y <- grid::unit(1/15 + logo_height_npc / 2, "npc")
+  # Create a grob function that will draw the logo in the margin area
+  logo_grob <- function() {
+    # Position logo at absolute coordinates:
+    # - x: flush with left edge (logo_size_npc / 2 centers the logo at its width)
+    # - y: 1/15 from bottom (logo_size_npc / 2 centers the logo at its height)
+    grid::grid.raster(
+      logo,
+      x = grid::unit(logo_size_npc / 2, "npc"),
+      y = grid::unit(1/15 + logo_size_npc / 2, "npc"),
+      width = grid::unit(logo_size_npc, "npc"),
+      height = grid::unit(logo_size_npc, "npc"),
+      interpolate = TRUE,
+      gp = grid::gpar(alpha = alpha)
+    )
+  }
 
-  # Create raster grob with fixed position
-  logo_raster <- grid::rasterGrob(
-    logo,
-    x = pos_x,
-    y = pos_y,
-    interpolate = TRUE,
-    width = grid::unit(logo_width_npc, "npc"),
-    height = grid::unit(logo_height_npc, "npc"),
-    gp = grid::gpar(alpha = alpha)
-  )
-
-  # Add logo to plot
+  # Use patchwork to add logo as an inset
+  # This places logo relative to entire plot area (including margins)
   plot +
-    ggplot2::annotation_custom(
-      logo_raster,
-      xmin = -Inf, xmax = Inf,
-      ymin = -Inf, ymax = Inf
-    ) +
-    ggplot2::coord_cartesian(clip = "off")
+    patchwork::inset_element(
+      grid::grobTree(grid::rasterGrob(
+        logo,
+        x = 0.5, y = 0.5,  # Center in its own viewport
+        width = 1, height = 1,  # Fill viewport
+        interpolate = TRUE,
+        gp = grid::gpar(alpha = alpha)
+      )),
+      left = 0,  # Start at left edge of plot
+      right = logo_size_npc,  # Width of logo
+      bottom = 1/15,  # Start 1/15 from bottom
+      top = 1/15 + logo_size_npc,  # Height of logo
+      align_to = "plot",  # Position relative to entire plot, not panel
+      clip = FALSE
+    )
 }
 
 #' @keywords internal
