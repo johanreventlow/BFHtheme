@@ -202,7 +202,7 @@ add_bfh_logo <- function(plot,
 
   # Calculate left margin: 1/15 of standard plot height (6 inches)
   # For a 6" plot: 6/15 = 0.4" = 0.4 * 72 = 28.8 points
-  logo_margin_pt <- (1/15) * 6 * 72  # 28.8 points
+  # logo_margin_pt <- (1/15) * 6 * 72  # 28.8 points
 
   # Use cowplot::ggdraw() + draw_plot() + draw_image() for precise positioning
   # ggdraw() creates a drawing canvas with relative coordinates (0-1)

@@ -1,10 +1,11 @@
 # remove.packages("BFHtheme")
 # install.packages("BFHtheme_0.1.0.tar.gz", repos = NULL, type = "source")
 #
-library(BFHtheme)
+# library(BFHtheme)
 library(ggplot2)
 
-devtools::load_all()
+# devtools::load_all()
+devtools::load_all(reset = TRUE, recompile = FALSE, helpers = FALSE)
 # devtools::check()
 
 # Lav tidsseriedata
@@ -40,11 +41,13 @@ p <- ggplot(time_data, aes(x = dato, y = antal_patienter, color = afdeling)) +
     y = "Antal patienter",
     color = ""
   ) +
+
   theme_bfh() +
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = margin(t = NA, r = NA, b = 0, l = 0, unit = "pt"))
 
 
 
 # Tilføj logo
-p_branded <- BFHtheme::add_bfh_logo(p)
+p_branded <- add_bfh_logo(p)
 print(p_branded)
