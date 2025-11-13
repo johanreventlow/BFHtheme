@@ -320,6 +320,96 @@ BFHtheme is a foundational package for:
 
 Changes to BFHtheme API must consider backward compatibility with these packages.
 
+## Cross-Repository Coordination
+
+### Responsibility Boundaries
+
+**BFHtheme provides:**
+- ggplot2 themes (theme_bfh, theme_bfh_minimal, theme_bfh_dark, theme_region_h)
+- Color palettes and scales (bfh_cols, bfh_pal, scale_color_bfh, scale_fill_bfh)
+- Font detection and session-level caching
+- Logo and branding helpers (add_bfh_logo, add_bfh_footer, bfh_title_block)
+- Publication-ready defaults and composable API
+
+**Downstream packages handle:**
+- **BFHcharts** - SPC chart-specific rendering (control charts, run charts, process behavior charts)
+- **BFHcharts** - Chart type validation and data preprocessing
+- **SPCify** - Shiny user interface and reactive workflows
+- **SPCify** - Data upload, transformation, and export functionality
+- **Both** - Application-specific business logic and domain rules
+
+### Communication Protocol
+
+**For feature requests from downstream packages:**
+
+1. **Create issue in BFHtheme repository**
+   - Use GitHub issue templates if available
+   - Clearly state which downstream package needs the feature
+
+2. **Add appropriate labels:**
+   - `enhancement` - For new features or capabilities
+   - `from-bfhcharts` - Requested by BFHcharts package
+   - `from-spcify` - Requested by SPCify application
+   - Additional labels as needed: `breaking-change`, `performance`, etc.
+
+3. **Document use case in issue description:**
+   ```markdown
+   ## Use Case
+   [Describe how the downstream package will use this feature]
+
+   ## Current Workaround
+   [Explain current solution or why it's not possible]
+
+   ## Proposed Solution
+   [Suggest API design or approach]
+
+   ## Impact
+   - Breaking change: Yes/No
+   - Affects: [list other downstream packages if applicable]
+   ```
+
+4. **Discuss API design before implementation**
+   - Review proposed function signatures
+   - Consider backward compatibility implications
+   - Evaluate impact on other downstream packages
+   - Align on naming conventions and parameter defaults
+
+5. **Coordinate release timing**
+   - Notify downstream maintainers of upcoming changes
+   - Provide advance notice for breaking changes (minimum 2 weeks)
+   - Coordinate version bumps across dependent packages
+   - Update downstream packages before announcing new release
+
+### Breaking Change Policy
+
+**When BFHtheme introduces breaking changes:**
+
+1. **Deprecation phase (minor version)**
+   - Add deprecation warnings to old functions
+   - Provide new functions alongside deprecated ones
+   - Update documentation with migration guidance
+   - Notify downstream maintainers via GitHub issues
+
+2. **Migration guide (before major version)**
+   - Document all breaking changes in NEWS.md
+   - Provide code examples showing old → new patterns
+   - Create migration checklist for downstream packages
+   - Offer to help with downstream updates if needed
+
+3. **Major version release**
+   - Remove deprecated functions
+   - Update downstream packages before release
+   - Announce release with migration guide
+   - Monitor downstream packages for issues
+
+**Example workflow:**
+```
+v0.5.0 → Add theme_bfh_v2() alongside theme_bfh()
+       → theme_bfh() shows .Deprecated() warning
+v0.6.0 → Both functions available, migration guide published
+v1.0.0 → Remove theme_bfh(), only theme_bfh_v2() remains (renamed to theme_bfh())
+```
+
 ## Important Constraints
 
 **Technical Constraints:**

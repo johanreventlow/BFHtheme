@@ -45,13 +45,4 @@ ggplot(mtcars, aes(wt, mpg)) +
   theme_bfh()
 }
 }
-\seealso{
-[theme_bfh_minimal()], [theme_bfh_print()], [theme_bfh_presentation()], [theme_bfh_dark()]
-
-Other BFH themes: 
-\code{\link{theme_bfh_dark}()},
-\code{\link{theme_bfh_minimal}()},
-\code{\link{theme_bfh_presentation}()},
-\code{\link{theme_bfh_print}()}
-}
 \concept{BFH themes}

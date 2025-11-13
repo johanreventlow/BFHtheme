@@ -23,7 +23,7 @@ test_that("get_bfh_font returns a font when check_installed is TRUE", {
 
 test_that("get_bfh_font prefers Mari when available", {
   skip_if_not_installed("systemfonts")
-  suppressMessages(clear_bfh_font_cache())
+  suppressMessages(BFHtheme:::clear_bfh_font_cache())
 
   # Test that Mari is preferred when available
   # This test relies on actual systemfonts behavior
@@ -55,16 +55,16 @@ test_that("get_bfh_font handles missing systemfonts package gracefully", {
   expect_type(result, "character")
 })
 
-# === Tests for check_bfh_fonts() ===
+# === Tests for BFHtheme:::check_bfh_fonts() ===
 
 test_that("check_bfh_fonts returns logical vector", {
-  result <- suppressMessages(check_bfh_fonts())
+  result <- suppressMessages(BFHtheme:::check_bfh_fonts())
   expect_type(result, "logical")
   expect_true(length(result) > 0)
 })
 
 test_that("check_bfh_fonts has named elements", {
-  result <- suppressMessages(check_bfh_fonts())
+  result <- suppressMessages(BFHtheme:::check_bfh_fonts())
   expect_named(result)
   expected_names <- c("Mari", "Mari Office", "Roboto", "Arial")
   expect_equal(names(result), expected_names)
@@ -72,51 +72,51 @@ test_that("check_bfh_fonts has named elements", {
 
 test_that("check_bfh_fonts prints output", {
   expect_output(
-    check_bfh_fonts(),
+    BFHtheme:::check_bfh_fonts(),
     "BFH Font Availability"
   )
 })
 
-# === Tests for install_roboto_font() ===
+# === Tests for BFHtheme:::install_roboto_font() ===
 
 test_that("install_roboto_font prints instructions", {
   expect_output(
-    install_roboto_font(),
+    BFHtheme:::install_roboto_font(),
     "Installing Roboto Font"
   )
 
   expect_output(
-    install_roboto_font(),
+    BFHtheme:::install_roboto_font(),
     "Apache License"
   )
 })
 
-# === Tests for setup_bfh_fonts() ===
+# === Tests for BFHtheme:::setup_bfh_fonts() ===
 
 test_that("setup_bfh_fonts returns character string", {
-  result <- suppressMessages(setup_bfh_fonts(use_showtext = FALSE))
+  result <- suppressMessages(BFHtheme:::setup_bfh_fonts(use_showtext = FALSE))
   expect_type(result, "character")
   expect_length(result, 1)
 })
 
 test_that("setup_bfh_fonts with showtext handles missing package", {
   # Should fall back gracefully when showtext not available
-  result <- suppressMessages(setup_bfh_fonts(use_showtext = TRUE))
+  result <- suppressMessages(BFHtheme:::setup_bfh_fonts(use_showtext = TRUE))
   expect_type(result, "character")
 })
 
 test_that("setup_bfh_fonts returns valid font name", {
-  result <- suppressMessages(setup_bfh_fonts(use_showtext = FALSE))
+  result <- suppressMessages(BFHtheme:::setup_bfh_fonts(use_showtext = FALSE))
   # Should return a reasonable font
   expect_true(nchar(result) > 0)
 })
 
-# === Tests for set_bfh_fonts() ===
+# === Tests for BFHtheme:::set_bfh_fonts() ===
 
 test_that("set_bfh_fonts returns font name invisibly", {
   skip_if_not_installed("ggplot2")
 
-  result <- suppressMessages(set_bfh_fonts(use_showtext = FALSE))
+  result <- suppressMessages(BFHtheme:::set_bfh_fonts(use_showtext = FALSE))
   expect_type(result, "character")
   expect_length(result, 1)
 })
@@ -128,7 +128,7 @@ test_that("set_bfh_fonts updates ggplot2 theme", {
   original_theme <- ggplot2::theme_get()
 
   # Set BFH fonts
-  result <- suppressMessages(set_bfh_fonts(use_showtext = FALSE))
+  result <- suppressMessages(BFHtheme:::set_bfh_fonts(use_showtext = FALSE))
 
   # Function should return a font name
   expect_type(result, "character")
@@ -146,7 +146,7 @@ test_that("set_bfh_fonts prints message", {
   skip_if_not_installed("ggplot2")
 
   expect_message(
-    set_bfh_fonts(use_showtext = FALSE),
+    BFHtheme:::set_bfh_fonts(use_showtext = FALSE),
     "BFH fonts set as default"
   )
 })
@@ -155,7 +155,7 @@ test_that("set_bfh_fonts prints message", {
 
 test_that("font cache improves performance on repeated calls", {
   # Clear cache to start fresh
-  suppressMessages(clear_bfh_font_cache())
+  suppressMessages(BFHtheme:::clear_bfh_font_cache())
 
   # First call should detect font
   font1 <- suppressMessages(get_bfh_font(check_installed = TRUE, silent = TRUE))
@@ -170,12 +170,12 @@ test_that("font cache improves performance on repeated calls", {
   expect_equal(font1, font2)
 })
 
-test_that("clear_bfh_font_cache() clears the cache", {
+test_that("BFHtheme:::clear_bfh_font_cache() clears the cache", {
   # Get font (will be cached)
   font1 <- suppressMessages(get_bfh_font(check_installed = TRUE, silent = TRUE))
 
   # Clear cache
-  expect_message(clear_bfh_font_cache(), "cache cleared")
+  expect_message(BFHtheme:::clear_bfh_font_cache(), "cache cleared")
 
   # Next call should not show cached message
   expect_message(
@@ -201,7 +201,7 @@ test_that("force_refresh bypasses cache", {
 
 test_that("cache persists across multiple calls", {
   # Clear cache
-  suppressMessages(clear_bfh_font_cache())
+  suppressMessages(BFHtheme:::clear_bfh_font_cache())
 
   # First call
   font1 <- suppressMessages(get_bfh_font(silent = TRUE))
@@ -223,18 +223,18 @@ test_that("font workflow: setup -> get -> set works correctly", {
   skip_if_not_installed("ggplot2")
 
   # Clear cache for clean test
-  suppressMessages(clear_bfh_font_cache())
+  suppressMessages(BFHtheme:::clear_bfh_font_cache())
 
   # Step 1: Get font
   font1 <- suppressMessages(get_bfh_font(check_installed = TRUE, silent = TRUE))
   expect_type(font1, "character")
 
   # Step 2: Setup fonts
-  font2 <- suppressMessages(setup_bfh_fonts(use_showtext = FALSE))
+  font2 <- suppressMessages(BFHtheme:::setup_bfh_fonts(use_showtext = FALSE))
   expect_type(font2, "character")
 
   # Step 3: Set as default
-  font3 <- suppressMessages(set_bfh_fonts(use_showtext = FALSE))
+  font3 <- suppressMessages(BFHtheme:::set_bfh_fonts(use_showtext = FALSE))
   expect_type(font3, "character")
 
   # All should return the same font (when not using showtext)
@@ -247,7 +247,7 @@ test_that("font workflow: setup -> get -> set works correctly", {
 test_that("get_bfh_font falls back to sans when no packages available", {
   # This tests the fallback path when neither systemfonts nor extrafont are available
   # In practice, systemfonts is usually available, so this is defensive
-  suppressMessages(clear_bfh_font_cache())
+  suppressMessages(BFHtheme:::clear_bfh_font_cache())
 
   result <- get_bfh_font(check_installed = TRUE, silent = TRUE, force_refresh = TRUE)
   expect_type(result, "character")
@@ -258,7 +258,7 @@ test_that("get_bfh_font falls back to sans when no packages available", {
 
 test_that("check_bfh_fonts handles missing font packages gracefully", {
   # Test that the function works even when systemfonts/extrafont aren't available
-  result <- suppressMessages(check_bfh_fonts())
+  result <- suppressMessages(BFHtheme:::check_bfh_fonts())
 
   expect_type(result, "logical")
   expect_named(result)
@@ -268,7 +268,7 @@ test_that("check_bfh_fonts handles missing font packages gracefully", {
 
 test_that("get_bfh_font respects font priority order", {
   skip_if_not_installed("systemfonts")
-  suppressMessages(clear_bfh_font_cache())
+  suppressMessages(BFHtheme:::clear_bfh_font_cache())
 
   result <- get_bfh_font(check_installed = TRUE, silent = TRUE, force_refresh = TRUE)
 
@@ -281,7 +281,7 @@ test_that("get_bfh_font can load Roboto via showtext when available", {
   skip_if_not_installed("showtext")
 
   # Clear cache for clean test
-  suppressMessages(clear_bfh_font_cache())
+  suppressMessages(BFHtheme:::clear_bfh_font_cache())
 
   # Mock scenario: Ingen Mari/Roboto installeret systemisk
   # Denne test verificerer at showtext-path virker
@@ -303,7 +303,7 @@ test_that("showtext fallback works when Mari fonts not available", {
   # showtext-integration er korrekt struktureret
 
   # Verificer at funktionen ikke fejler når showtext ikke er tilgængelig
-  suppressMessages(clear_bfh_font_cache())
+  suppressMessages(BFHtheme:::clear_bfh_font_cache())
 
   result <- suppressMessages(
     get_bfh_font(check_installed = TRUE, silent = TRUE, force_refresh = TRUE)

@@ -20,11 +20,11 @@ required!
 }
 \examples{
 \dontrun{
-install_roboto_font()
+BFHtheme:::install_roboto_font()
 }
 }
 \seealso{
-[check_bfh_fonts()]
+[get_bfh_font()]
 
 Other BFH fonts: 
 \code{\link{check_bfh_fonts}()},
@@ -36,3 +36,4 @@ Other BFH fonts:
 \code{\link{use_bfh_showtext}()}
 }
 \concept{BFH fonts}
+\keyword{internal}

@@ -15,7 +15,7 @@ Removes cached font detection results, ensuring that the next call to
 }
 \examples{
 # Clear font cache after installing new fonts
-clear_bfh_font_cache()
+BFHtheme:::clear_bfh_font_cache()
 
 # Font will be re-detected on next call
 font <- get_bfh_font()
@@ -33,3 +33,4 @@ Other BFH fonts:
 \code{\link{use_bfh_showtext}()}
 }
 \concept{BFH fonts}
+\keyword{internal}

@@ -12,9 +12,8 @@ set_bfh_defaults(
 )
 }
 \arguments{
-\item{theme}{Character name of the BFH theme to adopt. Valid choices are
-`"bfh"`, `"bfh_minimal"`, `"bfh_print"`, `"bfh_presentation"`, and
-`"bfh_dark"`. Defaults to `"bfh"`.}
+\item{theme}{Character name of the BFH theme to adopt. Only `"bfh"` is
+supported (other theme variants removed in v0.2.0). Defaults to `"bfh"`.}
 
 \item{palette}{Character name of the palette from [bfh_palettes] used to seed
 geom defaults. Defaults to `"main"`.}
@@ -53,15 +52,14 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   geom_point() +
   scale_color_bfh()  # Required for BFH colors
 
-# Use a different theme
-set_bfh_defaults(theme = "bfh_minimal", palette = "blues")
+# Use a different palette
+set_bfh_defaults(palette = "blues")
 }
 }
 \seealso{
-[reset_bfh_defaults()], [apply_bfh_theme()], [set_bfh_fonts()]
+[reset_bfh_defaults()], [set_bfh_fonts()]
 
 Other BFH defaults: 
-\code{\link{apply_bfh_theme}()},
 \code{\link{reset_bfh_defaults}()}
 }
 \concept{BFH defaults}

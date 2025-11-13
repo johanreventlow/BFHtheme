@@ -28,7 +28,6 @@ reset_bfh_defaults()
 [set_bfh_defaults()]
 
 Other BFH defaults: 
-\code{\link{apply_bfh_theme}()},
 \code{\link{set_bfh_defaults}()}
 }
 \concept{BFH defaults}

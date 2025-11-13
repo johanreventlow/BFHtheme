@@ -42,10 +42,8 @@ ggplot(mtcars, aes(wt, mpg)) +
 [bfh_labs()], [theme_bfh()], [add_bfh_footer()]
 
 Other BFH branding: 
-\code{\link{add_bfh_color_bar}()},
 \code{\link{add_bfh_footer}()},
 \code{\link{add_bfh_logo}()},
-\code{\link{add_logo}()},
 \code{\link{get_bfh_logo}()}
 }
 \concept{BFH branding}

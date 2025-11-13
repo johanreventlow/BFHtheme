@@ -68,9 +68,7 @@ add_bfh_logo(p, logo_path, position = "topright")
 [add_logo()], [get_bfh_logo()], [add_bfh_footer()], [add_bfh_color_bar()]
 
 Other BFH branding: 
-\code{\link{add_bfh_color_bar}()},
 \code{\link{add_bfh_footer}()},
-\code{\link{add_logo}()},
 \code{\link{bfh_title_block}()},
 \code{\link{get_bfh_logo}()}
 }

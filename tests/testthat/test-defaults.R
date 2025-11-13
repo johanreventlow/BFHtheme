@@ -184,48 +184,6 @@ test_that("reset_bfh_defaults prints message", {
   )
 })
 
-# === Tests for apply_bfh_theme() ===
-
-test_that("apply_bfh_theme returns list of components", {
-  result <- apply_bfh_theme()
-  expect_type(result, "list")
-  expect_true(length(result) >= 1)
-})
-
-test_that("apply_bfh_theme can be added to plot", {
-  skip_if_not_installed("ggplot2")
-
-  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
-    ggplot2::geom_point() +
-    apply_bfh_theme()
-
-  expect_s3_class(p, "ggplot")
-})
-
-test_that("apply_bfh_theme adds color scale when requested", {
-  result <- apply_bfh_theme(add_color_scale = TRUE)
-  expect_true(length(result) >= 2)
-})
-
-test_that("apply_bfh_theme adds fill scale when requested", {
-  result <- apply_bfh_theme(add_fill_scale = TRUE)
-  expect_true(length(result) >= 2)
-})
-
-test_that("apply_bfh_theme adds both scales when requested", {
-  result <- apply_bfh_theme(add_color_scale = TRUE, add_fill_scale = TRUE)
-  expect_true(length(result) >= 3)  # theme + 2 scales
-})
-
-test_that("apply_bfh_theme works with different themes", {
-  themes <- c("bfh", "bfh_minimal", "bfh_print", "bfh_presentation", "bfh_dark")
-
-  for (theme_name in themes) {
-    result <- apply_bfh_theme(theme = theme_name)
-    expect_type(result, "list")
-  }
-})
-
 # === Integration tests ===
 
 test_that("workflow: set -> plot -> reset works correctly", {

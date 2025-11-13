@@ -19,53 +19,6 @@ test_that("theme_bfh produces consistent visual output", {
   vdiffr::expect_doppelganger("theme_bfh_basic", p)
 })
 
-test_that("theme_bfh_minimal produces consistent visual output", {
-  skip_if_not_installed("vdiffr")
-  skip_if_not_installed("ggplot2")
-
-  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
-    ggplot2::geom_point() +
-    ggplot2::labs(title = "Minimal Theme") +
-    theme_bfh_minimal()
-
-  vdiffr::expect_doppelganger("theme_bfh_minimal", p)
-})
-
-test_that("theme_bfh_print produces consistent visual output", {
-  skip_if_not_installed("vdiffr")
-  skip_if_not_installed("ggplot2")
-
-  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
-    ggplot2::geom_point() +
-    ggplot2::labs(title = "Print Theme") +
-    theme_bfh_print()
-
-  vdiffr::expect_doppelganger("theme_bfh_print", p)
-})
-
-test_that("theme_bfh_presentation produces consistent visual output", {
-  skip_if_not_installed("vdiffr")
-  skip_if_not_installed("ggplot2")
-
-  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
-    ggplot2::geom_point() +
-    ggplot2::labs(title = "Presentation Theme") +
-    theme_bfh_presentation()
-
-  vdiffr::expect_doppelganger("theme_bfh_presentation", p)
-})
-
-test_that("theme_bfh_dark produces consistent visual output", {
-  skip_if_not_installed("vdiffr")
-  skip_if_not_installed("ggplot2")
-
-  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
-    ggplot2::geom_point(color = "white") +
-    ggplot2::labs(title = "Dark Theme") +
-    theme_bfh_dark()
-
-  vdiffr::expect_doppelganger("theme_bfh_dark", p)
-})
 
 test_that("theme_bfh with color scales produces consistent output", {
   skip_if_not_installed("vdiffr")

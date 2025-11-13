@@ -15,11 +15,11 @@ system, using `systemfonts` or `extrafont` when available.
 }
 \examples{
 \dontrun{
-check_bfh_fonts()
+BFHtheme:::check_bfh_fonts()
 }
 }
 \seealso{
-[get_bfh_font()], [install_roboto_font()]
+[get_bfh_font()]
 
 Other BFH fonts: 
 \code{\link{clear_bfh_font_cache}()},
@@ -31,3 +31,4 @@ Other BFH fonts:
 \code{\link{use_bfh_showtext}()}
 }
 \concept{BFH fonts}
+\keyword{internal}

@@ -12,7 +12,7 @@
 #' @return Character string containing the absolute path, or `NULL` if the asset
 #'   is unavailable.
 #' @export
-#' @seealso [add_logo()], [add_bfh_logo()]
+#' @seealso [add_bfh_logo()]
 #' @family BFH branding
 #' @examples
 #' \dontrun{
@@ -67,55 +67,3 @@ get_bfh_logo <- function(size = "web", variant = "color") {
   return(logo_path)
 }
 
-#' Add Packaged BFH Logo to a Plot
-#'
-#' @description
-#' Convenience wrapper around [add_bfh_logo()] that automatically pulls logo
-#' assets from the package via [get_bfh_logo()].
-#'
-#' @param plot A ggplot2 object.
-#' @param position Logo location: `"topleft"`, `"topright"`, `"bottomleft"`, or `"bottomright"`.
-#'   Defaults to `"bottomright"`.
-#' @param size Relative size of the logo (0–1). Defaults to `0.15`.
-#' @param alpha Transparency of the logo (0–1). Defaults to `0.9`.
-#' @param logo_size Logo file size: `"full"`, `"web"`, or `"small"`. Defaults to `"web"`.
-#' @param variant Logo variant: `"color"` (default), `"grey"`, or `"mark"`.
-#' @return Modified ggplot2 object with the logo applied.
-#' @export
-#' @seealso [get_bfh_logo()], [add_bfh_logo()]
-#' @family BFH branding
-#' @examples
-#' \dontrun{
-#' library(ggplot2)
-#' p <- ggplot(mtcars, aes(wt, mpg)) +
-#'   geom_point() +
-#'   theme_bfh()
-#'
-#' # Add color logo in bottom right corner (default)
-#' add_logo(p)
-#'
-#' # Add logo in top right corner
-#' add_logo(p, position = "topright")
-#'
-#' # Add greyscale logo
-#' add_logo(p, variant = "grey")
-#'
-#' # Add mark (symbol only, no text)
-#' add_logo(p, variant = "mark", size = 0.08)
-#' }
-add_logo <- function(plot,
-                     position = "bottomright",
-                     size = 0.15,
-                     alpha = 0.9,
-                     logo_size = "web",
-                     variant = "color") {
-
-  logo_path <- get_bfh_logo(logo_size, variant)
-
-  if (is.null(logo_path)) {
-    warning("Could not find BFH logo. Plot returned without logo.")
-    return(plot)
-  }
-
-  add_bfh_logo(plot, logo_path, position, size, alpha)
-}

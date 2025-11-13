@@ -43,13 +43,11 @@ add_bfh_logo(p, get_bfh_logo(variant = "mark"))
 }
 }
 \seealso{
-[add_logo()], [add_bfh_logo()]
+[add_bfh_logo()]
 
 Other BFH branding: 
-\code{\link{add_bfh_color_bar}()},
 \code{\link{add_bfh_footer}()},
 \code{\link{add_bfh_logo}()},
-\code{\link{add_logo}()},
 \code{\link{bfh_title_block}()}
 }
 \concept{BFH branding}

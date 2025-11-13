@@ -155,51 +155,35 @@ ggplot(mtcars, aes(x = factor(cyl), fill = factor(cyl))) +
   theme_bfh()
 ```
 
-### Minimal Theme
+### Customizing theme_bfh()
 
-Remove gridlines and axis accents with `theme_bfh_minimal()` whenever you want
-the data ink to stand out.
+You can customize `theme_bfh()` for specific use cases by adding additional
+`theme()` calls after applying the base theme.
 
-```{r theme-minimal, message=FALSE}
-ggplot(mtcars, aes(x = wt, y = mpg)) +
-  geom_point() +
-  labs(title = "Minimal Theme Example") +
-  theme_bfh_minimal()
-```
-
-### Print Theme
-
-`theme_bfh_print()` increases contrast, line weights, and title emphasis so
-graphics survive grayscale printing.
-
-```{r theme-print, message=FALSE}
-ggplot(mtcars, aes(x = wt, y = mpg)) +
-  geom_point() +
-  labs(title = "Print Theme Example") +
-  theme_bfh_print()
-```
-
-### Presentation Theme
-
-`theme_bfh_presentation()` scales typography and legends for projector use.
-
-```{r theme-presentation, message=FALSE}
-ggplot(mtcars, aes(x = wt, y = mpg)) +
-  geom_point() +
-  labs(title = "Presentation Theme") +
-  theme_bfh_presentation()
-```
-
-### Dark Theme
-
-Use `theme_bfh_dark()` when presenting on dark backgrounds or embedding plots
-in night-mode dashboards.
-
-```{r theme-dark, message=FALSE}
+```{r theme-custom, message=FALSE}
+# Example: Create a dark theme variant
 ggplot(mtcars, aes(x = wt, y = mpg)) +
   geom_point(color = "white") +
-  labs(title = "Dark Theme Example") +
-  theme_bfh_dark()
+  labs(title = "Custom Dark Theme") +
+  theme_bfh() +
+  theme(
+    plot.background = element_rect(fill = "#1a1a1a", color = NA),
+    panel.background = element_rect(fill = "#1a1a1a", color = NA),
+    text = element_text(color = "white"),
+    axis.text = element_text(color = "grey80")
+  )
+```
+
+```{r theme-custom-minimal, message=FALSE}
+# Example: Create a minimal variant without gridlines
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  labs(title = "Custom Minimal Theme") +
+  theme_bfh() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
 ```
 
 ## Setting Global Defaults

@@ -18,13 +18,7 @@ tags: [openspec, change]
 4. Capture architectural reasoning in `design.md` when the solution spans multiple systems, introduces new patterns, or demands trade-off discussion before committing to specs.
 5. Draft spec deltas in `changes/<id>/specs/<capability>/spec.md` (one folder per capability) using `## ADDED|MODIFIED|REMOVED Requirements` with at least one `#### Scenario:` per requirement and cross-reference related capabilities when relevant.
 6. Draft `tasks.md` as an ordered list of small, verifiable work items that deliver user-visible progress, include validation (tests, tooling), and highlight dependencies or parallelizable work.
-7. **Create GitHub issue** for tracking via `gh issue create` with:
-   - Title: `[OpenSpec] <change-id>`
-   - Body: Content from `proposal.md`
-   - Labels: `openspec-proposal` + relevant type (`enhancement`, `bug`, `documentation`, etc.)
-   - Add issue reference to `proposal.md` under `## Related` section
-   - Add issue references in `tasks.md` for cross-linking
-8. Validate with `openspec validate <id> --strict` and resolve every issue before sharing the proposal.
+7. Validate with `openspec validate <id> --strict` and resolve every issue before sharing the proposal.
 
 **Reference**
 - Use `openspec show <id> --json --deltas-only` or `openspec show <spec> --type spec` to inspect details when validation fails.

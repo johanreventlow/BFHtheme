@@ -100,14 +100,14 @@ bfh_save <- function(filename,
 #' @param format Aspect ratio. One of `"standard"`, `"wide"`, or `"square"`.
 #'   Defaults to `"standard"`.
 #' @return Named list with `width` and `height` in inches.
-#' @export
+#' @keywords internal
 #' @seealso [bfh_save()], [theme_bfh()]
 #' @family BFH helpers
 #' @details Invalid `type`/`format` combinations trigger a warning and fall back
 #' to the closest supported option.
 #' @examples
-#' get_bfh_dimensions("report", "standard")
-#' get_bfh_dimensions("presentation", "wide")
+#' BFHtheme:::get_bfh_dimensions("report", "standard")
+#' BFHtheme:::get_bfh_dimensions("presentation", "wide")
 get_bfh_dimensions <- function(type = "report", format = "standard") {
   dimensions <- list(
     report = list(
@@ -210,92 +210,6 @@ bfh_combine_plots <- function(plots,
   }
 }
 
-#' Add a BFH Colour Bar Annotation
-#'
-#' @description
-#' Adds a slim coloured band to any plot edge—a simple way to inject BFH brand
-#' cues without altering the main chart area.
-#'
-#' @details
-#' The `size` argument is expressed as a fraction of the plotting area (0–1).
-#' Values between 0.015 and 0.04 typically balance visibility with subtlety.
-#'
-#' @param plot A ggplot2 object.
-#' @param position Plot side on which the bar should appear: `"top"`, `"bottom"`,
-#'   `"left"`, or `"right"`. Defaults to `"top"`.
-#' @param color Fill colour of the bar. Defaults to `bfh_cols("hospital_primary")`.
-#' @param size Thickness of the bar (height for horizontal, width for vertical)
-#'   expressed as a fraction of the plotting area. Defaults to `0.02`.
-#' @return ggplot2 object with the annotation added.
-#' @export
-#' @seealso [add_bfh_footer()], [add_bfh_logo()], [bfh_title_block()]
-#' @family BFH branding
-#' @examples
-#' \dontrun{
-#' library(ggplot2)
-#' p <- ggplot(mtcars, aes(wt, mpg)) +
-#'   geom_point() +
-#'   theme_bfh()
-#'
-#' add_bfh_color_bar(p, position = "top")
-#' }
-add_bfh_color_bar <- function(plot,
-                              position = "top",
-                              color = bfh_cols("hospital_primary"),
-                              size = 0.02) {
-
-  if (!inherits(plot, "gg")) {
-    stop("plot must be a ggplot2 object")
-  }
-
-  # Create rectangle grob with position-specific viewport
-  # annotation_custom() kræver numeriske koordinater, ikke unit objekter
-  # Vi bruger derfor -Inf/Inf og lader grob'en selv håndtere positioning
-  bar_grob <- switch(position,
-    top = grid::rectGrob(
-      x = grid::unit(0.5, "npc"),
-      y = grid::unit(1 - size/2, "npc"),
-      width = grid::unit(1, "npc"),
-      height = grid::unit(size, "npc"),
-      gp = grid::gpar(fill = color, col = NA)
-    ),
-    bottom = grid::rectGrob(
-      x = grid::unit(0.5, "npc"),
-      y = grid::unit(size/2, "npc"),
-      width = grid::unit(1, "npc"),
-      height = grid::unit(size, "npc"),
-      gp = grid::gpar(fill = color, col = NA)
-    ),
-    left = grid::rectGrob(
-      x = grid::unit(size/2, "npc"),
-      y = grid::unit(0.5, "npc"),
-      width = grid::unit(size, "npc"),
-      height = grid::unit(1, "npc"),
-      gp = grid::gpar(fill = color, col = NA)
-    ),
-    right = grid::rectGrob(
-      x = grid::unit(1 - size/2, "npc"),
-      y = grid::unit(0.5, "npc"),
-      width = grid::unit(size, "npc"),
-      height = grid::unit(1, "npc"),
-      gp = grid::gpar(fill = color, col = NA)
-    ),
-    stop("position must be one of: top, bottom, left, right")
-  )
-
-  # Add annotation with -Inf/Inf til at fylde hele plot area
-  plot <- plot +
-    ggplot2::annotation_custom(
-      bar_grob,
-      xmin = -Inf, xmax = Inf,
-      ymin = -Inf, ymax = Inf
-    )
-
-  # Disable clipping to show the annotation
-  plot <- plot + ggplot2::coord_cartesian(clip = "off")
-
-  return(plot)
-}
 
 #' BFH-Style Plot Labels with Automatic Uppercase
 #'

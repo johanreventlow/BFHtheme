@@ -124,12 +124,12 @@ get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh =
 #' [get_bfh_font()] triggers a fresh lookup.
 #'
 #' @return Invisibly returns `TRUE`.
-#' @export
+#' @keywords internal
 #' @seealso [get_bfh_font()]
 #' @family BFH fonts
 #' @examples
 #' # Clear font cache after installing new fonts
-#' clear_bfh_font_cache()
+#' BFHtheme:::clear_bfh_font_cache()
 #'
 #' # Font will be re-detected on next call
 #' font <- get_bfh_font()
@@ -146,12 +146,12 @@ clear_bfh_font_cache <- function() {
 #' system, using `systemfonts` or `extrafont` when available.
 #'
 #' @return Invisibly returns a named logical vector with font availability.
-#' @export
-#' @seealso [get_bfh_font()], [install_roboto_font()]
+#' @keywords internal
+#' @seealso [get_bfh_font()]
 #' @family BFH fonts
 #' @examples
 #' \dontrun{
-#' check_bfh_fonts()
+#' BFHtheme:::check_bfh_fonts()
 #' }
 check_bfh_fonts <- function() {
   fonts_to_check <- c(
@@ -217,12 +217,12 @@ check_bfh_fonts <- function() {
 #' download and use Roboto from Google Fonts when needed - no manual installation
 #' required!
 #'
-#' @export
-#' @seealso [check_bfh_fonts()]
+#' @keywords internal
+#' @seealso [get_bfh_font()]
 #' @family BFH fonts
 #' @examples
 #' \dontrun{
-#' install_roboto_font()
+#' BFHtheme:::install_roboto_font()
 #' }
 install_roboto_font <- function() {
   cat("\n=== Installing Roboto Font ===\n\n")
@@ -266,13 +266,13 @@ install_roboto_font <- function() {
 #' @param use_showtext Logical. When `TRUE`, attempts to load Roboto through
 #'   `showtext::font_add_google()` and enable `showtext_auto()`. Defaults to `FALSE`.
 #' @return Character string naming the font family that should be used.
-#' @export
-#' @seealso [set_bfh_fonts()], [get_bfh_font()], [install_roboto_font()]
+#' @keywords internal
+#' @seealso [get_bfh_font()]
 #' @family BFH fonts
 #' @examples
 #' \dontrun{
 #' # Setup fonts
-#' font <- setup_bfh_fonts()
+#' font <- BFHtheme:::setup_bfh_fonts()
 #'
 #' # Use in plot
 #' library(ggplot2)
@@ -305,15 +305,15 @@ setup_bfh_fonts <- function(use_showtext = FALSE) {
 #' Convenience wrapper around [setup_bfh_fonts()] that immediately updates
 #' `ggplot2`'s global theme text family to the detected BFH font.
 #'
-#' @param use_showtext Logical. Forwarded to [setup_bfh_fonts()]. Defaults to `FALSE`.
+#' @param use_showtext Logical. Forwarded to internal setup function. Defaults to `FALSE`.
 #' @return Invisibly returns the font family that was set.
-#' @export
-#' @seealso [setup_bfh_fonts()], [set_bfh_defaults()]
+#' @keywords internal
+#' @seealso [get_bfh_font()], [set_bfh_defaults()]
 #' @family BFH fonts
 #' @examples
 #' \dontrun{
 #' # Set BFH fonts as default
-#' set_bfh_fonts()
+#' BFHtheme:::set_bfh_fonts()
 #'
 #' # Now all themes use BFH fonts automatically
 #' library(ggplot2)
@@ -350,14 +350,14 @@ set_bfh_fonts <- function(use_showtext = FALSE) {
 #' @param dpi Resolution for raster graphics (default: 300 for print quality)
 #'
 #' @return Invisibly returns `TRUE`.
-#' @export
+#' @keywords internal
 #' @seealso [get_bfh_font()], [bfh_save()]
 #' @family BFH fonts
 #' @examples
 #' \dontrun{
 #' # Setup at the start of your analysis
 #' library(BFHtheme)
-#' set_bfh_graphics()
+#' BFHtheme:::set_bfh_graphics()
 #'
 #' # Now all knitr chunks will use high-quality devices
 #' # For manual saving:
@@ -416,16 +416,16 @@ set_bfh_graphics <- function(dpi = 300) {
 #' @param family Font family name to register (default: "Roboto")
 #'
 #' @return Invisibly returns the font family name.
-#' @export
-#' @seealso [get_bfh_font()], [set_bfh_graphics()]
+#' @keywords internal
+#' @seealso [get_bfh_font()]
 #' @family BFH fonts
 #' @examples
 #' \dontrun{
 #' # Option 1: Load Roboto from Google Fonts
-#' use_bfh_showtext()
+#' BFHtheme:::use_bfh_showtext()
 #'
 #' # Option 2: Load custom fonts from files
-#' use_bfh_showtext(
+#' BFHtheme:::use_bfh_showtext(
 #'   font_paths = list(
 #'     regular = "path/to/Mari-Regular.ttf",
 #'     bold = "path/to/Mari-Bold.ttf",

@@ -30,7 +30,7 @@ avoiding the need for PostScript font databases or `extrafont`.
 \dontrun{
 # Setup at the start of your analysis
 library(BFHtheme)
-set_bfh_graphics()
+BFHtheme:::set_bfh_graphics()
 
 # Now all knitr chunks will use high-quality devices
 # For manual saving:
@@ -52,3 +52,4 @@ Other BFH fonts:
 \code{\link{use_bfh_showtext}()}
 }
 \concept{BFH fonts}
+\keyword{internal}

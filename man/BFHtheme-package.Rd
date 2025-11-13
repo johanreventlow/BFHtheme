@@ -40,8 +40,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 \section{Key Functions}{
 
 \describe{
-  \item{Themes}{`theme_bfh()`, `theme_bfh_minimal()`, `theme_bfh_print()`,
-    `theme_bfh_presentation()`, `theme_bfh_dark()`}
+  \item{Themes}{`theme_bfh()`, `theme_region_h()` (customize via `theme()` calls)}
   \item{Colors}{`bfh_colors`, `bfh_cols()`, `bfh_palettes`, `bfh_pal()`}
   \item{Scales}{`scale_color_bfh()`, `scale_fill_bfh()`}
   \item{Helpers}{`bfh_save()`, `set_bfh_defaults()`, `add_bfh_logo()`}

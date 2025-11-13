@@ -234,12 +234,12 @@ bfh_pal <- function(palette = "main", reverse = FALSE, ...) {
 #' or for testing purposes.
 #'
 #' @return Invisibly returns `TRUE`.
-#' @export
+#' @keywords internal
 #' @seealso [bfh_pal()]
 #' @family BFH colors
 #' @examples
 #' # Clear palette cache
-#' clear_bfh_pal_cache()
+#' BFHtheme:::clear_bfh_pal_cache()
 #'
 #' # Next call will recreate palette
 #' pal <- bfh_pal("main")

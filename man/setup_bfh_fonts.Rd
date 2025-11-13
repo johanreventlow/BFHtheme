@@ -20,7 +20,7 @@ Roboto via the `showtext` package when system fonts are not accessible.
 \examples{
 \dontrun{
 # Setup fonts
-font <- setup_bfh_fonts()
+font <- BFHtheme:::setup_bfh_fonts()
 
 # Use in plot
 library(ggplot2)
@@ -30,7 +30,7 @@ ggplot(mtcars, aes(wt, mpg)) +
 }
 }
 \seealso{
-[set_bfh_fonts()], [get_bfh_font()], [install_roboto_font()]
+[get_bfh_font()]
 
 Other BFH fonts: 
 \code{\link{check_bfh_fonts}()},
@@ -42,3 +42,4 @@ Other BFH fonts:
 \code{\link{use_bfh_showtext}()}
 }
 \concept{BFH fonts}
+\keyword{internal}

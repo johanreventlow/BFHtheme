@@ -93,9 +93,10 @@ R/
 
 #### Core Theming
 - **`themes.R`** - ggplot2 theme() objects
-  - Exports: `theme_bfh()`, `theme_bfh_minimal()`, `theme_bfh_dark()`, `theme_region_h()`
+  - Exports: `theme_bfh()`, `theme_region_h()`
   - Responsibilities: Define theme elements, typography, spacing, grids
   - Dependencies: `fonts.R` for font detection, `marquee` for text rendering
+  - Note: Theme variants removed in v0.2.0 - users customize via `theme()` calls
 
 - **`colors.R`** - Color definitions and palette management
   - Exports: `bfh_colors`, `bfh_palettes`, `bfh_cols()`, `bfh_pal()`
@@ -251,7 +252,7 @@ Let's say you want to add a new theme variant `theme_bfh_compact()`:
      base_family <- base_family %||% get_bfh_font(check_installed = TRUE, silent = TRUE)
 
      # Build theme
-     theme_bfh_minimal(base_size = base_size, base_family = base_family) +
+     theme_bfh(base_size = base_size, base_family = base_family) +
        theme(
          plot.margin = margin(5, 5, 5, 5),
          # ... compact spacing
@@ -1411,7 +1412,7 @@ Optional longer description providing context and rationale.
 
 ```bash
 # Good commit messages
-git commit -m "feat(themes): add theme_bfh_dark for dark backgrounds"
+git commit -m "feat(themes): add custom theme styling option"
 git commit -m "fix(colors): resolve bfh_cols() zero-argument bug"
 git commit -m "test(fonts): add coverage for extrafont fallback path"
 git commit -m "docs(readme): update installation instructions"

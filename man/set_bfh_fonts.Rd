@@ -7,7 +7,7 @@
 set_bfh_fonts(use_showtext = FALSE)
 }
 \arguments{
-\item{use_showtext}{Logical. Forwarded to [setup_bfh_fonts()]. Defaults to `FALSE`.}
+\item{use_showtext}{Logical. Forwarded to internal setup function. Defaults to `FALSE`.}
 }
 \value{
 Invisibly returns the font family that was set.
@@ -19,7 +19,7 @@ Convenience wrapper around [setup_bfh_fonts()] that immediately updates
 \examples{
 \dontrun{
 # Set BFH fonts as default
-set_bfh_fonts()
+BFHtheme:::set_bfh_fonts()
 
 # Now all themes use BFH fonts automatically
 library(ggplot2)
@@ -29,7 +29,7 @@ ggplot(mtcars, aes(wt, mpg)) +
 }
 }
 \seealso{
-[setup_bfh_fonts()], [set_bfh_defaults()]
+[get_bfh_font()], [set_bfh_defaults()]
 
 Other BFH fonts: 
 \code{\link{check_bfh_fonts}()},
@@ -41,3 +41,4 @@ Other BFH fonts:
 \code{\link{use_bfh_showtext}()}
 }
 \concept{BFH fonts}
+\keyword{internal}

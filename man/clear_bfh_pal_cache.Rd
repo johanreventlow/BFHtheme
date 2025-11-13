@@ -16,7 +16,7 @@ or for testing purposes.
 }
 \examples{
 # Clear palette cache
-clear_bfh_pal_cache()
+BFHtheme:::clear_bfh_pal_cache()
 
 # Next call will recreate palette
 pal <- bfh_pal("main")
@@ -32,3 +32,4 @@ Other BFH colors:
 \code{\link{show_bfh_palettes}()}
 }
 \concept{BFH colors}
+\keyword{internal}

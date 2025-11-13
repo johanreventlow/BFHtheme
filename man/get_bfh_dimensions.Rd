@@ -25,8 +25,8 @@ Invalid `type`/`format` combinations trigger a warning and fall back
 to the closest supported option.
 }
 \examples{
-get_bfh_dimensions("report", "standard")
-get_bfh_dimensions("presentation", "wide")
+BFHtheme:::get_bfh_dimensions("report", "standard")
+BFHtheme:::get_bfh_dimensions("presentation", "wide")
 }
 \seealso{
 [bfh_save()], [theme_bfh()]
@@ -37,3 +37,4 @@ Other BFH helpers:
 \code{\link{bfh_save}()}
 }
 \concept{BFH helpers}
+\keyword{internal}

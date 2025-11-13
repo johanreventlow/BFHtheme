@@ -22,32 +22,6 @@ test_that("theme_bfh accepts base_family parameter", {
   expect_s3_class(theme_sans, "theme")
 })
 
-test_that("all theme variants exist and return themes", {
-  expect_s3_class(theme_bfh_minimal(), "theme")
-  expect_s3_class(theme_bfh_print(), "theme")
-  expect_s3_class(theme_bfh_presentation(), "theme")
-  expect_s3_class(theme_bfh_dark(), "theme")
-})
-
-test_that("theme_bfh_minimal has minimal grid", {
-  theme <- theme_bfh_minimal()
-  expect_s3_class(theme, "theme")
-})
-
-test_that("theme_bfh_print has appropriate settings for print", {
-  theme <- theme_bfh_print()
-  expect_s3_class(theme, "theme")
-})
-
-test_that("theme_bfh_presentation has larger text for presentations", {
-  theme <- theme_bfh_presentation()
-  expect_s3_class(theme, "theme")
-})
-
-test_that("theme_bfh_dark has dark background", {
-  theme <- theme_bfh_dark()
-  expect_s3_class(theme, "theme")
-})
 
 test_that("theme_bfh works with ggplot2", {
   skip_if_not_installed("ggplot2")
@@ -60,30 +34,6 @@ test_that("theme_bfh works with ggplot2", {
   expect_s3_class(p, "ggplot")
 })
 
-test_that("all theme variants work with ggplot2", {
-  skip_if_not_installed("ggplot2")
-
-  p1 <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
-    ggplot2::geom_point() +
-    theme_bfh_minimal()
-
-  p2 <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
-    ggplot2::geom_point() +
-    theme_bfh_print()
-
-  p3 <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
-    ggplot2::geom_point() +
-    theme_bfh_presentation()
-
-  p4 <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
-    ggplot2::geom_point() +
-    theme_bfh_dark()
-
-  expect_s3_class(p1, "gg")
-  expect_s3_class(p2, "gg")
-  expect_s3_class(p3, "gg")
-  expect_s3_class(p4, "gg")
-})
 
 test_that("theme_bfh y-axis labels are left-aligned", {
   theme <- theme_bfh()
@@ -92,11 +42,3 @@ test_that("theme_bfh y-axis labels are left-aligned", {
   expect_equal(theme$axis.text.y$hjust, 0)
 })
 
-test_that("all theme variants have left-aligned y-axis labels", {
-  # Test alle variants
-  expect_equal(theme_bfh()$axis.text.y$hjust, 0)
-  expect_equal(theme_bfh_minimal()$axis.text.y$hjust, 0)
-  expect_equal(theme_bfh_print()$axis.text.y$hjust, 0)
-  expect_equal(theme_bfh_presentation()$axis.text.y$hjust, 0)
-  expect_equal(theme_bfh_dark()$axis.text.y$hjust, 0)
-})

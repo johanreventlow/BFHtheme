@@ -31,10 +31,10 @@ with modern devices (`ragg`, `svglite`, `cairo_pdf`).
 \examples{
 \dontrun{
 # Option 1: Load Roboto from Google Fonts
-use_bfh_showtext()
+BFHtheme:::use_bfh_showtext()
 
 # Option 2: Load custom fonts from files
-use_bfh_showtext(
+BFHtheme:::use_bfh_showtext(
   font_paths = list(
     regular = "path/to/Mari-Regular.ttf",
     bold = "path/to/Mari-Bold.ttf",
@@ -45,7 +45,7 @@ use_bfh_showtext(
 }
 }
 \seealso{
-[get_bfh_font()], [set_bfh_graphics()]
+[get_bfh_font()]
 
 Other BFH fonts: 
 \code{\link{check_bfh_fonts}()},
@@ -57,3 +57,4 @@ Other BFH fonts:
 \code{\link{setup_bfh_fonts}()}
 }
 \concept{BFH fonts}
+\keyword{internal}
