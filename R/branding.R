@@ -190,7 +190,7 @@ add_bfh_logo <- function(plot,
   }
 
   # Use patchwork to add logo as an inset
-  # This places logo relative to entire plot area (including margins)
+  # This places logo relative to full area (including all margins)
   plot +
     patchwork::inset_element(
       grid::grobTree(grid::rasterGrob(
@@ -200,11 +200,11 @@ add_bfh_logo <- function(plot,
         interpolate = TRUE,
         gp = grid::gpar(alpha = alpha)
       )),
-      left = 0,  # Start at left edge of plot
+      left = 0,  # Start at left edge
       right = logo_size_npc,  # Width of logo
       bottom = 1/15,  # Start 1/15 from bottom
       top = 1/15 + logo_size_npc,  # Height of logo
-      align_to = "plot",  # Position relative to entire plot, not panel
+      align_to = "full",  # Position relative to full area (including all margins)
       clip = FALSE
     )
 }
