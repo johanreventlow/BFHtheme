@@ -199,19 +199,20 @@ add_bfh_logo <- function(plot,
   logo_size <- 1/15  # As fraction of plot height
   logo_position_bottom <- 1/15  # Position from bottom
 
-  # Use cowplot::draw_image() for precise positioning
-  # This function handles aspect ratio correctly and positions relative to plot coordinates
-  plot +
+  # Use cowplot::ggdraw() + draw_plot() + draw_image() for precise positioning
+  # ggdraw() creates a drawing canvas with relative coordinates (0-1)
+  # draw_plot() places the original plot
+  # draw_image() adds the logo with precise positioning
+  cowplot::ggdraw() +
+    cowplot::draw_plot(plot) +
     cowplot::draw_image(
       image = logo,
-      x = 0,  # Left edge of plot
-      y = logo_position_bottom,  # 1/15 from bottom
-      width = logo_size,  # 1/15 of plot height
-      height = logo_size,  # 1/15 of plot height (square)
+      x = 0,  # Left edge (in relative coordinates 0-1)
+      y = logo_position_bottom,  # 1/15 from bottom (in relative coordinates)
+      width = logo_size,  # 1/15 of canvas width
+      height = logo_size,  # 1/15 of canvas height (square)
       hjust = 0,  # Horizontal justification: left
       vjust = 0,  # Vertical justification: bottom
-      halign = 0,  # Horizontal alignment within space
-      valign = 0,  # Vertical alignment within space
       interpolate = TRUE
     )
 }
