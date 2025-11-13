@@ -522,11 +522,11 @@ bfh_save("figure.png", p, width = 10, height = 8, units = "cm", dpi = 300)
 Query the recommended sizes directly from the helper for reproducible reporting:
 
 ```{r dimensions}
-# Get dimensions for different output types
-report_dims <- get_bfh_dimensions(type = "report", format = "standard")
+# Get dimensions for different output types (internal function)
+report_dims <- BFHtheme:::get_bfh_dimensions(type = "report", format = "standard")
 print(report_dims)
 
-presentation_dims <- get_bfh_dimensions(type = "presentation", format = "wide")
+presentation_dims <- BFHtheme:::get_bfh_dimensions(type = "presentation", format = "wide")
 print(presentation_dims)
 ```
 

@@ -37,7 +37,7 @@ In this vignette you will learn how to:
 | Use branded colour scales | `scale_color_bfh()`, `scale_fill_bfh()` |
 | Manage fonts and defaults | `set_bfh_defaults()`, `set_bfh_fonts()` |
 | Browse colours and palettes | `bfh_cols()`, `show_bfh_palettes()` |
-| Export figures | `bfh_save()`, `get_bfh_dimensions()` |
+| Export figures | `bfh_save()` |
 
 ## Installation
 
@@ -231,7 +231,8 @@ bfh_save("plot.pdf", p, width = 8, height = 6, dpi = 600)
 Inspect the recommended sizes programmatically:
 
 ```{r dimensions, eval=FALSE}
-get_bfh_dimensions("presentation", "wide")
+# Internal function - use ::: to access
+BFHtheme:::get_bfh_dimensions("presentation", "wide")
 ```
 
 ## Font Configuration
