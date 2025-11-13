@@ -33,7 +33,8 @@ test_that("add_bfh_logo validates file exists", {
 test_that("add_bfh_logo enforces optional root restriction", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("png")
-  skip_if_not_installed("patchwork")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
 
   p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
 
@@ -62,7 +63,8 @@ test_that("add_bfh_logo enforces optional root restriction", {
 test_that("add_bfh_logo accepts normalized shortcuts", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("png")
-  skip_if_not_installed("patchwork")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
 
   p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
 
@@ -100,7 +102,8 @@ test_that("add_bfh_logo accepts normalized shortcuts", {
 test_that("add_bfh_logo accepts NULL logo_path (default logo)", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("png")
-  skip_if_not_installed("patchwork")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
 
   p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
 
@@ -170,7 +173,8 @@ test_that("add_bfh_logo validates alpha parameter", {
 test_that("add_bfh_logo uses fixed positioning", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("png")
-  skip_if_not_installed("patchwork")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
 
   p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
 
@@ -186,7 +190,8 @@ test_that("add_bfh_logo uses fixed positioning", {
 test_that("add_bfh_logo returns ggplot object", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("png")
-  skip_if_not_installed("patchwork")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
 
   p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
   result <- add_bfh_logo(p, test_logo_path)
@@ -198,7 +203,8 @@ test_that("add_bfh_logo preserves aspect ratio", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("png")
   skip_if_not_installed("grid")
-  skip_if_not_installed("patchwork")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
 
   # Create test logo with known aspect ratio
   # 5 pixels high, 10 pixels wide = 0.5 aspect ratio

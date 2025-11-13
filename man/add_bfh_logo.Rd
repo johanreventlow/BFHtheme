@@ -20,17 +20,23 @@ Modified ggplot2 object with the logo applied.
 \description{
 Places the BFH mark logo at a fixed, brand-compliant position on ggplot2
 visualizations. The logo is automatically positioned at the bottom-left corner
-with standardized sizing (1/15 of plot height).
+with standardized sizing (1/15 of plot height, square).
 }
 \details{
 **Simplified API (v0.3.0):** This function now uses fixed positioning to ensure
 consistent branding across all visualizations. The logo is always placed at the
-bottom-left corner, flush with the plot edge, at a height of 1/15 of the total
-plot height.
+bottom-left corner, flush with the plot edge, at a height and width of 1/15 of
+the total plot height (square aspect ratio).
 
 **Default logo:** When `logo_path = NULL`, the function automatically loads
 `bfh_mark.png` (full resolution BFH symbol mark). For custom logos, provide
 a path to a PNG or JPEG file.
+
+**Dependencies:** Requires the `cowplot` and `magick` packages for precise
+logo positioning with correct aspect ratio. Install with:
+```r
+install.packages(c("cowplot", "magick"))
+```
 
 **Security:** File paths are normalized and verified to prevent tampering.
 For additional security, you can restrict logo loading to a specific directory:

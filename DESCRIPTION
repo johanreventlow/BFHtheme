@@ -39,6 +39,7 @@ Suggests:
     svglite,
     png,
     jpeg,
-    patchwork
+    cowplot,
+    magick
 VignetteBuilder: knitr
 Config/testthat/edition: 3

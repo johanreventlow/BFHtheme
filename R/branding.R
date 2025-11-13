@@ -3,17 +3,23 @@
 #' @description
 #' Places the BFH mark logo at a fixed, brand-compliant position on ggplot2
 #' visualizations. The logo is automatically positioned at the bottom-left corner
-#' with standardized sizing (1/15 of plot height).
+#' with standardized sizing (1/15 of plot height, square).
 #'
 #' @details
 #' **Simplified API (v0.3.0):** This function now uses fixed positioning to ensure
 #' consistent branding across all visualizations. The logo is always placed at the
-#' bottom-left corner, flush with the plot edge, at a height of 1/15 of the total
-#' plot height.
+#' bottom-left corner, flush with the plot edge, at a height and width of 1/15 of
+#' the total plot height (square aspect ratio).
 #'
 #' **Default logo:** When `logo_path = NULL`, the function automatically loads
 #' `bfh_mark.png` (full resolution BFH symbol mark). For custom logos, provide
 #' a path to a PNG or JPEG file.
+#'
+#' **Dependencies:** Requires the `cowplot` and `magick` packages for precise
+#' logo positioning with correct aspect ratio. Install with:
+#' ```r
+#' install.packages(c("cowplot", "magick"))
+#' ```
 #'
 #' **Security:** File paths are normalized and verified to prevent tampering.
 #' For additional security, you can restrict logo loading to a specific directory:
@@ -33,8 +39,6 @@
 #' @return Modified ggplot2 object with the logo applied.
 #' @export
 #'
-#' @importFrom ggplot2 annotation_custom coord_cartesian
-#' @importFrom grid rasterGrob gpar unit
 #' @seealso [get_bfh_logo()], [add_bfh_footer()]
 #' @family BFH branding
 #' @examples
@@ -170,42 +174,45 @@ add_bfh_logo <- function(plot,
     return(plot)
   }
 
-  # Fixed positioning: logo height and width both 1/15 of plot height (square)
-  logo_size_npc <- 1/15
-
-  # Create a grob function that will draw the logo in the margin area
-  logo_grob <- function() {
-    # Position logo at absolute coordinates:
-    # - x: flush with left edge (logo_size_npc / 2 centers the logo at its width)
-    # - y: 1/15 from bottom (logo_size_npc / 2 centers the logo at its height)
-    grid::grid.raster(
-      logo,
-      x = grid::unit(logo_size_npc / 2, "npc"),
-      y = grid::unit(1/15 + logo_size_npc / 2, "npc"),
-      width = grid::unit(logo_size_npc, "npc"),
-      height = grid::unit(logo_size_npc, "npc"),
-      interpolate = TRUE,
-      gp = grid::gpar(alpha = alpha)
+  # Check if cowplot and magick are available (required for logo positioning)
+  if (!requireNamespace("cowplot", quietly = TRUE)) {
+    warning(
+      "Package 'cowplot' is required for logo positioning. ",
+      "Install with: install.packages('cowplot'). ",
+      "Returning plot without logo.",
+      call. = FALSE
     )
+    return(plot)
   }
 
-  # Use patchwork to add logo as an inset
-  # This places logo relative to full area (including all margins)
+  if (!requireNamespace("magick", quietly = TRUE)) {
+    warning(
+      "Package 'magick' is required for image handling. ",
+      "Install with: install.packages('magick'). ",
+      "Returning plot without logo.",
+      call. = FALSE
+    )
+    return(plot)
+  }
+
+  # Fixed positioning: logo height and width both 1/15 of plot height (square)
+  logo_size <- 1/15  # As fraction of plot height
+  logo_position_bottom <- 1/15  # Position from bottom
+
+  # Use cowplot::draw_image() for precise positioning
+  # This function handles aspect ratio correctly and positions relative to plot coordinates
   plot +
-    patchwork::inset_element(
-      grid::grobTree(grid::rasterGrob(
-        logo,
-        x = 0.5, y = 0.5,  # Center in its own viewport
-        width = 1, height = 1,  # Fill viewport
-        interpolate = TRUE,
-        gp = grid::gpar(alpha = alpha)
-      )),
-      left = 0,  # Start at left edge
-      right = logo_size_npc,  # Width of logo
-      bottom = 1/15,  # Start 1/15 from bottom
-      top = 1/15 + logo_size_npc,  # Height of logo
-      align_to = "full",  # Position relative to full area (including all margins)
-      clip = FALSE
+    cowplot::draw_image(
+      image = logo,
+      x = 0,  # Left edge of plot
+      y = logo_position_bottom,  # 1/15 from bottom
+      width = logo_size,  # 1/15 of plot height
+      height = logo_size,  # 1/15 of plot height (square)
+      hjust = 0,  # Horizontal justification: left
+      vjust = 0,  # Vertical justification: bottom
+      halign = 0,  # Horizontal alignment within space
+      valign = 0,  # Vertical alignment within space
+      interpolate = TRUE
     )
 }
 
