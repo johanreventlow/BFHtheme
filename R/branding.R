@@ -1,14 +1,19 @@
 #' Add BFH Logo to a Plot
 #'
 #' @description
-#' Places a Bispebjerg og Frederiksberg Hospital logo onto an existing ggplot,
-#' preserving the original chart while adding brand context.
+#' Places the BFH mark logo at a fixed, brand-compliant position on ggplot2
+#' visualizations. The logo is automatically positioned at the bottom-left corner
+#' with standardized sizing (1/15 of plot height).
 #'
 #' @details
-#' The helper reads PNG or JPEG files supplied via `logo_path`. Aspect ratio is
-#' preserved automatically, and the logo is positioned using absolute
-#' coordinates based on the selected corner. For packaged logos, see [add_logo()]
-#' and [get_bfh_logo()].
+#' **Simplified API (v0.3.0):** This function now uses fixed positioning to ensure
+#' consistent branding across all visualizations. The logo is always placed at the
+#' bottom-left corner, flush with the plot edge, at a height of 1/15 of the total
+#' plot height.
+#'
+#' **Default logo:** When `logo_path = NULL`, the function automatically loads
+#' `bfh_mark.png` (full resolution BFH symbol mark). For custom logos, provide
+#' a path to a PNG or JPEG file.
 #'
 #' **Security:** File paths are normalized and verified to prevent tampering.
 #' For additional security, you can restrict logo loading to a specific directory:
@@ -16,22 +21,21 @@
 #' options(BFHtheme.logo_root = "/safe/logo/directory")
 #' ```
 #' When set, only logos within this directory (or subdirectories) will be allowed.
-#' File size and readability are also verified before processing.
+#'
+#' **Breaking changes from v0.2.0:** The `position`, `size`, and `padding`
+#' parameters have been removed to enforce consistent branding. See NEWS.md for
+#' migration guidance.
 #'
 #' @param plot A ggplot2 object.
-#' @param logo_path Path to a PNG or JPEG logo file.
-#' @param position Logo location: `"topleft"`, `"topright"`, `"bottomleft"`, or
-#'   `"bottomright"`. Defaults to `"bottomright"`.
-#' @param size Relative width of the logo (0–1). Defaults to `0.1` (10% of plot width).
-#'   Height is derived from the image aspect ratio.
+#' @param logo_path Path to a PNG or JPEG logo file. When `NULL` (default),
+#'   uses the packaged BFH mark logo (`bfh_mark.png`).
 #' @param alpha Transparency of the logo (0–1). Defaults to `1` (fully opaque).
-#' @param padding Padding from plot edge as a fraction of plot size. Defaults to `0.02`.
 #' @return Modified ggplot2 object with the logo applied.
 #' @export
 #'
-#' @importFrom ggplot2 annotation_custom coord_cartesian theme margin annotate labs
-#' @importFrom grid rectGrob textGrob grobTree gpar unit rasterGrob
-#' @seealso [add_logo()], [get_bfh_logo()], [add_bfh_footer()], [add_bfh_color_bar()]
+#' @importFrom ggplot2 annotation_custom coord_cartesian
+#' @importFrom grid rasterGrob gpar unit
+#' @seealso [get_bfh_logo()], [add_bfh_footer()]
 #' @family BFH branding
 #' @examples
 #' \dontrun{
@@ -40,27 +44,31 @@
 #'   geom_point() +
 #'   theme_bfh()
 #'
-#' # Option 1: Use packaged BFH logo (recommended)
-#' logo_path <- get_bfh_logo("web")
-#' add_bfh_logo(p, logo_path, position = "topright")
+#' # Use default BFH mark logo (recommended)
+#' add_bfh_logo(p)
 #'
-#' # Option 2: Use custom logo from file system
-#' # add_bfh_logo(p, "/path/to/your/custom/logo.png", position = "bottomright")
+#' # Use custom logo
+#' add_bfh_logo(p, logo_path = "/path/to/custom_logo.png")
+#'
+#' # Adjust transparency
+#' add_bfh_logo(p, alpha = 0.7)
 #' }
 add_bfh_logo <- function(plot,
-                         logo_path,
-                         position = "bottomright",
-                         size = 0.1,
-                         alpha = 1,
-                         padding = 0.02) {
+                         logo_path = NULL,
+                         alpha = 1) {
+
+  # Load default logo if not specified
+  if (is.null(logo_path)) {
+    logo_path <- get_bfh_logo(size = "full", variant = "mark")
+    if (is.null(logo_path)) {
+      stop("BFH mark logo not found. Package may not be installed correctly.", call. = FALSE)
+    }
+  }
 
   # Input validation
   if (!is.character(logo_path) || length(logo_path) != 1 || nchar(logo_path) == 0) {
     stop("logo_path must be a non-empty character string", call. = FALSE)
   }
-
-  # Validate position parameter using centralized validation
-  position <- validate_choice(position, "position", c("topleft", "topright", "bottomleft", "bottomright"))
 
   # === Security Layer 1: Path Normalization ===
   # Normalize path (allowing shortcuts like ~ or ..) and ensure it resolves
@@ -114,10 +122,8 @@ add_bfh_logo <- function(plot,
     stop("Logo file is empty or unreadable", call. = FALSE)
   }
 
-  # Validate numeric parameters using centralized validation
-  size <- validate_numeric_range(size, "size", 0.001, 1)
+  # Validate alpha parameter
   alpha <- validate_numeric_range(alpha, "alpha", 0, 1)
-  padding <- validate_numeric_range(padding, "padding", 0, 1)
 
   logo_type <- detect_logo_image_type(normalized_path, file_info$size)
 
@@ -153,43 +159,28 @@ add_bfh_logo <- function(plot,
     stop("Logo file must be a valid PNG or JPEG image", call. = FALSE)
   )
 
-  # Beregn aspect ratio for at bevare logoets proportioner
-  # Logo array har dimensioner [height, width, channels] eller [height, width]
+  # Calculate aspect ratio to preserve logo proportions
+  # Logo array has dimensions [height, width, channels] or [height, width]
   logo_dims <- dim(logo)
-  logo_height <- logo_dims[1]
-  logo_width <- logo_dims[2]
-  aspect_ratio <- logo_height / logo_width
+  logo_height_px <- logo_dims[1]
+  logo_width_px <- logo_dims[2]
+  aspect_ratio <- logo_height_px / logo_width_px
 
-  # Beregn faktisk højde baseret på bredde og aspect ratio
-  logo_width_npc <- size
-  logo_height_npc <- size * aspect_ratio
+  # Fixed positioning: logo height is 1/15 of plot height
+  logo_height_npc <- 1/15
+  logo_width_npc <- logo_height_npc / aspect_ratio  # Preserve aspect ratio
 
-  # Determine position parameters med korrekte dimensioner
-  # Position is already validated, so we can safely use switch()
-  pos <- switch(position,
-    topleft = list(
-      x = grid::unit(padding + logo_width_npc/2, "npc"),
-      y = grid::unit(1 - padding - logo_height_npc/2, "npc")
-    ),
-    topright = list(
-      x = grid::unit(1 - padding - logo_width_npc/2, "npc"),
-      y = grid::unit(1 - padding - logo_height_npc/2, "npc")
-    ),
-    bottomleft = list(
-      x = grid::unit(padding + logo_width_npc/2, "npc"),
-      y = grid::unit(padding + logo_height_npc/2, "npc")
-    ),
-    bottomright = list(
-      x = grid::unit(1 - padding - logo_width_npc/2, "npc"),
-      y = grid::unit(padding + logo_height_npc/2, "npc")
-    )
-  )
+  # Fixed position: bottom-left corner
+  # - Horizontal: centered at half the logo width (flush with left edge)
+  # - Vertical: 1/15 from bottom + half logo height
+  pos_x <- grid::unit(logo_width_npc / 2, "npc")
+  pos_y <- grid::unit(1/15 + logo_height_npc / 2, "npc")
 
-  # Convert to raster with position applied og korrekt aspect ratio
+  # Create raster grob with fixed position
   logo_raster <- grid::rasterGrob(
     logo,
-    x = pos$x,
-    y = pos$y,
+    x = pos_x,
+    y = pos_y,
     interpolate = TRUE,
     width = grid::unit(logo_width_npc, "npc"),
     height = grid::unit(logo_height_npc, "npc"),

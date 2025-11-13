@@ -1,3 +1,67 @@
+# BFHtheme 0.3.0
+
+## Breaking Changes 🚨
+
+This release simplifies the `add_bfh_logo()` function to enforce consistent, brand-compliant logo placement across all visualizations.
+
+### Logo Placement Simplified
+
+The `add_bfh_logo()` function now uses **fixed positioning** to ensure consistent branding:
+
+**Removed parameters:**
+- `position` - Logo always placed bottom-left
+- `size` - Logo height always 1/15 of plot height
+- `padding` - Logo always flush with edge (0 padding)
+
+**New default behavior:**
+- Logo automatically loads BFH mark (`bfh_mark.png`) when `logo_path = NULL`
+- Fixed position: bottom-left corner, flush with plot edge
+- Fixed sizing: logo height = 1/15 of plot height, positioned 1/15 from bottom
+
+**Migration:**
+
+**Before (v0.2.0):**
+```r
+p <- ggplot(data, aes(x, y)) + geom_point() + theme_bfh()
+
+# Custom positioning and sizing
+add_bfh_logo(p, get_bfh_logo(), position = "topright", size = 0.15, padding = 0.02)
+```
+
+**After (v0.3.0):**
+```r
+p <- ggplot(data, aes(x, y)) + geom_point() + theme_bfh()
+
+# Simplified API - fixed positioning
+add_bfh_logo(p)  # Uses default bfh_mark.png, fixed position
+
+# With custom logo
+add_bfh_logo(p, logo_path = "/path/to/custom_logo.png")
+
+# With transparency
+add_bfh_logo(p, alpha = 0.7)
+```
+
+### Updated Function Signature
+
+```r
+# OLD
+add_bfh_logo(plot, logo_path, position = "bottomright",
+             size = 0.1, alpha = 1, padding = 0.02)
+
+# NEW
+add_bfh_logo(plot, logo_path = NULL, alpha = 1)
+```
+
+## Improvements
+
+- **Consistency:** All plots use identical logo placement matching brand guidelines
+- **Simplicity:** Fewer parameters = easier to use, harder to misuse
+- **Quality:** Default to high-resolution mark (`bfh_mark.png`) for print-quality output
+- **Compliance:** Fixed sizing ensures logo prominence requirements are met
+
+---
+
 # BFHtheme 0.2.0
 
 ## Breaking Changes 🚨

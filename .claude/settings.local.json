@@ -13,7 +13,9 @@
       "Read(//Users/johanreventlow/Documents/R/**)",
       "Read(//Users/johanreventlow/.claude/rules/**)",
       "WebSearch",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(openspec list:*)",
+      "Bash(openspec validate:*)"
     ],
     "deny": [],
     "ask": []

@@ -95,16 +95,23 @@ test_that("add_bfh_logo accepts normalized shortcuts", {
   )
 })
 
-test_that("add_bfh_logo validates logo_path type", {
+test_that("add_bfh_logo accepts NULL logo_path (default logo)", {
   skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
 
   p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
 
-  # NULL
-  expect_error(
-    add_bfh_logo(p, NULL),
-    "logo_path must be a non-empty character string"
+  # NULL should load default logo
+  expect_s3_class(
+    add_bfh_logo(p),  # logo_path = NULL by default
+    "ggplot"
   )
+})
+
+test_that("add_bfh_logo validates logo_path type when provided", {
+  skip_if_not_installed("ggplot2")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
 
   # Empty string
   expect_error(
@@ -139,28 +146,6 @@ test_that("add_bfh_logo rejects invalid MIME types", {
   )
 })
 
-test_that("add_bfh_logo validates size parameter", {
-  skip_if_not_installed("ggplot2")
-  skip_if_not_installed("png")
-
-  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
-
-  # Size must be > 0 and <= 1
-  expect_error(
-    add_bfh_logo(p, test_logo_path, size = 0),
-    "size must be a number between 0 and 1"
-  )
-
-  expect_error(
-    add_bfh_logo(p, test_logo_path, size = 1.5),
-    "size must be a number between 0 and 1"
-  )
-
-  expect_error(
-    add_bfh_logo(p, test_logo_path, size = -0.1),
-    "size must be a number between 0 and 1"
-  )
-})
 
 test_that("add_bfh_logo validates alpha parameter", {
   skip_if_not_installed("ggplot2")
@@ -170,50 +155,28 @@ test_that("add_bfh_logo validates alpha parameter", {
 
   expect_error(
     add_bfh_logo(p, test_logo_path, alpha = 1.5),
-    "alpha must be a number between 0 and 1"
+    "alpha must be between 0 and 1"
   )
 
   expect_error(
     add_bfh_logo(p, test_logo_path, alpha = -0.1),
-    "alpha must be a number between 0 and 1"
+    "alpha must be between 0 and 1"
   )
 })
 
-test_that("add_bfh_logo accepts valid positions", {
+test_that("add_bfh_logo uses fixed positioning", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("png")
 
   p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
 
-  # All valid positions should work
-  expect_s3_class(
-    add_bfh_logo(p, test_logo_path, position = "topleft"),
-    "ggplot"
-  )
-  expect_s3_class(
-    add_bfh_logo(p, test_logo_path, position = "topright"),
-    "ggplot"
-  )
-  expect_s3_class(
-    add_bfh_logo(p, test_logo_path, position = "bottomleft"),
-    "ggplot"
-  )
-  expect_s3_class(
-    add_bfh_logo(p, test_logo_path, position = "bottomright"),
-    "ggplot"
-  )
-})
+  # Function should work with minimal parameters (fixed positioning)
+  result <- add_bfh_logo(p, test_logo_path)
+  expect_s3_class(result, "ggplot")
 
-test_that("add_bfh_logo rejects invalid position", {
-  skip_if_not_installed("ggplot2")
-  skip_if_not_installed("png")
-
-  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
-
-  expect_error(
-    add_bfh_logo(p, test_logo_path, position = "center"),
-    "position must be one of"
-  )
+  # With alpha parameter
+  result_alpha <- add_bfh_logo(p, test_logo_path, alpha = 0.7)
+  expect_s3_class(result_alpha, "ggplot")
 })
 
 test_that("add_bfh_logo returns ggplot object", {
@@ -237,7 +200,8 @@ test_that("add_bfh_logo preserves aspect ratio", {
 
   # This test verifies that the logo uses different width and height
   # based on aspect ratio (should not be square)
-  result <- add_bfh_logo(p, test_logo_path, size = 0.2)
+  # Fixed positioning now uses 1/15 height, width calculated from aspect ratio
+  result <- add_bfh_logo(p, test_logo_path)
 
   expect_s3_class(result, "ggplot")
   # Functional test: ensure it doesn't error and returns valid plot

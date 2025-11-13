@@ -4,42 +4,33 @@
 \alias{add_bfh_logo}
 \title{Add BFH Logo to a Plot}
 \usage{
-add_bfh_logo(
-  plot,
-  logo_path,
-  position = "bottomright",
-  size = 0.1,
-  alpha = 1,
-  padding = 0.02
-)
+add_bfh_logo(plot, logo_path = NULL, alpha = 1)
 }
 \arguments{
 \item{plot}{A ggplot2 object.}
 
-\item{logo_path}{Path to a PNG or JPEG logo file.}
-
-\item{position}{Logo location: `"topleft"`, `"topright"`, `"bottomleft"`, or
-`"bottomright"`. Defaults to `"bottomright"`.}
-
-\item{size}{Relative width of the logo (0–1). Defaults to `0.1` (10% of plot width).
-Height is derived from the image aspect ratio.}
+\item{logo_path}{Path to a PNG or JPEG logo file. When `NULL` (default),
+uses the packaged BFH mark logo (`bfh_mark.png`).}
 
 \item{alpha}{Transparency of the logo (0–1). Defaults to `1` (fully opaque).}
-
-\item{padding}{Padding from plot edge as a fraction of plot size. Defaults to `0.02`.}
 }
 \value{
 Modified ggplot2 object with the logo applied.
 }
 \description{
-Places a Bispebjerg og Frederiksberg Hospital logo onto an existing ggplot,
-preserving the original chart while adding brand context.
+Places the BFH mark logo at a fixed, brand-compliant position on ggplot2
+visualizations. The logo is automatically positioned at the bottom-left corner
+with standardized sizing (1/15 of plot height).
 }
 \details{
-The helper reads PNG or JPEG files supplied via `logo_path`. Aspect ratio is
-preserved automatically, and the logo is positioned using absolute
-coordinates based on the selected corner. For packaged logos, see [add_logo()]
-and [get_bfh_logo()].
+**Simplified API (v0.3.0):** This function now uses fixed positioning to ensure
+consistent branding across all visualizations. The logo is always placed at the
+bottom-left corner, flush with the plot edge, at a height of 1/15 of the total
+plot height.
+
+**Default logo:** When `logo_path = NULL`, the function automatically loads
+`bfh_mark.png` (full resolution BFH symbol mark). For custom logos, provide
+a path to a PNG or JPEG file.
 
 **Security:** File paths are normalized and verified to prevent tampering.
 For additional security, you can restrict logo loading to a specific directory:
@@ -47,7 +38,10 @@ For additional security, you can restrict logo loading to a specific directory:
 options(BFHtheme.logo_root = "/safe/logo/directory")
 ```
 When set, only logos within this directory (or subdirectories) will be allowed.
-File size and readability are also verified before processing.
+
+**Breaking changes from v0.2.0:** The `position`, `size`, and `padding`
+parameters have been removed to enforce consistent branding. See NEWS.md for
+migration guidance.
 }
 \examples{
 \dontrun{
@@ -56,16 +50,18 @@ p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point() +
   theme_bfh()
 
-# Option 1: Use packaged BFH logo (recommended)
-logo_path <- get_bfh_logo("web")
-add_bfh_logo(p, logo_path, position = "topright")
+# Use default BFH mark logo (recommended)
+add_bfh_logo(p)
 
-# Option 2: Use custom logo from file system
-# add_bfh_logo(p, "/path/to/your/custom/logo.png", position = "bottomright")
+# Use custom logo
+add_bfh_logo(p, logo_path = "/path/to/custom_logo.png")
+
+# Adjust transparency
+add_bfh_logo(p, alpha = 0.7)
 }
 }
 \seealso{
-[add_logo()], [get_bfh_logo()], [add_bfh_footer()], [add_bfh_color_bar()]
+[get_bfh_logo()], [add_bfh_footer()]
 
 Other BFH branding: 
 \code{\link{add_bfh_footer}()},
