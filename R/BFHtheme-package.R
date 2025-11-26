@@ -62,39 +62,51 @@
 ## usethis namespace: end
 NULL
 
-# Register fonts on Windows at package load
-.onLoad <- function(libname, pkgname) {
-  # Only run on Windows
+# Package-level state to track what was configured
+.bfh_state <- new.env(parent = emptyenv())
 
-  if (.Platform$OS.type != "windows") {
-    return(invisible())
+# Configure graphics and fonts at package load
+.onLoad <- function(libname, pkgname) {
+  # Track what we configure for .onAttach message
+  .bfh_state$ragg_configured <- FALSE
+  .bfh_state$fonts_registered <- FALSE
+
+
+  # Set knitr defaults to use ragg for high-quality font rendering
+
+  # This applies to both Windows and Mac for consistent quality
+  if (requireNamespace("knitr", quietly = TRUE) &&
+      requireNamespace("ragg", quietly = TRUE)) {
+    tryCatch({
+      knitr::opts_chunk$set(dev = "ragg_png", dpi = 300)
+      .bfh_state$ragg_configured <- TRUE
+    }, error = function(e) NULL)
   }
 
-  # Fonts to register (in priority order)
-  fonts_to_register <- c("Mari", "Mari Office", "Roboto", "Arial")
+  # Windows-specific: Register fonts with grDevices::windowsFonts
+  # This is a fallback for when ragg is not used (e.g., base R plots)
+  if (.Platform$OS.type == "windows") {
+    fonts_to_register <- c("Mari", "Mari Office", "Roboto", "Arial")
 
-  # Check which fonts are available via systemfonts
-  if (requireNamespace("systemfonts", quietly = TRUE)) {
-    for (font_name in fonts_to_register) {
-      match_result <- tryCatch({
-        systemfonts::match_fonts(font_name)
-      }, error = function(e) NULL)
-
-      # If font is found, register it with Windows
-      if (!is.null(match_result) &&
-          !is.null(match_result$path) &&
-          !is.na(match_result$path) &&
-          nzchar(match_result$path)) {
-        # Register font with grDevices::windowsFonts
-        # Use tryCatch in case font is already registered
-        tryCatch({
-          # Create named list for windowsFonts()
-          font_list <- stats::setNames(
-            list(grDevices::windowsFont(font_name)),
-            font_name
-          )
-          do.call(grDevices::windowsFonts, font_list)
+    if (requireNamespace("systemfonts", quietly = TRUE)) {
+      for (font_name in fonts_to_register) {
+        match_result <- tryCatch({
+          systemfonts::match_fonts(font_name)
         }, error = function(e) NULL)
+
+        if (!is.null(match_result) &&
+            !is.null(match_result$path) &&
+            !is.na(match_result$path) &&
+            nzchar(match_result$path)) {
+          tryCatch({
+            font_list <- stats::setNames(
+              list(grDevices::windowsFont(font_name)),
+              font_name
+            )
+            do.call(grDevices::windowsFonts, font_list)
+            .bfh_state$fonts_registered <- TRUE
+          }, error = function(e) NULL)
+        }
       }
     }
   }
@@ -104,11 +116,28 @@ NULL
 
 # Package startup message
 .onAttach <- function(libname, pkgname) {
-  # Check font availability using modern systemfonts
-  has_mari <- FALSE
+  # Build informative startup message
 
+  msg_parts <- "BFHtheme loaded!"
+
+  # Check what was configured
+  config_info <- character(0)
+
+  if (isTRUE(.bfh_state$ragg_configured)) {
+    config_info <- c(config_info, "knitr: ragg_png (dpi=300)")
+  }
+
+  if (isTRUE(.bfh_state$fonts_registered)) {
+    config_info <- c(config_info, "Windows fonts registered")
+  }
+
+  if (length(config_info) > 0) {
+    msg_parts <- paste0(msg_parts, " [", paste(config_info, collapse = ", "), "]")
+  }
+
+  # Check font availability
+  has_mari <- FALSE
   if (requireNamespace("systemfonts", quietly = TRUE)) {
-    # Check for Mari fonts using match_fonts (modern API)
     mari_result <- tryCatch({
       systemfonts::match_fonts("Mari")
     }, error = function(e) NULL)
@@ -119,16 +148,22 @@ NULL
                 nzchar(mari_result$path)
   }
 
-  # Show helpful message if Mari not found
+  # Add font warning if needed
   if (!has_mari) {
-    packageStartupMessage(
-      "BFHtheme loaded!\n",
-      "Note: Mari font not detected. For best font rendering:\n",
-      "  - Install Roboto (https://fonts.google.com/specimen/Roboto)\n",
-      "  - Or use: use_bfh_showtext() to load fonts via showtext\n",
-      "  - See: ?set_bfh_graphics for device recommendations"
+    msg_parts <- paste0(
+      msg_parts, "\n",
+      "Note: Mari font not detected. Using fallback font.\n",
+      "  - Install Roboto: https://fonts.google.com/specimen/Roboto"
     )
-  } else {
-    packageStartupMessage("BFHtheme loaded!")
   }
+
+  # Suggest ragg installation if not available
+  if (!requireNamespace("ragg", quietly = TRUE)) {
+    msg_parts <- paste0(
+      msg_parts, "\n",
+      "Tip: Install 'ragg' for better font rendering: install.packages('ragg')"
+    )
+  }
+
+  packageStartupMessage(msg_parts)
 }
