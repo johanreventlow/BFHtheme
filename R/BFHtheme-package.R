@@ -62,6 +62,46 @@
 ## usethis namespace: end
 NULL
 
+# Register fonts on Windows at package load
+.onLoad <- function(libname, pkgname) {
+  # Only run on Windows
+
+  if (.Platform$OS.type != "windows") {
+    return(invisible())
+  }
+
+  # Fonts to register (in priority order)
+  fonts_to_register <- c("Mari", "Mari Office", "Roboto", "Arial")
+
+  # Check which fonts are available via systemfonts
+  if (requireNamespace("systemfonts", quietly = TRUE)) {
+    for (font_name in fonts_to_register) {
+      match_result <- tryCatch({
+        systemfonts::match_fonts(font_name)
+      }, error = function(e) NULL)
+
+      # If font is found, register it with Windows
+      if (!is.null(match_result) &&
+          !is.null(match_result$path) &&
+          !is.na(match_result$path) &&
+          nzchar(match_result$path)) {
+        # Register font with grDevices::windowsFonts
+        # Use tryCatch in case font is already registered
+        tryCatch({
+          # Create named list for windowsFonts()
+          font_list <- stats::setNames(
+            list(grDevices::windowsFont(font_name)),
+            font_name
+          )
+          do.call(grDevices::windowsFonts, font_list)
+        }, error = function(e) NULL)
+      }
+    }
+  }
+
+  invisible()
+}
+
 # Package startup message
 .onAttach <- function(libname, pkgname) {
   # Check font availability using modern systemfonts
