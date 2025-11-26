@@ -258,7 +258,7 @@ clear_bfh_pal_cache <- function() {
 #' @param n Optional integer specifying how many colors to preview from each
 #'   palette. When `NULL` (default) all palette entries are shown.
 #' @export
-#' @importFrom purrr walk
+#' @importFrom scales show_col
 #' @family BFH colors
 #' @examples
 #' \dontrun{
@@ -277,9 +277,7 @@ show_bfh_palettes <- function(n = NULL) {
 
   graphics::par(mfrow = c(n_pals, 1), mai = c(0.2, 0.6, 0.2, 0.2))
 
-  # Modernized with purrr::walk() for functional iteration
-  purrr::walk(pal_names, function(pal_name) {
-    # Use %||% for NULL coalescing
+  for (pal_name in pal_names) {
     pal <- if (is.null(n)) {
       bfh_palettes[[pal_name]]
     } else {
@@ -288,5 +286,5 @@ show_bfh_palettes <- function(n = NULL) {
 
     scales::show_col(pal, labels = TRUE, borders = NA, cex_label = 0.8)
     graphics::title(main = pal_name, line = -1)
-  })
+  }
 }

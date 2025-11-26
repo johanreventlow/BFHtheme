@@ -233,7 +233,6 @@ bfh_combine_plots <- function(plots,
 #'   }
 #' @return A ggplot2 labels object.
 #' @export
-#' @importFrom purrr imap
 #' @seealso [ggplot2::labs()], [bfh_title_block()]
 #' @family BFH helpers
 #' @examples
@@ -269,14 +268,13 @@ bfh_labs <- function(...) {
   # Labels that should NOT be uppercased
   keep_as_is <- c("title")
 
-  # Use purrr::imap() which preserves names automatically
-  args <- purrr::imap(args, function(value, name) {
-    if (is.character(value) && !name %in% keep_as_is) {
-      toupper(value)
-    } else {
-      value
+  # Transform arguments: uppercase all character values except 'title'
+  arg_names <- names(args)
+  for (i in seq_along(args)) {
+    if (is.character(args[[i]]) && !arg_names[i] %in% keep_as_is) {
+      args[[i]] <- toupper(args[[i]])
     }
-  })
+  }
 
   # Call ggplot2::labs() with converted arguments
   do.call(ggplot2::labs, args)

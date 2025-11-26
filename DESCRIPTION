@@ -27,8 +27,7 @@ Imports:
     grid,
     grDevices,
     scales,
-    marquee,
-    purrr
+    marquee
 Suggests:
     knitr,
     rmarkdown,
@@ -40,6 +39,7 @@ Suggests:
     png,
     jpeg,
     cowplot,
-    magick
+    magick,
+    patchwork
 VignetteBuilder: knitr
 Config/testthat/edition: 3
