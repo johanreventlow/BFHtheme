@@ -48,6 +48,6 @@ p <- ggplot(time_data, aes(x = dato, y = antal_patienter, color = afdeling)) +
 
 
 
-# Tilføj logo
+print(p)# Tilføj logo
 p_branded <- add_bfh_logo(p)
 print(p_branded)

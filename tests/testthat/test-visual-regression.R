@@ -1,7 +1,11 @@
 # Visual regression tests using vdiffr
 # These tests create SVG snapshots of theme outputs to detect visual changes
+# Skip on CRAN and during R CMD check as font availability varies
 
 test_that("theme_bfh produces consistent visual output", {
+  skip_on_cran()
+  skip_if(identical(Sys.getenv("_R_CHECK_PACKAGE_NAME_"), "BFHtheme"),
+          "Skipping visual tests during R CMD check")
   skip_if_not_installed("vdiffr")
   skip_if_not_installed("ggplot2")
 
@@ -21,6 +25,9 @@ test_that("theme_bfh produces consistent visual output", {
 
 
 test_that("theme_bfh with color scales produces consistent output", {
+  skip_on_cran()
+  skip_if(identical(Sys.getenv("_R_CHECK_PACKAGE_NAME_"), "BFHtheme"),
+          "Skipping visual tests during R CMD check")
   skip_if_not_installed("vdiffr")
   skip_if_not_installed("ggplot2")
 
@@ -37,6 +44,9 @@ test_that("theme_bfh with color scales produces consistent output", {
 })
 
 test_that("theme_bfh with facets produces consistent output", {
+  skip_on_cran()
+  skip_if(identical(Sys.getenv("_R_CHECK_PACKAGE_NAME_"), "BFHtheme"),
+          "Skipping visual tests during R CMD check")
   skip_if_not_installed("vdiffr")
   skip_if_not_installed("ggplot2")
 

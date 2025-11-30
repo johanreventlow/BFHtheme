@@ -1,7 +1,7 @@
 Package: BFHtheme
 Type: Package
 Title: BFH Theme and Color Palettes for ggplot2
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: c(
     person(
       "Johan", "Reventlow",
@@ -34,12 +34,14 @@ Suggests:
     testthat (>= 3.0.0),
     systemfonts,
     showtext,
+    sysfonts,
     ragg,
     svglite,
     png,
     jpeg,
     cowplot,
     magick,
-    patchwork
+    patchwork,
+    vdiffr
 VignetteBuilder: knitr
 Config/testthat/edition: 3

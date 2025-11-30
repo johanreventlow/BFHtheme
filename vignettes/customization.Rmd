@@ -31,7 +31,7 @@ out-of-the-box defaults. You will learn how to:
 | --- | --- |
 | Theme tweaks | `theme_bfh_*()`, `theme()` |
 | Colours & palettes | `bfh_cols()`, `bfh_pal()`, `scale_*_bfh_*()` |
-| Branding elements | `add_bfh_logo()`, `add_bfh_footer()`, `add_bfh_color_bar()` |
+| Branding elements | `add_bfh_logo()`, `add_bfh_footer()` |
 | Layout helpers | `bfh_combine_plots()`, `bfh_save()` |
 
 ```{r load, message=FALSE}
@@ -179,24 +179,6 @@ add_bfh_footer(
   p,
   text = "Bispebjerg og Frederiksberg Hospital - 2024",
   color = bfh_cols("hospital_primary")
-)
-```
-
-### Colour Bar Annotations
-
-Introduce subtle brand accents with a slim colour bar:
-
-```{r color-bar, eval=FALSE}
-p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
-  geom_point() +
-  labs(title = "Vehicle Analysis") +
-  theme_bfh()
-
-add_bfh_color_bar(
-  p,
-  position = "top",
-  color = bfh_cols("hospital_primary"),
-  size = 0.02
 )
 ```
 

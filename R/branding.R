@@ -282,7 +282,7 @@ detect_logo_image_type <- function(path, file_size) {
 #' @param height Footer height as a fraction of the plotting area. Defaults to `0.05`.
 #' @return ggplot2 object with the footer applied.
 #' @export
-#' @seealso [add_bfh_logo()], [add_bfh_color_bar()], [bfh_title_block()]
+#' @seealso [add_bfh_logo()], [bfh_title_block()]
 #' @family BFH branding
 #' @examples
 #' \dontrun{

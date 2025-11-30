@@ -46,7 +46,7 @@ add_bfh_footer(p, text = "Bispebjerg og Frederiksberg Hospital - 2024")
 }
 }
 \seealso{
-[add_bfh_logo()], [add_bfh_color_bar()], [bfh_title_block()]
+[add_bfh_logo()], [bfh_title_block()]
 
 Other BFH branding: 
 \code{\link{add_bfh_logo}()},

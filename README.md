@@ -87,7 +87,6 @@ ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
 ### Available Themes
 
 - `theme_bfh()` - Main BFH theme (customizable via additional `theme()` calls)
-- `theme_region_h()` - Theme for Region Hovedstaden branding
 
 ### Available Palettes
 

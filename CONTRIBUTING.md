@@ -93,7 +93,7 @@ R/
 
 #### Core Theming
 - **`themes.R`** - ggplot2 theme() objects
-  - Exports: `theme_bfh()`, `theme_region_h()`
+  - Exports: `theme_bfh()`
   - Responsibilities: Define theme elements, typography, spacing, grids
   - Dependencies: `fonts.R` for font detection, `marquee` for text rendering
   - Note: Theme variants removed in v0.2.0 - users customize via `theme()` calls

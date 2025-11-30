@@ -282,10 +282,12 @@ install_roboto_font <- function() {
 #' }
 setup_bfh_fonts <- function(use_showtext = FALSE) {
 
-  if (use_showtext && requireNamespace("showtext", quietly = TRUE)) {
+  if (use_showtext &&
+      requireNamespace("showtext", quietly = TRUE) &&
+      requireNamespace("sysfonts", quietly = TRUE)) {
     # Try to add Roboto from Google Fonts
     tryCatch({
-      showtext::font_add_google("Roboto", "Roboto")
+      sysfonts::font_add_google("Roboto", "Roboto")
       showtext::showtext_auto()
       message("Loaded Roboto font via Google Fonts (showtext)")
       return("Roboto")
@@ -435,15 +437,16 @@ set_bfh_graphics <- function(dpi = 300) {
 #' )
 #' }
 use_bfh_showtext <- function(font_paths = NULL, family = "Roboto") {
-  if (!requireNamespace("showtext", quietly = TRUE)) {
-    stop("Install 'showtext' package:\n  install.packages('showtext')",
+  if (!requireNamespace("showtext", quietly = TRUE) ||
+      !requireNamespace("sysfonts", quietly = TRUE)) {
+    stop("Install 'showtext' and 'sysfonts' packages:\n  install.packages(c('showtext', 'sysfonts'))",
          call. = FALSE)
   }
 
   if (is.null(font_paths)) {
     # Load from Google Fonts
     tryCatch({
-      showtext::font_add_google(family, family)
+      sysfonts::font_add_google(family, family)
       message("Loaded ", family, " from Google Fonts via showtext")
     }, error = function(e) {
       stop("Could not load ", family, " from Google Fonts: ", e$message,
@@ -455,7 +458,7 @@ use_bfh_showtext <- function(font_paths = NULL, family = "Roboto") {
       stop("font_paths must contain at least 'regular' entry", call. = FALSE)
     }
 
-    showtext::font_add(
+    sysfonts::font_add(
       family = family,
       regular = font_paths$regular,
       bold = font_paths$bold %||% font_paths$regular,

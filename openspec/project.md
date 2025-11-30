@@ -72,7 +72,7 @@ if (exists(cache_key, envir = .cache, inherits = FALSE)) {
 **Layered API Design:**
 ```
 User-facing API
-├── Themes (theme_bfh, theme_bfh_minimal, theme_bfh_dark, theme_region_h)
+├── Themes (theme_bfh)
 ├── Colors (bfh_cols, bfh_pal)
 ├── Scales (scale_color_bfh, scale_fill_bfh)
 ├── Branding (add_bfh_logo, add_bfh_footer, bfh_title_block)
@@ -325,7 +325,7 @@ Changes to BFHtheme API must consider backward compatibility with these packages
 ### Responsibility Boundaries
 
 **BFHtheme provides:**
-- ggplot2 themes (theme_bfh, theme_bfh_minimal, theme_bfh_dark, theme_region_h)
+- ggplot2 themes (theme_bfh)
 - Color palettes and scales (bfh_cols, bfh_pal, scale_color_bfh, scale_fill_bfh)
 - Font detection and session-level caching
 - Logo and branding helpers (add_bfh_logo, add_bfh_footer, bfh_title_block)

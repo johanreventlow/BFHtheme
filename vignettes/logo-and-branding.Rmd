@@ -103,15 +103,13 @@ logo_path <- get_bfh_logo(size = "web")
 add_bfh_logo(p, logo_path, position = "topright", size = 0.15)
 ```
 
-Funktionen `add_bfh_color_bar()` kan kombineres med logo og footer for et fuldt
-branded layout.
+Logo og footer kan kombineres for et fuldt branded layout.
 
 ```{r combined-branding, eval=FALSE}
 library(magrittr)
 
 p %>%
-  add_bfh_color_bar(position = "top") %>%
-  add_logo(position = "bottomright") %>%
+  add_bfh_logo(position = "bottomright") %>%
   add_bfh_footer(text = "Bispebjerg og Frederiksberg Hospital - 2024")
 ```
 

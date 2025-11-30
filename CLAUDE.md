@@ -55,7 +55,7 @@ BFHtheme/
 │   ├── defaults.R            # Global defaults management
 │   ├── utils_operators.R     # Internal operators (%||%)
 │   └── BFHtheme-package.R    # Package documentation
-├── inst/logos/               # Hospital logos (BFH, Region H)
+├── inst/logo/                # Hospital logos (BFH, Region H)
 ├── tests/testthat/           # Unit tests
 ├── vignettes/                # Long-form documentation
 └── man/                      # Auto-generated documentation
@@ -64,10 +64,7 @@ BFHtheme/
 ### Core Components
 
 **Themes:**
-- `theme_bfh()` - Main professional theme
-- `theme_bfh_minimal()` - Minimal variant
-- `theme_bfh_dark()` - Dark mode variant
-- `theme_region_h()` - Region Hovedstaden theme
+- `theme_bfh()` - Main professional theme (customizable via `theme()` calls)
 
 **Colors:**
 - `bfh_colors` - Named color list (28 colors)

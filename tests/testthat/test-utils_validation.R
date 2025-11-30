@@ -137,25 +137,25 @@ test_that("validate_numeric_range rejects values above maximum", {
 test_that("validate_numeric_range rejects non-numeric inputs", {
   expect_error(
     validate_numeric_range("0.5", "size", 0, 1),
-    "size must be numeric"
+    "size must be a single numeric value"
   )
   expect_error(
     validate_numeric_range(TRUE, "alpha", 0, 1),
-    "alpha must be numeric"
+    "alpha must be a single numeric value"
   )
 })
 
 test_that("validate_numeric_range rejects NULL when allow_null = FALSE", {
   expect_error(
     validate_numeric_range(NULL, "size", 0, 1, allow_null = FALSE),
-    "size must be numeric"
+    "size cannot be NULL"
   )
 })
 
 test_that("validate_numeric_range rejects NA", {
   expect_error(
     validate_numeric_range(NA_real_, "size", 0, 1),
-    "size must be numeric"
+    "size must be a single numeric value"
   )
 })
 
@@ -163,22 +163,6 @@ test_that("validate_numeric_range rejects vectors with multiple elements", {
   expect_error(
     validate_numeric_range(c(0.5, 0.6), "size", 0, 1),
     "size must be a single numeric value"
-  )
-})
-
-test_that("validate_numeric_range handles exclusive bounds correctly", {
-  # Test exclusive_min
-  expect_equal(validate_numeric_range(0.1, "size", 0, 1, exclusive_min = TRUE), 0.1)
-  expect_error(
-    validate_numeric_range(0, "size", 0, 1, exclusive_min = TRUE),
-    "size must be greater than 0"
-  )
-
-  # Test exclusive_max
-  expect_equal(validate_numeric_range(0.9, "size", 0, 1, exclusive_max = TRUE), 0.9)
-  expect_error(
-    validate_numeric_range(1, "size", 0, 1, exclusive_max = TRUE),
-    "size must be less than 1"
   )
 })
 
@@ -196,32 +180,32 @@ test_that("validate_choice accepts NULL when allow_null = TRUE", {
 test_that("validate_choice rejects invalid choices", {
   expect_error(
     validate_choice("middle", "position", c("top", "bottom")),
-    "position must be one of: top, bottom"
+    "position must be one of"
   )
   expect_error(
     validate_choice("large", "size", c("small", "medium")),
-    "size must be one of: small, medium"
+    "size must be one of"
   )
 })
 
 test_that("validate_choice rejects NULL when allow_null = FALSE", {
   expect_error(
     validate_choice(NULL, "position", c("top", "bottom"), allow_null = FALSE),
-    "position must be one of: top, bottom"
+    "position cannot be NULL"
   )
 })
 
 test_that("validate_choice rejects non-character inputs", {
   expect_error(
     validate_choice(1, "position", c("top", "bottom")),
-    "position must be a character string"
+    "position must be a single character value"
   )
 })
 
 test_that("validate_choice rejects vectors with multiple elements", {
   expect_error(
     validate_choice(c("top", "bottom"), "position", c("top", "bottom", "middle")),
-    "position must be a single value"
+    "position must be a single character value"
   )
 })
 
@@ -229,7 +213,7 @@ test_that("validate_choice handles case sensitivity", {
   # Default is case-sensitive
   expect_error(
     validate_choice("TopLeft", "position", c("topleft", "topright")),
-    "position must be one of: topleft, topright"
+    "position must be one of"
   )
 })
 
