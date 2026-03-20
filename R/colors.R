@@ -26,8 +26,8 @@ bfh_colors <- c(
 
   # Secondary hospital colors
   `hospital_blue`       = "#009ce8",  # RGB: 0,156,232
-  `hospital_light_blue1`= "#cce5f1",  # RGB: 204,211,221
-  `hospital_light_blue2`= "#e5f2f8",  # RGB: 229,242,248
+  `hospital_light_blue1`= "#99d8f6",  # RGB: 153,216,246 (shade af #009ce8)
+  `hospital_light_blue2`= "#d8eef9",  # RGB: 216,238,249 (shade af #009ce8)
 
   # Neutral/grey colors (hospital)
   `hospital_grey`       = "#646c6f",  # RGB: 100,108,111
@@ -52,8 +52,8 @@ bfh_colors <- c(
   # Hospital aliases
   `primary`             = "#007dbb",
   `blue`                = "#009ce8",
-  `light_blue`          = "#cce5f1",
-  `very_light_blue`     = "#e5f2f8",
+  `light_blue`          = "#99d8f6",
+  `very_light_blue`     = "#d8eef9",
   `grey`                = "#646c6f",
   `dark_grey`           = "#333333",
   `white`               = "#ffffff",
