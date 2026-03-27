@@ -28,7 +28,8 @@ time_data <- data.frame(
 )
 
 # Lav tidsserieplot med Hospital branding
-p <- ggplot(time_data, aes(x = dato, y = antal_patienter, color = afdeling)) +
+# p <-
+  ggplot(time_data, aes(x = dato, y = antal_patienter, color = afdeling)) +
   geom_line(linewidth = 1.2) +
   scale_color_bfh(palette = "hospital") +
   scale_x_datetime_bfh(breaks = scales::breaks_pretty(n = 8)) +
@@ -41,7 +42,6 @@ p <- ggplot(time_data, aes(x = dato, y = antal_patienter, color = afdeling)) +
     y = "Antal patienter",
     color = ""
   ) +
-
   theme_bfh() +
   theme(legend.position = "none",
         plot.margin = margin(t = NA, r = NA, b = 0, l = 0, unit = "pt"))
