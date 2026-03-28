@@ -89,38 +89,3 @@ validate_numeric_range <- function(value, name, min, max, allow_null = FALSE) {
 
   value
 }
-
-#' Validate choice from allowed options
-#'
-#' @description
-#' Ensures that a value is one of the allowed choices.
-#'
-#' @param value Value to validate
-#' @param name Character string naming the argument (for error messages)
-#' @param choices Character vector of allowed values
-#' @param allow_null Logical; allow NULL values? Defaults to FALSE
-#' @return The validated value (unchanged if valid)
-#' @keywords internal
-#' @examples
-#' \dontrun{
-#' validate_choice("topright", "position", c("topleft", "topright", "bottomleft", "bottomright"))
-#' validate_choice("invalid", "position", c("topleft", "topright"))  # Error
-#' }
-validate_choice <- function(value, name, choices, allow_null = FALSE) {
-  if (is.null(value)) {
-    if (allow_null) {
-      return(NULL)
-    }
-    stop(sprintf("%s cannot be NULL", name), call. = FALSE)
-  }
-
-  if (!is.character(value) || length(value) != 1 || is.na(value)) {
-    stop(sprintf("%s must be a single character value", name), call. = FALSE)
-  }
-
-  if (!(value %in% choices)) {
-    stop(sprintf("%s must be one of: %s", name, paste(dQuote(choices), collapse = ", ")), call. = FALSE)
-  }
-
-  value
-}
