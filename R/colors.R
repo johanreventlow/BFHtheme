@@ -29,10 +29,16 @@ bfh_colors <- c(
   `hospital_light_blue1`= "#99d8f6",  # RGB: 153,216,246 (shade af #009ce8)
   `hospital_light_blue2`= "#d8eef9",  # RGB: 216,238,249 (shade af #009ce8)
 
-  # Neutral/grey colors (hospital)
-  `hospital_grey`       = "#646c6f",  # RGB: 100,108,111
-  `hospital_dark_grey`  = "#333333",  # RGB: 51,51,51
-  `hospital_white`      = "#ffffff",  # RGB: 255,255,255
+  # Officiel koncern-grå (alle enheder, designguide s.18-21)
+  `regionh_grey`        = "#646c6f",  # RGB: 100,108,111 — officiel sekundær neutral
+  `regionh_dark`        = "#333333",  # RGB: 51,51,51   — officiel mørk neutral
+  `regionh_white`       = "#ffffff",  # RGB: 255,255,255
+
+  # UI-hjælpefarver (afledt af designguide infografik s.39)
+  `ui_grey_light`       = "#ebebeb",  # RGB: 235,235,235 — baggrunde, subtle borders
+  `ui_grey_soft`        = "#b8b8b8",  # RGB: 184,184,184 — disabled, dividers
+  `ui_grey_mid`         = "#8f8f8f",  # RGB: 143,143,143 — knapper, ikoner normal
+  `ui_grey_dark`        = "#666666",  # RGB: 102,102,102 — sekundær tekst, hover
 
   # === REGION HOVEDSTADEN COLORS (Koncern) ===
   # Primary Region H color (identitetsfarve)
@@ -43,10 +49,7 @@ bfh_colors <- c(
   `regionh_light_grey1` = "#ccd3dd",  # RGB: 204,211,221
   `regionh_light_grey2` = "#e5e9ee",  # RGB: 229,233,238
 
-  # Neutral/grey colors (Region H)
-  `regionh_grey`        = "#646c6f",  # RGB: 100,108,111
-  `regionh_dark_grey`   = "#333333",  # RGB: 51,51,51
-  `regionh_white`       = "#ffffff",  # RGB: 255,255,255
+  # (Neutrale Region H farver defineret ovenfor: regionh_grey, regionh_dark, regionh_white)
 
   # === ALIASES FOR EASIER USE ===
   # Hospital aliases
@@ -57,6 +60,10 @@ bfh_colors <- c(
   `grey`                = "#646c6f",
   `dark_grey`           = "#333333",
   `white`               = "#ffffff",
+  `ui_light`            = "#ebebeb",
+  `ui_soft`             = "#b8b8b8",
+  `ui_mid`              = "#8f8f8f",
+  `ui_dark`             = "#666666",
 
   # Region H primary
   `regionh_navy`        = "#002555"
@@ -131,9 +138,9 @@ bfh_cols <- function(...) {
 #' @family BFH colors
 bfh_palettes <- list(
   # === HOSPITAL PALETTES ===
-  `main` = bfh_cols("hospital_primary", "hospital_blue", "hospital_grey", "dark_grey"),
+  `main` = bfh_cols("hospital_primary", "hospital_blue", "regionh_grey", "dark_grey"),
 
-  `hospital` = bfh_cols("hospital_primary", "hospital_blue", "hospital_grey", "dark_grey"),
+  `hospital` = bfh_cols("hospital_primary", "hospital_blue", "regionh_grey", "dark_grey"),
 
   `hospital_blues` = bfh_cols("hospital_primary", "hospital_blue", "light_blue",
                                "very_light_blue"),
@@ -142,7 +149,7 @@ bfh_palettes <- list(
                                    "light_blue", "very_light_blue", "white"),
 
   `hospital_infographic` = bfh_cols("hospital_primary", "hospital_blue", "light_blue",
-                                     "hospital_grey", "dark_grey"),
+                                     "regionh_grey", "dark_grey"),
 
   # === REGION HOVEDSTADEN PALETTES ===
   `regionh` = bfh_cols("regionh_primary", "regionh_blue", "regionh_grey", "dark_grey"),
@@ -168,13 +175,13 @@ bfh_palettes <- list(
   `blues_sequential` = bfh_cols("hospital_primary", "hospital_blue",
                                 "light_blue", "very_light_blue", "white"),
 
-  `greys` = bfh_cols("dark_grey", "hospital_grey", "light_blue", "very_light_blue"),
+  `greys` = bfh_cols("dark_grey", "regionh_grey", "light_blue", "very_light_blue"),
 
-  `contrast` = bfh_cols("hospital_primary", "hospital_grey", "hospital_blue",
+  `contrast` = bfh_cols("hospital_primary", "regionh_grey", "hospital_blue",
                         "dark_grey"),
 
   `infographic` = bfh_cols("hospital_primary", "hospital_blue", "light_blue",
-                           "hospital_grey", "dark_grey")
+                           "regionh_grey", "dark_grey")
 )
 
 # Package-level palette cache environment
