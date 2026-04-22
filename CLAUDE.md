@@ -289,6 +289,14 @@ devtools::build_vignettes()
 # pkgdown::build_site()        # (future)
 ```
 
+### Branch and CI Workflow
+
+- `develop` er integrationsbranch for løbende arbejde.
+- `main` er release-/promotionsbranch og bør kun opdateres via PR fra `develop`.
+- CI kører på push og PR mod både `develop` og `main`.
+- `open-main-pr` opretter automatisk en `develop` → `main` PR, når CI-gaten på `develop` er grøn.
+- `tag-release` opretter release-tags efter grøn `R-CMD-check` på `main`.
+
 ---
 
 ## 6) Domain-Specific Guidance

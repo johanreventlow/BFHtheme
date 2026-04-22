@@ -134,7 +134,7 @@ department-specific requirements.
 # Create a custom palette with specific colours
 custom_colors <- c(
   bfh_cols("hospital_primary"),
-  bfh_cols("hospital_grey"),
+  bfh_cols("regionh_grey"),
   bfh_cols("regionh_primary")
 )
 

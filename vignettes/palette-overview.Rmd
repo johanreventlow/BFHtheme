@@ -32,9 +32,9 @@ paletter og hvordan du anvender dem i `ggplot2`.
 | `hospital_blue` | `#009ce8` | 0, 156, 232 | Sekundær blå |
 | `hospital_light_blue1` | `#cce5f1` | 204, 229, 241 | Lys blå 1 |
 | `hospital_light_blue2` | `#e5f2f8` | 229, 242, 248 | Lys blå 2 |
-| `hospital_grey` | `#646c6f` | 100, 108, 111 | Neutral grå |
-| `hospital_dark_grey` | `#333333` | 51, 51, 51 | Mørk grå |
-| `hospital_white` | `#ffffff` | 255, 255, 255 | Hvid |
+| `regionh_grey` | `#646c6f` | 100, 108, 111 | Neutral grå |
+| `regionh_dark` | `#333333` | 51, 51, 51 | Mørk grå |
+| `regionh_white` | `#ffffff` | 255, 255, 255 | Hvid |
 
 ### Region Hovedstaden
 
