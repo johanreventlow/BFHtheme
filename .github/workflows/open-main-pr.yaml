@@ -55,8 +55,10 @@ jobs:
           REPO: ${{ github.repository }}
           SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
           # Lint is informational initially because the existing package has
-          # pre-existing lint debt. Add it here once that debt is resolved.
-          REQUIRED_WORKFLOWS: "test-coverage,R-CMD-check"
+          # pre-existing lint debt. Coverage is also informational for now
+          # because external runner/apt issues can make it flaky before tests
+          # execute. Tighten this gate after both signals are stable.
+          REQUIRED_WORKFLOWS: "R-CMD-check"
         run: |
           set -euo pipefail
 
