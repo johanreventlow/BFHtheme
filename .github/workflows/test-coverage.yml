@@ -1,0 +1,76 @@
+# Workflow for test coverage via covr + Codecov.
+# Reference: https://github.com/r-lib/actions/tree/v2/examples
+name: test-coverage
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+    # Keep coverage visible during CI bootstrap, but do not block promotion
+    # while runner-level apt/setup issues are still being shaken out.
+    continue-on-error: true
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::covr, any::xml2
+          needs: coverage
+
+      - name: Test coverage
+        env:
+          RUNNER_TEMP_ENV: ${{ runner.temp }}
+          # Visual regression tests are intentionally skipped in package-check
+          # style CI because font/rendering differences make snapshots unstable.
+          _R_CHECK_PACKAGE_NAME_: BFHtheme
+        run: |
+          cov <- covr::package_coverage(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP_ENV"), winslash = "/"), "package")
+          )
+          covr::to_cobertura(cov)
+        shell: Rscript {0}
+
+      - uses: codecov/codecov-action@v4
+        continue-on-error: true
+        with:
+          fail_ci_if_error: false
+          file: ./cobertura.xml
+          plugin: noop
+          disable_search: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Show testthat output
+        if: always()
+        env:
+          RUNNER_TEMP_ENV: ${{ runner.temp }}
+        run: |
+          find "$RUNNER_TEMP_ENV/package" -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures
+          path: ${{ runner.temp }}/package

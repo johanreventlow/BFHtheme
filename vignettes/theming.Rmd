@@ -64,7 +64,7 @@ hospital_palette <- bfh_cols(
   "hospital_blue",
   "hospital_light_blue1",
   "hospital_light_blue2",
-  "hospital_grey"
+  "regionh_grey"
 )
 print(hospital_palette)
 ```
@@ -358,7 +358,7 @@ ggplot(site_data, aes(x = quarter, y = value, group = site, colour = site)) +
     values = c(
       "BFH" = bfh_cols("hospital_primary"),
       "Rigshospitalet" = bfh_cols("regionh_primary"),
-      "Hvidovre" = bfh_cols("hospital_grey")
+      "Hvidovre" = bfh_cols("regionh_grey")
     )
   ) +
   theme_bfh()
@@ -380,7 +380,7 @@ ggplot(site_data, aes(x = quarter, y = value, group = site, colour = site)) +
 - Use: Backgrounds, fills, lighter emphasis
 - Usage: Sequential scales, area fills
 
-**Neutrals**: `hospital_grey`, `hospital_dark_grey`
+**Neutrals**: `regionh_grey`, `regionh_dark`
 - Use: Text, borders, secondary information
 - Usage: Axis labels, grid lines
 

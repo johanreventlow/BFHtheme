@@ -7,7 +7,6 @@
 # R package build artifacts
 *.tar.gz
 *.Rcheck/
-.Rbuildignore
 
 # System files
 .DS_Store

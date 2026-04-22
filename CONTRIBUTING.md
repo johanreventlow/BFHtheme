@@ -1451,19 +1451,33 @@ Complete this checklist:
 
 ### Creating a Pull Request
 
-1. **Push your branch:**
+1. **Branch from `develop`:**
+
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feature/your-feature-name
+```
+
+2. **Push your branch:**
 
 ```bash
 git push origin feature/your-feature-name
 ```
 
-2. **Create PR on GitHub:**
+3. **Create PR on GitHub:**
    - Go to https://github.com/johanreventlow/BFHtheme
    - Click "New Pull Request"
    - Select your branch
+   - Use `develop` as the base branch for feature and fix work
    - Fill in the PR template
 
-3. **PR Description Template:**
+4. **Promotion to `main`:**
+   - Do not merge feature branches directly to `main`.
+   - When `develop` CI is green, GitHub Actions opens a `develop` → `main` PR automatically.
+   - Review and merge that promotion PR manually.
+
+5. **PR Description Template:**
 
 ```markdown
 ## Summary
