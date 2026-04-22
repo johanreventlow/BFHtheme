@@ -15,6 +15,9 @@ permissions:
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+    # Keep coverage visible during CI bootstrap, but do not block promotion
+    # while runner-level apt/setup issues are still being shaken out.
+    continue-on-error: true
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
