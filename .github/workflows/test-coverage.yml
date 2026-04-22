@@ -18,9 +18,6 @@ jobs:
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      # Visual regression tests are intentionally skipped in package-check style
-      # CI because font/rendering differences make snapshots unstable.
-      _R_CHECK_PACKAGE_NAME_: BFHtheme
 
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +36,9 @@ jobs:
       - name: Test coverage
         env:
           RUNNER_TEMP_ENV: ${{ runner.temp }}
+          # Visual regression tests are intentionally skipped in package-check
+          # style CI because font/rendering differences make snapshots unstable.
+          _R_CHECK_PACKAGE_NAME_: BFHtheme
         run: |
           cov <- covr::package_coverage(
             quiet = FALSE,
