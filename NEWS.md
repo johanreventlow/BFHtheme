@@ -1,3 +1,40 @@
+# BFHtheme 0.5.1
+
+## Breaking Changes
+
+* `theme_bfh()` validerer nu `base_size` ved indgang. Kald med
+  `base_size = NULL`, `base_size = 0` eller negative værdier stopper med
+  "base_size must be positive numeric" frem for sen- eller uforklarlig fejl
+  nede i `grid::unit()`.
+
+* `theme_bfh()` validerer nu `base_family`. En vektor eller ikke-karakter-værdi
+  stopper med "base_family must be a character scalar or NULL".
+
+* `bfh_save()` validerer nu `width`, `height` og `dpi` ved indgang.
+  Negative eller nul-værdier stopper med "X must be positive numeric" frem for
+  sen hukommelsesfejl.
+
+* `add_bfh_footer()` validerer nu `height`: værdier ≤ 0 eller > 1 stopper med
+  "height must be in (0, 1]".
+
+## Bug Fixes
+
+* Tests skriver ikke længere midlertidige filer til brugerens hjemmemappe (`~`).
+  `test-branding.R` bruger nu `withr::local_tempdir()`, `withr::local_dir()` og
+  `withr::local_options()` i stedet for manuel `on.exit(setwd(...))` og
+  `on.exit(options(...))`.
+
+## Internal Changes
+
+* `R/utils_validation.R`: `validate_numeric_range()` er udvidet med parameter
+  `exclusive_min = FALSE`. Bruges af de nye valideringer ovenfor.
+
+* `tests/testthat/Rplots.pdf` slettet fra repo. `.gitignore` og `.Rbuildignore`
+  har nu eksplicitte rækker for `Rplots.pdf`.
+
+* `CONTRIBUTING.md`: Tilføjet "Visual Regression Tests" sektion i Testing-
+  kapitlet med procedure for inspektion og accept via `vdiffr::manage_cases()`.
+
 # BFHtheme 0.5.0
 
 ## Breaking Changes

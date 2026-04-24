@@ -17,5 +17,7 @@
 ^openspec$
 ^theme_demo\.R$
 ^Rplots\.pdf$
+^tests/testthat/Rplots\.pdf$
+^tests/testthat/_snaps$
 ^doc$
 ^Meta$

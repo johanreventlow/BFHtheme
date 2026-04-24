@@ -318,6 +318,14 @@ add_bfh_footer <- function(plot,
                            text_color = "white",
                            height = 0.05) {
 
+  height <- validate_numeric_range(height, "height", 0, 1, exclusive_min = TRUE)
+
+  if (!is.null(text)) {
+    if (!is.character(text) || length(text) != 1 || is.na(text)) {
+      stop("text must be a character scalar or NULL", call. = FALSE)
+    }
+  }
+
   text <- text %||% "Bispebjerg og Frederiksberg Hospital"
 
   footer_rect <- grid::rectGrob(
