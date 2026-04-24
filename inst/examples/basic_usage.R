@@ -51,7 +51,7 @@ p3 <- ggplot(economics_long, aes(x = date, y = value01, color = variable)) +
     y = "Normalized Value",
     color = "Indicator"
   ) +
-  theme_bfh_minimal() +
+  theme_bfh() +
   scale_color_bfh(palette = "contrast")
 
 print(p3)
@@ -103,7 +103,7 @@ p6 <- ggplot(mpg, aes(x = class, y = hwy, fill = class)) +
     x = "Vehicle Class",
     y = "Highway MPG"
   ) +
-  theme_bfh_print() +
+  theme_bfh() +
   scale_fill_bfh(palette = "warm") +
   theme(
     legend.position = "none",

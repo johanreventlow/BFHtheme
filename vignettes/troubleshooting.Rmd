@@ -88,17 +88,20 @@ Hvis filen mangler, så geninstaller pakken for at gendanne logoressourcerne.
 
 ### Logoet er i dårlig kvalitet
 
+Brug `get_bfh_logo()` med `size = "full"` for høj opløsning (300 DPI).
+
 ```{r logo-quality, eval=FALSE}
-add_logo(plot, logo_size = "full")  # Til print
-add_logo(plot, logo_size = "web")   # Til skærm
+add_bfh_logo(plot, logo_path = get_bfh_logo(size = "full"))  # Til print
+add_bfh_logo(plot, logo_path = get_bfh_logo(size = "web"))   # Til skærm
 ```
 
-### Logoet er for stort eller blokerer data
+### Logoet dækker data
+
+Brug `alpha` for at gøre logoet mere gennemsigtigt.
 
 ```{r logo-size, eval=FALSE}
-add_logo(plot, size = 0.08)
-add_logo(plot, size = 0.20)
-add_logo(plot, position = "topleft", alpha = 0.6)
+add_bfh_logo(plot)              # Standard placering (bottom-left)
+add_bfh_logo(plot, alpha = 0.6) # Halvtransparent
 ```
 
 ## Tema relaterede problemer

@@ -83,30 +83,19 @@ NULL
     }, error = function(e) NULL)
   }
 
-  # Windows-specific: Register fonts with grDevices::windowsFonts
-  # This is a fallback for when ragg is not used (e.g., base R plots)
   if (.Platform$OS.type == "windows") {
     fonts_to_register <- c("Mari", "Mari Office", "Roboto", "Arial")
 
-    if (requireNamespace("systemfonts", quietly = TRUE)) {
-      for (font_name in fonts_to_register) {
-        match_result <- tryCatch({
-          systemfonts::match_fonts(font_name)
+    for (font_name in fonts_to_register) {
+      if (font_available(font_name)) {
+        tryCatch({
+          font_list <- stats::setNames(
+            list(grDevices::windowsFont(font_name)),
+            font_name
+          )
+          do.call(grDevices::windowsFonts, font_list)
+          .bfh_state$fonts_registered <- TRUE
         }, error = function(e) NULL)
-
-        if (!is.null(match_result) &&
-            !is.null(match_result$path) &&
-            !is.na(match_result$path) &&
-            nzchar(match_result$path)) {
-          tryCatch({
-            font_list <- stats::setNames(
-              list(grDevices::windowsFont(font_name)),
-              font_name
-            )
-            do.call(grDevices::windowsFonts, font_list)
-            .bfh_state$fonts_registered <- TRUE
-          }, error = function(e) NULL)
-        }
       }
     }
   }
@@ -135,18 +124,7 @@ NULL
     msg_parts <- paste0(msg_parts, " [", paste(config_info, collapse = ", "), "]")
   }
 
-  # Check font availability
-  has_mari <- FALSE
-  if (requireNamespace("systemfonts", quietly = TRUE)) {
-    mari_result <- tryCatch({
-      systemfonts::match_fonts("Mari")
-    }, error = function(e) NULL)
-
-    has_mari <- !is.null(mari_result) &&
-                !is.null(mari_result$path) &&
-                !is.na(mari_result$path) &&
-                nzchar(mari_result$path)
-  }
+  has_mari <- font_available("Mari")
 
   # Add font warning if needed
   if (!has_mari) {

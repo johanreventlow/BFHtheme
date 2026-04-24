@@ -1,3 +1,31 @@
+# BFHtheme (development)
+
+## Bug Fixes
+
+* Fixed font detection false positives: `systemfonts::match_fonts()` returns a
+  Helvetica fallback path even for non-installed fonts on macOS, causing
+  BFHtheme to report fonts like "Roboto" as available when they were not.
+  Font availability is now checked via `systemfonts::system_fonts()$family`
+  exact match, which is reliable across platforms. `systemfonts` moved from
+  Suggests to Imports to guarantee availability (#67).
+
+## Documentation
+
+* Synced all documentation to current API (#68):
+  - `README.md`: Replaced deprecated `add_logo()` and `add_watermark()` calls
+    with current `add_bfh_logo()` API.
+  - `vignettes/logo-and-branding.Rmd`: Rewritten for simplified
+    `add_bfh_logo(plot, logo_path = NULL, alpha = 1)` signature; removed
+    `position`, `size`, `variant`, `logo_size` parameters removed in v0.3.0.
+  - `vignettes/troubleshooting.Rmd`: Replaced `add_logo()` references.
+  - `inst/examples/color_demo.R`: Replaced `hospital_grey` (non-existent) with
+    `regionh_grey`.
+  - `inst/examples/basic_usage.R`: Replaced `theme_bfh_minimal()` and
+    `theme_bfh_print()` (removed in v0.2.0) with `theme_bfh()`.
+  - `inst/examples/logo_demo.R`: Rewritten to use only current exported API.
+  - Added CI smoke test that parses all `inst/examples/*.R` files to catch
+    future API drift.
+
 # BFHtheme 0.3.0
 
 ## Breaking Changes 🚨

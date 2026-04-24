@@ -314,3 +314,31 @@ test_that("showtext fallback works when Mari fonts not available", {
   expect_length(result, 1)
   expect_true(nchar(result) > 0)
 })
+
+# === Tests for font_available() ===
+
+test_that("font_available returns FALSE for non-existent font", {
+  expect_false(BFHtheme:::font_available("NonExistentFont12345XYZ"))
+})
+
+test_that("font_available returns logical scalar", {
+  result <- BFHtheme:::font_available("Arial")
+  expect_type(result, "logical")
+  expect_length(result, 1)
+})
+
+test_that("font_available uses system_fonts family match, not match_fonts path heuristic", {
+  # Regression: match_fonts() returns a Helvetica fallback path even for
+  # non-installed fonts on macOS. font_available() must not false-positive.
+  # Any font name that is NOT in system_fonts()$family must return FALSE.
+  installed <- systemfonts::system_fonts()$family
+  made_up <- "Definitely_Not_A_Real_Font_AAABBB"
+  expect_false(made_up %in% installed)
+  expect_false(BFHtheme:::font_available(made_up))
+})
+
+test_that("check_bfh_fonts returns only TRUE/FALSE, never NA", {
+  result <- suppressMessages(BFHtheme:::check_bfh_fonts())
+  expect_false(anyNA(result))
+  expect_type(result, "logical")
+})

@@ -12,7 +12,7 @@ cat("==========================================\n\n")
 cat("Official Hospital Colors:\n")
 cat("- Primary (Identitetsfarve): ", bfh_cols("hospital_primary"), "\n")
 cat("- Hospital Blue:             ", bfh_cols("hospital_blue"), "\n")
-cat("- Hospital Grey:             ", bfh_cols("hospital_grey"), "\n")
+cat("- Region H Grey:             ", bfh_cols("regionh_grey"), "\n")
 cat("- Dark Grey:                 ", bfh_cols("dark_grey"), "\n\n")
 
 # Show all palettes visually

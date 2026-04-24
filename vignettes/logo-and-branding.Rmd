@@ -40,8 +40,9 @@ Pakkeindholdet dækker tre logo-varianter i tre størrelser:
 
 ## Grundlæggende brug
 
-`add_logo()` er den nemmeste måde at tilføje et logo til et eksisterende
-`ggplot`-objekt.
+`add_bfh_logo()` er den nemmeste måde at tilføje et logo til et eksisterende
+`ggplot`-objekt. Logoet placeres altid i nederste venstre hjørne med fast
+størrelse for konsistent branding.
 
 ```{r basic-logo, eval=FALSE}
 library(BFHtheme)
@@ -51,36 +52,23 @@ p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point() +
   theme_bfh()
 
-add_logo(p)                    # Farvelogo nederst til højre
-add_logo(p, variant = "grey")  # Gråtonet version
-add_logo(p, variant = "mark")  # Kun mærket
+add_bfh_logo(p)  # Standard: BFH mark, fast placering
 ```
 
-## Placering og størrelse
+## Vælg logo-variant og opløsning
 
-Angiv `position` og `size` for fuld kontrol over placering og skala.
-
-```{r position-size, eval=FALSE}
-add_logo(p, position = "topright")
-add_logo(p, position = "topleft")
-add_logo(p, position = "bottomleft")
-add_logo(p, position = "bottomright", size = 0.12)
-```
-
-`size` refererer til brøkdelen af plottets bredde som logoet fylder. Standard er
-`0.15`, hvilket passer de fleste plots.
-
-## Vælg variant og opløsning
+Brug `get_bfh_logo()` til at hente stien til en specifik variant og størrelse,
+og send den til `add_bfh_logo()`.
 
 ```{r variant-resolution, eval=FALSE}
-# Standardfarve i webopløsning
-add_logo(p, variant = "color", logo_size = "web")
+# Farvelogo i webopløsning
+add_bfh_logo(p, logo_path = get_bfh_logo(variant = "color", size = "web"))
 
 # Gråtonet logo til print
-add_logo(p, variant = "grey", logo_size = "full")
+add_bfh_logo(p, logo_path = get_bfh_logo(variant = "grey", size = "full"))
 
-# Kompakt mærke, små plots
-add_logo(p, variant = "mark", logo_size = "small", size = 0.08)
+# Kompakt mærke
+add_bfh_logo(p, logo_path = get_bfh_logo(variant = "mark", size = "small"))
 ```
 
 ## Gennemsigtighed
@@ -88,52 +76,48 @@ add_logo(p, variant = "mark", logo_size = "small", size = 0.08)
 Brug `alpha` for at gøre logoet mere eller mindre synligt.
 
 ```{r transparency, eval=FALSE}
-add_logo(p, alpha = 0.9)  # Standard
-add_logo(p, alpha = 0.7)  # Mere transparent
-add_logo(p, alpha = 0.3)  # Vandmærkeeffekt
+add_bfh_logo(p)              # Standard (alpha = 1)
+add_bfh_logo(p, alpha = 0.7) # Mere transparent
+add_bfh_logo(p, alpha = 0.3) # Vandmærkeeffekt
 ```
 
-## Avanceret brug
-
-Vil du arbejde direkte med filerne, kan du hente stien til den ønskede
-logoressource via `get_bfh_logo()`.
-
-```{r manual-path, eval=FALSE}
-logo_path <- get_bfh_logo(size = "web")
-add_bfh_logo(p, logo_path, position = "topright", size = 0.15)
-```
+## Kombinér logo og footer
 
 Logo og footer kan kombineres for et fuldt branded layout.
 
 ```{r combined-branding, eval=FALSE}
-library(magrittr)
+p_with_logo <- add_bfh_logo(p)
+p_branded <- add_bfh_footer(p_with_logo, text = "Bispebjerg og Frederiksberg Hospital - 2024")
+print(p_branded)
+```
 
-p %>%
-  add_bfh_logo(position = "bottomright") %>%
-  add_bfh_footer(text = "Bispebjerg og Frederiksberg Hospital - 2024")
+## Find tilgængelige logofiler
+
+```{r logo-path, eval=FALSE}
+# Standard logo (BFH mark, fuld opløsning)
+logo_path <- get_bfh_logo()
+cat("Logo path:", logo_path, "\n")
+cat("File exists:", file.exists(logo_path), "\n")
+
+# Hent specifik variant
+get_bfh_logo(variant = "color", size = "web")
+get_bfh_logo(variant = "grey", size = "full")
 ```
 
 ## Scenarier
 
-- **Print**: brug `logo_size = "full"` og `size` omkring 0.18–0.20
-- **Web/skærm**: `logo_size = "web"` og standardstørrelsen 0.15
-- **Præsentationer**: øg `size` (0.18–0.25) for synlighed på afstand
-- **Tæt på data**: flyt logoet til et hjørne uden data, eller reducer `alpha`
+- **Print**: brug `logo_path = get_bfh_logo(size = "full")`
+- **Web/skærm**: `logo_path = get_bfh_logo(size = "web")` eller standard
+- **Diskret branding**: sæt `alpha` til 0.5–0.7
 
 ## Fejlfinding
 
+Hvis logoet ikke vises, bekræft at filen eksisterer:
+
 ```{r troubleshooting, eval=FALSE}
-# Logo vises ikke
 logo_path <- get_bfh_logo()
 file.exists(logo_path)
-
-# Justér størrelse
-add_logo(p, size = 0.10)
-add_logo(p, size = 0.20)
-
-# Flyt logo hvis det dækker data
-add_logo(p, position = "topleft", alpha = 0.6)
 ```
 
-Hvis logoet mangler i filsystemet, så geninstaller pakken eller regenerer
-filerne fra kilderne i `inst/source_files/`.
+Hvis logoet mangler i filsystemet, geninstaller pakken for at gendanne
+logoressourcerne fra `inst/logo/`.

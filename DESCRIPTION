@@ -27,12 +27,12 @@ Imports:
     grid,
     grDevices,
     scales,
-    marquee
+    marquee,
+    systemfonts
 Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    systemfonts,
     showtext,
     sysfonts,
     ragg,

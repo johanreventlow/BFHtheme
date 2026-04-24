@@ -15,8 +15,8 @@ if (!is.null(logo_path)) {
   stop("BFH logo not found. Please ensure it's included in the package.")
 }
 
-# Example 1: Basic plot with logo in bottom right
-cat("Example 1: Logo in bottom right (default)\n")
+# Example 1: Basic plot with logo (default: BFH mark, bottom-left)
+cat("Example 1: Logo with default placement\n")
 
 p1 <- ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
   geom_point(size = 3) +
@@ -30,12 +30,11 @@ p1 <- ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
   theme_bfh() +
   scale_color_bfh(palette = "hospital")
 
-# Add logo
-p1_with_logo <- add_logo(p1)
+p1_with_logo <- add_bfh_logo(p1)
 print(p1_with_logo)
 
-# Example 2: Logo in different positions
-cat("\nExample 2: Logo in top right corner\n")
+# Example 2: Logo with custom path and transparency
+cat("\nExample 2: Logo with custom path\n")
 
 p2 <- ggplot(mpg, aes(x = class, fill = class)) +
   geom_bar() +
@@ -52,11 +51,12 @@ p2 <- ggplot(mpg, aes(x = class, fill = class)) +
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
-p2_with_logo <- add_logo(p2, position = "topright", size = 0.12)
+logo_path_web <- get_bfh_logo(size = "web")
+p2_with_logo <- add_bfh_logo(p2, logo_path = logo_path_web)
 print(p2_with_logo)
 
-# Example 3: High-resolution logo for print
-cat("\nExample 3: High-resolution logo for print output\n")
+# Example 3: Logo with transparency
+cat("\nExample 3: Semi-transparent logo\n")
 
 p3 <- ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   geom_point(size = 2.5, alpha = 0.7) +
@@ -66,14 +66,14 @@ p3 <- ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
     x = "Sepal Length (cm)",
     y = "Sepal Width (cm)"
   ) +
-  theme_bfh_print() +
+  theme_bfh() +
   scale_color_bfh(palette = "hospital_blues")
 
-p3_with_logo <- add_logo(p3, position = "bottomleft", logo_size = "full", size = 0.18)
+p3_with_logo <- add_bfh_logo(p3, alpha = 0.7)
 print(p3_with_logo)
 
-# Example 4: Manual logo path (alternative method)
-cat("\nExample 4: Using manual logo path\n")
+# Example 4: Logo combined with footer
+cat("\nExample 4: Logo combined with footer\n")
 
 p4 <- ggplot(economics_long[economics_long$variable %in% c("unemploy", "pop"), ],
              aes(x = date, y = value01, color = variable)) +
@@ -85,34 +85,11 @@ p4 <- ggplot(economics_long[economics_long$variable %in% c("unemploy", "pop"), ]
     y = "Normalized Value",
     color = "Indicator"
   ) +
-  theme_bfh_minimal() +
+  theme_bfh() +
   scale_color_bfh(palette = "hospital")
 
-# Add logo with manual path
-logo_path <- get_bfh_logo("web")
-p4_with_logo <- add_bfh_logo(p4, logo_path, position = "topright", size = 0.12)
-print(p4_with_logo)
-
-# Example 5: Combine logo with other branding elements
-cat("\nExample 5: Logo combined with color bar\n")
-
-p5 <- ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
-  geom_tile() +
-  labs(
-    title = "Old Faithful Eruptions",
-    x = "Waiting Time (min)",
-    y = "Eruption Duration (min)",
-    fill = "Density"
-  ) +
-  theme_bfh() +
-  scale_fill_bfh_continuous(palette = "hospital_blues_seq")
-
-# Add both logo and color bar
-p5_branded <- p5 %>%
-  add_bfh_color_bar(position = "top", color = bfh_cols("hospital_primary")) %>%
-  add_logo(position = "bottomright", size = 0.12, alpha = 0.85)
-
-print(p5_branded)
+p4_branded <- add_bfh_logo(p4)
+print(p4_branded)
 
 # Save example with logo
 cat("\nSaving plot with logo...\n")
