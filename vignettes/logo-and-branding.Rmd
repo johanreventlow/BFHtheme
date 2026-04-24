@@ -117,7 +117,7 @@ For at aktivere `ragg_png`-rendering (anbefalet for BFH-grafikker i R Markdown
 og Quarto), kald `use_bfh_knitr_defaults()` eksplicit i dit setup-chunk:
 
 ````markdown
-```{r setup}
+```{r setup-bfh-knitr}
 library(BFHtheme)
 use_bfh_knitr_defaults()         # sætter dev = "ragg_png", dpi = 300
 use_bfh_knitr_defaults(dpi = 150) # lavere opløsning til drafts
