@@ -280,5 +280,125 @@ test_that("bfh_title_block can be added to plot", {
   expect_s3_class(p, "ggplot")
 })
 
+# === Tests for logo cache ===
+
+test_that("logo cache returns same array on repeated calls", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  # Clear cache before test
+  clear_bfh_logo_cache()
+  on.exit(clear_bfh_logo_cache(), add = TRUE)
+
+  # First call: populates cache
+  add_bfh_logo(p, test_logo_path)
+  n_after_first <- length(ls(envir = BFHtheme:::.bfh_logo_cache))
+
+  # Second identical call: should not add new cache entry
+  add_bfh_logo(p, test_logo_path)
+  n_after_second <- length(ls(envir = BFHtheme:::.bfh_logo_cache))
+
+  expect_equal(n_after_first, 1L)
+  expect_equal(n_after_second, 1L)
+})
+
+test_that("logo cache invalidates when file mtime changes", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  fresh_logo <- tempfile(fileext = ".png")
+  logo_array <- array(0, dim = c(5, 10, 3))
+  png::writePNG(logo_array, fresh_logo)
+  on.exit(unlink(fresh_logo), add = TRUE)
+
+  clear_bfh_logo_cache()
+  on.exit(clear_bfh_logo_cache(), add = TRUE)
+
+  add_bfh_logo(p, fresh_logo)
+  n_after_first <- length(ls(envir = BFHtheme:::.bfh_logo_cache))
+
+  # Touch file to simulate mtime change
+  Sys.sleep(1.1)
+  png::writePNG(logo_array, fresh_logo)
+
+  add_bfh_logo(p, fresh_logo)
+  n_after_second <- length(ls(envir = BFHtheme:::.bfh_logo_cache))
+
+  expect_equal(n_after_first, 1L)
+  expect_equal(n_after_second, 2L)  # New cache entry for new mtime
+})
+
+# === Tests for resource limits ===
+
+test_that("add_bfh_logo rejects files exceeding max bytes", {
+  skip_if_not_installed("ggplot2")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  original <- getOption("BFHtheme.logo_max_bytes")
+  options(BFHtheme.logo_max_bytes = 1L)
+  on.exit(options(BFHtheme.logo_max_bytes = original), add = TRUE)
+
+  expect_error(
+    add_bfh_logo(p, test_logo_path),
+    "exceeds size limit"
+  )
+})
+
+test_that("add_bfh_logo accepts files within custom max bytes", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  original <- getOption("BFHtheme.logo_max_bytes")
+  options(BFHtheme.logo_max_bytes = 10 * 1024^2)
+  on.exit(options(BFHtheme.logo_max_bytes = original), add = TRUE)
+
+  expect_s3_class(add_bfh_logo(p, test_logo_path), "ggplot")
+})
+
+test_that("add_bfh_logo rejects images exceeding max dim", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  large_logo <- tempfile(fileext = ".png")
+  large_array <- array(0.5, dim = c(10, 10, 3))
+  png::writePNG(large_array, large_logo)
+  on.exit(unlink(large_logo), add = TRUE)
+
+  original <- getOption("BFHtheme.logo_max_dim")
+  options(BFHtheme.logo_max_dim = 5L)
+  on.exit(options(BFHtheme.logo_max_dim = original), add = TRUE)
+
+  expect_error(
+    add_bfh_logo(p, large_logo),
+    "exceed.*limit"
+  )
+})
+
+test_that("add_bfh_logo stops when cowplot is absent", {
+  skip_if_not_installed("ggplot2")
+  # This test only runs in environments where cowplot is not installed.
+  # It validates the fail-hard contract for missing cowplot.
+  skip_if(requireNamespace("cowplot", quietly = TRUE),
+          "Test requires cowplot to be absent")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+  expect_error(add_bfh_logo(p), "cowplot")
+})
+
 # === Cleanup ===
 # Cleanup happens automatically with withr

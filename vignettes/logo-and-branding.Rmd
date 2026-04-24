@@ -110,6 +110,22 @@ get_bfh_logo(variant = "grey", size = "full")
 - **Web/skærm**: `logo_path = get_bfh_logo(size = "web")` eller standard
 - **Diskret branding**: sæt `alpha` til 0.5–0.7
 
+## Opt-in knitr-opsætning
+
+`library(BFHtheme)` ændrer *ikke* globale knitr-indstillinger automatisk.
+For at aktivere `ragg_png`-rendering (anbefalet for BFH-grafikker i R Markdown
+og Quarto), kald `use_bfh_knitr_defaults()` eksplicit i dit setup-chunk:
+
+````markdown
+```{r setup}
+library(BFHtheme)
+use_bfh_knitr_defaults()         # sætter dev = "ragg_png", dpi = 300
+use_bfh_knitr_defaults(dpi = 150) # lavere opløsning til drafts
+```
+````
+
+Kræver `ragg`-pakken: `install.packages("ragg")`.
+
 ## Fejlfinding
 
 Hvis logoet ikke vises, bekræft at filen eksisterer:

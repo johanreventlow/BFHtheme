@@ -175,12 +175,20 @@ test_that("reset_bfh_defaults resets to ggplot2 defaults", {
   expect_equal(class(current_theme), class(default_theme))
 })
 
-test_that("reset_bfh_defaults prints message", {
+test_that("reset_bfh_defaults emits fallback message when no state saved", {
   skip_if_not_installed("ggplot2")
+
+  # Ensure no saved state
+  .bfh_state$previous_theme <- NULL
+  .bfh_state$previous_geoms <- NULL
+  on.exit({
+    .bfh_state$previous_theme <- NULL
+    .bfh_state$previous_geoms <- NULL
+  }, add = TRUE)
 
   expect_message(
     reset_bfh_defaults(),
-    "ggplot2 defaults have been reset"
+    "No saved state found"
   )
 })
 
@@ -207,6 +215,102 @@ test_that("workflow: set -> plot -> reset works correctly", {
   # Should be back to original
   current_theme <- ggplot2::theme_get()
   expect_equal(class(current_theme), class(original_theme))
+})
+
+# === Tests for reversible defaults (make-global-state-explicit) ===
+
+test_that("set->reset cycle restores previous theme exactly", {
+  skip_if_not_installed("ggplot2")
+
+  ggplot2::theme_set(ggplot2::theme_classic())
+  original_theme <- ggplot2::theme_get()
+  on.exit(ggplot2::theme_set(ggplot2::theme_gray()), add = TRUE)
+
+  suppressMessages(set_bfh_defaults())
+  suppressMessages(reset_bfh_defaults())
+
+  restored_theme <- ggplot2::theme_get()
+  # panel.background differs: classic=white, gray=grey92
+  expect_equal(
+    restored_theme$panel.background$fill,
+    original_theme$panel.background$fill
+  )
+  # Verify it is NOT theme_gray (which uses grey92 background)
+  expect_false(identical(
+    restored_theme$panel.background$fill,
+    ggplot2::theme_gray()$panel.background$fill
+  ))
+})
+
+test_that("set->reset cycle restores previous geom defaults", {
+  skip_if_not_installed("ggplot2")
+
+  # Set a distinctive custom colour
+  ggplot2::update_geom_defaults("point", list(colour = "red"))
+  on.exit(
+    ggplot2::update_geom_defaults("point", list(colour = "black")),
+    add = TRUE
+  )
+
+  suppressMessages(set_bfh_defaults())
+
+  # BFH palette colour should now be active (not red)
+  bfh_colour <- ggplot2::GeomPoint$default_aes$colour
+  expect_false(identical(bfh_colour, "red"))
+
+  suppressMessages(reset_bfh_defaults())
+
+  restored_colour <- ggplot2::GeomPoint$default_aes$colour
+  expect_equal(restored_colour, "red")
+})
+
+test_that("reset_bfh_defaults without prior set falls back gracefully", {
+  skip_if_not_installed("ggplot2")
+
+  .bfh_state$previous_theme <- NULL
+  .bfh_state$previous_geoms <- NULL
+  on.exit({
+    .bfh_state$previous_theme <- NULL
+    .bfh_state$previous_geoms <- NULL
+  }, add = TRUE)
+
+  expect_message(reset_bfh_defaults(), "No saved state found")
+  result <- suppressMessages(reset_bfh_defaults())
+  expect_true(result)
+  expect_equal(class(ggplot2::theme_get()), class(ggplot2::theme_gray()))
+})
+
+test_that("library(BFHtheme) does not modify knitr chunk options", {
+  skip_if_not_installed("knitr")
+
+  # knitr is loaded; check that BFHtheme did not touch dev option
+  # BFHtheme is already loaded in test session, so we verify the current state
+  dev_option <- knitr::opts_chunk$get("dev")
+  # dev should NOT be "ragg_png" unless the user explicitly called
+  # use_bfh_knitr_defaults() — which tests do not do
+  expect_false(identical(dev_option, "ragg_png"))
+})
+
+test_that("use_bfh_knitr_defaults sets dev to ragg_png", {
+  skip_if_not_installed("knitr")
+  skip_if_not_installed("ragg")
+
+  original_dev <- knitr::opts_chunk$get("dev")
+  on.exit(knitr::opts_chunk$set(dev = original_dev), add = TRUE)
+
+  use_bfh_knitr_defaults()
+  expect_equal(knitr::opts_chunk$get("dev"), "ragg_png")
+})
+
+test_that("use_bfh_knitr_defaults respects dpi argument", {
+  skip_if_not_installed("knitr")
+  skip_if_not_installed("ragg")
+
+  original_dpi <- knitr::opts_chunk$get("dpi")
+  on.exit(knitr::opts_chunk$set(dpi = original_dpi), add = TRUE)
+
+  use_bfh_knitr_defaults(dpi = 150)
+  expect_equal(knitr::opts_chunk$get("dpi"), 150)
 })
 
 test_that("palette fallback updates palette variable correctly", {

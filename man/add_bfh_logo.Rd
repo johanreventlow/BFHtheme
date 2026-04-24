@@ -12,7 +12,8 @@ add_bfh_logo(plot, logo_path = NULL, alpha = 1)
 \item{logo_path}{Path to a PNG or JPEG logo file. When `NULL` (default),
 uses the packaged BFH mark logo (`bfh_mark.png`).}
 
-\item{alpha}{Transparency of the logo (0–1). Defaults to `1` (fully opaque).}
+\item{alpha}{Transparency of the logo (0–1). Defaults to `1` (fully opaque).
+A value of `0` produces an invisible logo.}
 }
 \value{
 Modified ggplot2 object with the logo applied.
@@ -23,7 +24,7 @@ visualizations. The logo is automatically positioned at the bottom-left corner
 with standardized sizing (1/15 of plot height, square).
 }
 \details{
-**Simplified API (v0.3.0):** This function now uses fixed positioning to ensure
+**Simplified API (v0.3.0):** This function uses fixed positioning to ensure
 consistent branding across all visualizations. The logo is always placed at the
 bottom-left corner, flush with the plot edge, at a height and width of 1/15 of
 the total plot height (square aspect ratio).
@@ -32,18 +33,27 @@ the total plot height (square aspect ratio).
 `bfh_mark.png` (full resolution BFH symbol mark). For custom logos, provide
 a path to a PNG or JPEG file.
 
-**Dependencies:** Requires the `cowplot` and `magick` packages for precise
-logo positioning with correct aspect ratio. Install with:
+**Dependencies:** Requires the `cowplot` package for precise logo positioning.
+Install with:
 ```r
-install.packages(c("cowplot", "magick"))
+install.packages("cowplot")
 ```
 
-**Security:** File paths are normalized and verified to prevent tampering.
-For additional security, you can restrict logo loading to a specific directory:
+**Path restriction:** Restrict logo loading to a specific directory
+(path-prefix check, not a security sandbox):
 ```r
-options(BFHtheme.logo_root = "/safe/logo/directory")
+options(BFHtheme.logo_root = "/approved/logo/directory")
 ```
 When set, only logos within this directory (or subdirectories) will be allowed.
+
+**Resource limits:** Maximum file size and image dimensions can be configured:
+```r
+options(BFHtheme.logo_max_bytes = 5 * 1024^2)  # 5 MB default
+options(BFHtheme.logo_max_dim   = 4096)         # 4096 px default
+```
+
+**Performance:** Decoded logo images are cached per path and file modification
+time. Repeated calls with the same unchanged file avoid redundant disk reads.
 
 **Breaking changes from v0.2.0:** The `position`, `size`, and `padding`
 parameters have been removed to enforce consistent branding. See NEWS.md for

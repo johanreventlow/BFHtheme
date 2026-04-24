@@ -1,3 +1,27 @@
+# Geom classes modified by set_bfh_defaults() — used for save/restore
+.bfh_managed_geoms <- c(
+  "point", "line", "area", "rect", "density",
+  "bar", "col", "boxplot", "violin", "dotplot"
+)
+
+# Map geom names to exported ggplot2 Geom ggproto objects for default_aes access
+.bfh_geom_class <- function(geom_name) {
+  switch(
+    geom_name,
+    point   = ggplot2::GeomPoint,
+    line    = ggplot2::GeomLine,
+    area    = ggplot2::GeomArea,
+    rect    = ggplot2::GeomRect,
+    density = ggplot2::GeomDensity,
+    bar     = ggplot2::GeomBar,
+    col     = ggplot2::GeomCol,
+    boxplot = ggplot2::GeomBoxplot,
+    violin  = ggplot2::GeomViolin,
+    dotplot = ggplot2::GeomDotplot,
+    stop("Unknown geom: ", geom_name, call. = FALSE)
+  )
+}
+
 #' Set BFH Defaults for ggplot2
 #'
 #' @description
@@ -10,6 +34,9 @@
 #' updates default aesthetics for commonly used geoms (points, lines, bars, and
 #' more). Colour/fill scales are not altered automatically—continue to add
 #' `scale_*_bfh()` when mapping aesthetics.
+#'
+#' Previous global state (active theme and geom defaults) is saved automatically
+#' and can be restored with [reset_bfh_defaults()].
 #'
 #' @param theme Character name of the BFH theme to adopt. Only `"bfh"` is
 #'   supported (other theme variants removed in v0.2.0). Defaults to `"bfh"`.
@@ -47,33 +74,37 @@ set_bfh_defaults <- function(theme = "bfh",
                              base_size = 12,
                              base_family = NULL) {
 
-  # Set the theme (only "bfh" supported after v0.2.0)
+  # Save current state before mutation
+  .bfh_state$previous_theme <- ggplot2::theme_get()
+  .bfh_state$previous_geoms <- lapply(
+    stats::setNames(.bfh_managed_geoms, .bfh_managed_geoms),
+    function(nm) as.list(.bfh_geom_class(nm)$default_aes)
+  )
+
   theme_func <- switch(theme,
     "bfh" = theme_bfh,
-    theme_bfh  # default fallback
+    theme_bfh
   )
 
   ggplot2::theme_set(theme_func(base_size = base_size, base_family = base_family))
 
-  # Get the palette colors
   pal_colors <- bfh_palettes[[palette]]
   if (is.null(pal_colors)) {
     warning("Palette '", palette, "' not found. Using 'main' palette.", call. = FALSE)
-    palette <- "main"  # Opdater palette-variablen
+    palette <- "main"
     pal_colors <- bfh_palettes[["main"]]
   }
 
-  # Set default colors for common geoms
-  ggplot2::update_geom_defaults("point", list(colour = pal_colors[1]))
-  ggplot2::update_geom_defaults("line", list(colour = pal_colors[1]))
-  ggplot2::update_geom_defaults("area", list(fill = pal_colors[1]))
-  ggplot2::update_geom_defaults("rect", list(fill = pal_colors[1]))
-  ggplot2::update_geom_defaults("density", list(fill = pal_colors[1]))
-  ggplot2::update_geom_defaults("bar", list(fill = pal_colors[1]))
-  ggplot2::update_geom_defaults("col", list(fill = pal_colors[1]))
-  ggplot2::update_geom_defaults("boxplot", list(fill = pal_colors[1]))
-  ggplot2::update_geom_defaults("violin", list(fill = pal_colors[1]))
-  ggplot2::update_geom_defaults("dotplot", list(fill = pal_colors[1]))
+  ggplot2::update_geom_defaults("point",   list(colour = pal_colors[1]))
+  ggplot2::update_geom_defaults("line",    list(colour = pal_colors[1]))
+  ggplot2::update_geom_defaults("area",    list(fill   = pal_colors[1]))
+  ggplot2::update_geom_defaults("rect",    list(fill   = pal_colors[1]))
+  ggplot2::update_geom_defaults("density", list(fill   = pal_colors[1]))
+  ggplot2::update_geom_defaults("bar",     list(fill   = pal_colors[1]))
+  ggplot2::update_geom_defaults("col",     list(fill   = pal_colors[1]))
+  ggplot2::update_geom_defaults("boxplot", list(fill   = pal_colors[1]))
+  ggplot2::update_geom_defaults("violin",  list(fill   = pal_colors[1]))
+  ggplot2::update_geom_defaults("dotplot", list(fill   = pal_colors[1]))
 
   message("BFH defaults set successfully!")
   message("Theme: ", theme)
@@ -85,8 +116,13 @@ set_bfh_defaults <- function(theme = "bfh",
 #' Reset ggplot2 Defaults
 #'
 #' @description
-#' Restores ggplot2's original theme and geom defaults, undoing the effect of
-#' [set_bfh_defaults()].
+#' Restores the theme and geom defaults that were active before [set_bfh_defaults()]
+#' was last called.
+#'
+#' @details
+#' If [set_bfh_defaults()] has not been called in the current session, falls
+#' back to `theme_gray()` and ggplot2's hardcoded geom defaults, and emits a
+#' message indicating no saved state was found.
 #'
 #' @return Invisibly returns `TRUE` once defaults are reset.
 #' @export
@@ -99,27 +135,36 @@ set_bfh_defaults <- function(theme = "bfh",
 #'
 #' # ... create some plots ...
 #'
-#' # Reset to ggplot2 defaults
+#' # Reset to previous state
 #' reset_bfh_defaults()
 #' }
 reset_bfh_defaults <- function() {
-  # Reset to ggplot2 default theme
-  ggplot2::theme_set(ggplot2::theme_gray())
+  if (is.null(.bfh_state$previous_theme)) {
+    message("No saved state found. Resetting to ggplot2 defaults.")
+    ggplot2::theme_set(ggplot2::theme_gray())
 
-  # Reset geom defaults to original ggplot2 colors
-  ggplot2::update_geom_defaults("point", list(colour = "black"))
-  ggplot2::update_geom_defaults("line", list(colour = "black"))
-  ggplot2::update_geom_defaults("area", list(fill = "grey20"))
-  ggplot2::update_geom_defaults("rect", list(fill = "grey35"))
-  ggplot2::update_geom_defaults("density", list(fill = "grey20"))
-  ggplot2::update_geom_defaults("bar", list(fill = "grey35"))
-  ggplot2::update_geom_defaults("col", list(fill = "grey35"))
-  ggplot2::update_geom_defaults("boxplot", list(fill = "white"))
-  ggplot2::update_geom_defaults("violin", list(fill = "white"))
-  ggplot2::update_geom_defaults("dotplot", list(fill = "black"))
+    ggplot2::update_geom_defaults("point",   list(colour = "black"))
+    ggplot2::update_geom_defaults("line",    list(colour = "black"))
+    ggplot2::update_geom_defaults("area",    list(fill   = "grey20"))
+    ggplot2::update_geom_defaults("rect",    list(fill   = "grey35"))
+    ggplot2::update_geom_defaults("density", list(fill   = "grey20"))
+    ggplot2::update_geom_defaults("bar",     list(fill   = "grey35"))
+    ggplot2::update_geom_defaults("col",     list(fill   = "grey35"))
+    ggplot2::update_geom_defaults("boxplot", list(fill   = "white"))
+    ggplot2::update_geom_defaults("violin",  list(fill   = "white"))
+    ggplot2::update_geom_defaults("dotplot", list(fill   = "black"))
+  } else {
+    ggplot2::theme_set(.bfh_state$previous_theme)
 
-  message("ggplot2 defaults have been reset.")
+    for (nm in names(.bfh_state$previous_geoms)) {
+      ggplot2::update_geom_defaults(nm, .bfh_state$previous_geoms[[nm]])
+    }
+
+    .bfh_state$previous_theme <- NULL
+    .bfh_state$previous_geoms <- NULL
+
+    message("BFH defaults reset.")
+  }
 
   invisible(TRUE)
 }
-

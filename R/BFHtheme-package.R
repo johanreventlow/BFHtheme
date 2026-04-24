@@ -62,21 +62,12 @@
 ## usethis namespace: end
 NULL
 
-# Package-level state to track what was configured
+# Package-level state environments
 .bfh_state <- new.env(parent = emptyenv())
+.bfh_logo_cache <- new.env(parent = emptyenv())
 
 .onLoad <- function(libname, pkgname) {
-  # Track what we configure, so .onAttach can report it
-  .bfh_state$ragg_configured <- FALSE
   .bfh_state$fonts_registered <- FALSE
-
-  if (requireNamespace("knitr", quietly = TRUE) &&
-      requireNamespace("ragg", quietly = TRUE)) {
-    tryCatch({
-      knitr::opts_chunk$set(dev = "ragg_png", dpi = 300)
-      .bfh_state$ragg_configured <- TRUE
-    }, error = function(e) NULL)
-  }
 
   if (.Platform$OS.type == "windows") {
     fonts_to_register <- c("Mari", "Mari Office", "Roboto", "Arial")
@@ -101,11 +92,8 @@ NULL
 .onAttach <- function(libname, pkgname) {
   msg_parts <- "BFHtheme loaded!"
 
-  config_info <- character(0)
-  if (isTRUE(.bfh_state$ragg_configured)) config_info <- c(config_info, "knitr: ragg_png (dpi=300)")
-  if (isTRUE(.bfh_state$fonts_registered)) config_info <- c(config_info, "Windows fonts registered")
-  if (length(config_info) > 0) {
-    msg_parts <- paste0(msg_parts, " [", paste(config_info, collapse = ", "), "]")
+  if (isTRUE(.bfh_state$fonts_registered)) {
+    msg_parts <- paste0(msg_parts, " [Windows fonts registered]")
   }
 
   if (!font_available("Mari")) {
@@ -119,7 +107,8 @@ NULL
   if (!requireNamespace("ragg", quietly = TRUE)) {
     msg_parts <- paste0(
       msg_parts, "\n",
-      "Tip: Install 'ragg' for better font rendering: install.packages('ragg')"
+      "Tip: Install 'ragg' for better font rendering: install.packages('ragg')\n",
+      "     Then call use_bfh_knitr_defaults() to enable ragg in knitr."
     )
   }
 
