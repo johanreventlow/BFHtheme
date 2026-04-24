@@ -1,4 +1,4 @@
-# BFHtheme (development)
+# BFHtheme 0.5.0
 
 ## Breaking Changes
 

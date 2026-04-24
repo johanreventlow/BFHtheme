@@ -1,7 +1,7 @@
 Package: BFHtheme
 Type: Package
 Title: BFH Theme and Color Palettes for ggplot2
-Version: 0.4.0
+Version: 0.5.0
 Authors@R: c(
     person(
       "Johan", "Reventlow",
