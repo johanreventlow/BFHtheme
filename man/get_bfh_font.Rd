@@ -24,8 +24,8 @@ result to avoid repeated system queries. The priority order is:
 Mari → Mari Office → Roboto → Arial → sans.
 }
 \details{
-When `systemfonts` package is installed, the function uses
-`systemfonts::match_font()` to robustly check font availability on your system.
+Font availability is checked via `systemfonts::system_fonts()` exact family
+name matching, which is reliable across platforms.
 
 Results are cached in the package environment; use [clear_bfh_font_cache()]
 or set `force_refresh = TRUE` after installing new fonts.

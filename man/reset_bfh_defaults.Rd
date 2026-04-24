@@ -10,8 +10,13 @@ reset_bfh_defaults()
 Invisibly returns `TRUE` once defaults are reset.
 }
 \description{
-Restores ggplot2's original theme and geom defaults, undoing the effect of
-[set_bfh_defaults()].
+Restores the theme and geom defaults that were active before [set_bfh_defaults()]
+was last called.
+}
+\details{
+If [set_bfh_defaults()] has not been called in the current session, falls
+back to `theme_gray()` and ggplot2's hardcoded geom defaults, and emits a
+message indicating no saved state was found.
 }
 \examples{
 \dontrun{
@@ -20,7 +25,7 @@ set_bfh_defaults()
 
 # ... create some plots ...
 
-# Reset to ggplot2 defaults
+# Reset to previous state
 reset_bfh_defaults()
 }
 }
@@ -28,6 +33,7 @@ reset_bfh_defaults()
 [set_bfh_defaults()]
 
 Other BFH defaults: 
-\code{\link{set_bfh_defaults}()}
+\code{\link{set_bfh_defaults}()},
+\code{\link{use_bfh_knitr_defaults}()}
 }
 \concept{BFH defaults}

@@ -42,3 +42,18 @@ test_that("theme_bfh y-axis labels are left-aligned", {
   expect_equal(theme$axis.text.y$hjust, 0)
 })
 
+test_that("theme_bfh rejects invalid base_size", {
+  expect_error(theme_bfh(base_size = -1),   "base_size must be positive numeric")
+  expect_error(theme_bfh(base_size = 0),    "base_size must be positive numeric")
+  expect_error(theme_bfh(base_size = NULL), "base_size must be positive numeric")
+})
+
+test_that("theme_bfh accepts valid base_size", {
+  expect_s3_class(theme_bfh(base_size = 14), "theme")
+})
+
+test_that("theme_bfh rejects invalid base_family", {
+  expect_error(theme_bfh(base_family = 123),              "base_family must be a character scalar or NULL")
+  expect_error(theme_bfh(base_family = c("Arial", "sans")), "base_family must be a character scalar or NULL")
+})
+

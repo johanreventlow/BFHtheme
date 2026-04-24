@@ -49,6 +49,10 @@ bfh_save <- function(filename,
                      dpi = 300,
                      ...) {
 
+  if (!is.null(width)) width <- validate_numeric_range(width, "width", 0, Inf, exclusive_min = TRUE)
+  if (!is.null(height)) height <- validate_numeric_range(height, "height", 0, Inf, exclusive_min = TRUE)
+  dpi <- validate_numeric_range(dpi, "dpi", 0, Inf, exclusive_min = TRUE)
+
   # Define presets (dimensions in inches)
   presets <- list(
     report_full = list(width = 7, height = 5),

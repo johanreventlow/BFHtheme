@@ -43,6 +43,17 @@ theme_bfh <- function(base_size = 12,
                       base_line_size = base_size / 22,
                       base_rect_size = base_size / 22) {
 
+  if (is.null(base_size) || !is.numeric(base_size) || length(base_size) != 1 ||
+      is.na(base_size) || base_size <= 0) {
+    stop("base_size must be positive numeric", call. = FALSE)
+  }
+
+  if (!is.null(base_family)) {
+    if (!is.character(base_family) || length(base_family) != 1 || is.na(base_family)) {
+      stop("base_family must be a character scalar or NULL", call. = FALSE)
+    }
+  }
+
   # Auto-detect best font if not specified
   base_family <- .resolve_base_family(base_family)
 

@@ -6,7 +6,7 @@
 #' with standardized sizing (1/15 of plot height, square).
 #'
 #' @details
-#' **Simplified API (v0.3.0):** This function now uses fixed positioning to ensure
+#' **Simplified API (v0.3.0):** This function uses fixed positioning to ensure
 #' consistent branding across all visualizations. The logo is always placed at the
 #' bottom-left corner, flush with the plot edge, at a height and width of 1/15 of
 #' the total plot height (square aspect ratio).
@@ -15,18 +15,27 @@
 #' `bfh_mark.png` (full resolution BFH symbol mark). For custom logos, provide
 #' a path to a PNG or JPEG file.
 #'
-#' **Dependencies:** Requires the `cowplot` and `magick` packages for precise
-#' logo positioning with correct aspect ratio. Install with:
+#' **Dependencies:** Requires the `cowplot` package for precise logo positioning.
+#' Install with:
 #' ```r
-#' install.packages(c("cowplot", "magick"))
+#' install.packages("cowplot")
 #' ```
 #'
-#' **Security:** File paths are normalized and verified to prevent tampering.
-#' For additional security, you can restrict logo loading to a specific directory:
+#' **Path restriction:** Restrict logo loading to a specific directory
+#' (path-prefix check, not a security sandbox):
 #' ```r
-#' options(BFHtheme.logo_root = "/safe/logo/directory")
+#' options(BFHtheme.logo_root = "/approved/logo/directory")
 #' ```
 #' When set, only logos within this directory (or subdirectories) will be allowed.
+#'
+#' **Resource limits:** Maximum file size and image dimensions can be configured:
+#' ```r
+#' options(BFHtheme.logo_max_bytes = 5 * 1024^2)  # 5 MB default
+#' options(BFHtheme.logo_max_dim   = 4096)         # 4096 px default
+#' ```
+#'
+#' **Performance:** Decoded logo images are cached per path and file modification
+#' time. Repeated calls with the same unchanged file avoid redundant disk reads.
 #'
 #' **Breaking changes from v0.2.0:** The `position`, `size`, and `padding`
 #' parameters have been removed to enforce consistent branding. See NEWS.md for
@@ -36,6 +45,7 @@
 #' @param logo_path Path to a PNG or JPEG logo file. When `NULL` (default),
 #'   uses the packaged BFH mark logo (`bfh_mark.png`).
 #' @param alpha Transparency of the logo (0–1). Defaults to `1` (fully opaque).
+#'   A value of `0` produces an invisible logo.
 #' @return Modified ggplot2 object with the logo applied.
 #' @export
 #'
@@ -61,6 +71,15 @@ add_bfh_logo <- function(plot,
                          logo_path = NULL,
                          alpha = 1) {
 
+  # cowplot required — fail early with actionable message
+  if (!requireNamespace("cowplot", quietly = TRUE)) {
+    stop(
+      "Package 'cowplot' is required for logo placement. ",
+      "Install with: install.packages('cowplot')",
+      call. = FALSE
+    )
+  }
+
   # Load default logo if not specified
   if (is.null(logo_path)) {
     logo_path <- get_bfh_logo(size = "full", variant = "mark")
@@ -69,13 +88,11 @@ add_bfh_logo <- function(plot,
     }
   }
 
-  # Input validation
   if (!is.character(logo_path) || length(logo_path) != 1 || nchar(logo_path) == 0) {
     stop("logo_path must be a non-empty character string", call. = FALSE)
   }
 
-  # === Security Layer 1: Path Normalization ===
-  # Normalize path (allowing shortcuts like ~ or ..) and ensure it resolves
+  # Resolve path
   normalized_path <- tryCatch(
     normalizePath(logo_path, winslash = "/", mustWork = TRUE),
     error = function(e) {
@@ -87,23 +104,17 @@ add_bfh_logo <- function(plot,
     }
   )
 
-  # === Security Layer 2: Tampering Protection ===
-  # Re-normalize the resolved path to ensure stability and verify path hasn't changed
-  # This catches symbolic link attacks and path confusion exploits
+  # Verify path resolves consistently
   normalized_verification <- tryCatch(
     normalizePath(normalized_path, winslash = "/", mustWork = TRUE),
-    error = function(e) {
-      stop("Invalid file path: ", logo_path, call. = FALSE)
-    }
+    error = function(e) stop("Invalid file path: ", logo_path, call. = FALSE)
   )
 
   if (!identical(normalized_path, normalized_verification)) {
     stop("Invalid file path: ", logo_path, call. = FALSE)
   }
 
-  # === Security Layer 3: Optional Root Directory Restriction ===
-  # Users can restrict logo loading to specific directory via options(BFHtheme.logo_root = "/path")
-  # This provides sandboxing for high-security applications
+  # Optional directory whitelist (path-prefix check)
   allowed_root <- getOption("BFHtheme.logo_root")
   if (!is.null(allowed_root)) {
     normalized_root <- tryCatch(
@@ -119,113 +130,121 @@ add_bfh_logo <- function(plot,
     }
   }
 
-  # === Security Layer 4: File Integrity Checks ===
-  # Verify file is readable and has content before processing
+  # File integrity and size limit
   file_info <- file.info(normalized_path)
   if (is.na(file_info$size) || file_info$size == 0) {
     stop("Logo file is empty or unreadable", call. = FALSE)
   }
 
+  max_bytes <- getOption("BFHtheme.logo_max_bytes", 5 * 1024^2)
+  if (file_info$size > max_bytes) {
+    stop(
+      "Logo file exceeds size limit (", round(file_info$size / 1024^2, 1), " MB > ",
+      round(max_bytes / 1024^2, 1), " MB). ",
+      "Increase limit with: options(BFHtheme.logo_max_bytes = <bytes>)",
+      call. = FALSE
+    )
+  }
+
   # Validate alpha parameter
   alpha <- validate_numeric_range(alpha, "alpha", 0, 1)
 
-  logo_type <- detect_logo_image_type(normalized_path, file_info$size)
+  # Cache lookup: key combines path + mtime to detect file changes
+  cache_key <- paste0(normalized_path, "_", as.numeric(file_info$mtime))
+  if (exists(cache_key, envir = .bfh_logo_cache, inherits = FALSE)) {
+    logo <- get(cache_key, envir = .bfh_logo_cache, inherits = FALSE)
+  } else {
+    logo_type <- detect_logo_image_type(normalized_path, file_info$size)
 
-  if (!requireNamespace("png", quietly = TRUE) &&
-      !requireNamespace("jpeg", quietly = TRUE)) {
-    warning("Packages 'png' and/or 'jpeg' recommended for image support.")
-  }
-
-  logo <- switch(
-    logo_type,
-    png = {
-      if (!requireNamespace("png", quietly = TRUE)) {
-        stop("Package 'png' is required to read PNG files. Install with: install.packages('png')", call. = FALSE)
-      }
-      tryCatch(
-        png::readPNG(normalized_path),
-        error = function(e) {
-          stop("Failed to read PNG file: ", e$message, call. = FALSE)
+    logo <- switch(
+      logo_type,
+      png = {
+        if (!requireNamespace("png", quietly = TRUE)) {
+          stop("Package 'png' is required to read PNG files. Install with: install.packages('png')", call. = FALSE)
         }
-      )
-    },
-    jpeg = {
-      if (!requireNamespace("jpeg", quietly = TRUE)) {
-        stop("Package 'jpeg' is required to read JPEG files. Install with: install.packages('jpeg')", call. = FALSE)
-      }
-      tryCatch(
-        jpeg::readJPEG(normalized_path),
-        error = function(e) {
-          stop("Failed to read JPEG file: ", e$message, call. = FALSE)
+        tryCatch(
+          png::readPNG(normalized_path),
+          error = function(e) stop("Failed to read PNG file: ", e$message, call. = FALSE)
+        )
+      },
+      jpeg = {
+        if (!requireNamespace("jpeg", quietly = TRUE)) {
+          stop("Package 'jpeg' is required to read JPEG files. Install with: install.packages('jpeg')", call. = FALSE)
         }
+        tryCatch(
+          jpeg::readJPEG(normalized_path),
+          error = function(e) stop("Failed to read JPEG file: ", e$message, call. = FALSE)
+        )
+      },
+      stop("Logo file must be a valid PNG or JPEG image", call. = FALSE)
+    )
+
+    # Dimension limit applied after decode (before storing in cache)
+    max_dim <- getOption("BFHtheme.logo_max_dim", 4096)
+    logo_dims <- dim(logo)
+    if (length(logo_dims) >= 2 && (logo_dims[1] > max_dim || logo_dims[2] > max_dim)) {
+      stop(
+        "Logo image dimensions (", logo_dims[1], "x", logo_dims[2], " px) exceed limit (",
+        max_dim, " px). ",
+        "Resize the image or increase limit with: options(BFHtheme.logo_max_dim = <px>)",
+        call. = FALSE
       )
-    },
-    stop("Logo file must be a valid PNG or JPEG image", call. = FALSE)
-  )
+    }
 
-  # Check if patchwork is available (required for full plot positioning)
-  if (!requireNamespace("patchwork", quietly = TRUE)) {
-    warning(
-      "Package 'patchwork' is required for logo positioning. ",
-      "Install with: install.packages('patchwork'). ",
-      "Returning plot without logo.",
-      call. = FALSE
-    )
-    return(plot)
+    assign(cache_key, logo, envir = .bfh_logo_cache)
   }
 
-  # Check if cowplot and magick are available (required for logo positioning)
-  if (!requireNamespace("cowplot", quietly = TRUE)) {
-    warning(
-      "Package 'cowplot' is required for logo positioning. ",
-      "Install with: install.packages('cowplot'). ",
-      "Returning plot without logo.",
-      call. = FALSE
-    )
-    return(plot)
-  }
-
-  if (!requireNamespace("magick", quietly = TRUE)) {
-    warning(
-      "Package 'magick' is required for image handling. ",
-      "Install with: install.packages('magick'). ",
-      "Returning plot without logo.",
-      call. = FALSE
-    )
-    return(plot)
+  # Apply alpha via image array (works with any cowplot version)
+  if (alpha < 1) {
+    logo_dims <- dim(logo)
+    if (length(logo_dims) == 3L) {
+      if (logo_dims[3L] >= 4L) {
+        logo[, , 4L] <- logo[, , 4L] * alpha
+      } else if (logo_dims[3L] == 3L) {
+        alpha_layer <- array(alpha, dim = c(logo_dims[1L], logo_dims[2L], 1L))
+        logo <- array(c(logo, alpha_layer), dim = c(logo_dims[1L], logo_dims[2L], 4L))
+      }
+    }
   }
 
   # Fixed positioning: logo height and width both 1/15 of plot height (square)
-  logo_size <- 1/15  # As fraction of plot height
-  logo_position_bottom <- 1/15  # Position from bottom
-  left_margin <- logo_size  # Left margin = logo width for proper spacing
+  logo_size <- 1 / 15
+  logo_position_bottom <- 1 / 15
+  left_margin <- logo_size
 
-  # Calculate left margin: 1/15 of standard plot height (6 inches)
-  # For a 6" plot: 6/15 = 0.4" = 0.4 * 72 = 28.8 points
-  # logo_margin_pt <- (1/15) * 6 * 72  # 28.8 points
-
-  # Use cowplot::ggdraw() + draw_plot() + draw_image() for precise positioning
-  # ggdraw() creates a drawing canvas with relative coordinates (0-1)
-  # draw_plot() places the original plot with left margin
-  # draw_image() adds the logo in the left margin space
   cowplot::ggdraw() +
     cowplot::draw_plot(
       plot,
-      x = left_margin,  # Offset plot to right by logo width
-      width = 1 - left_margin  # Reduce plot width to accommodate logo
+      x = left_margin,
+      width = 1 - left_margin
     ) +
     cowplot::draw_image(
       image = logo,
-      x = 0,  # Left edge (in relative coordinates 0-1)
-      y = logo_position_bottom,  # 1/15 from bottom (in relative coordinates)
-      width = logo_size,  # 1/15 of canvas width
-      height = logo_size,  # 1/15 of canvas height (square)
-      hjust = 0,  # Horizontal justification: left
-      vjust = 0,  # Vertical justification: bottom
-      halign = 0,  # Horizontal alignment within bounding box
-      valign = 0,  # Vertical alignment within bounding box
+      x = 0,
+      y = logo_position_bottom,
+      width = logo_size,
+      height = logo_size,
+      hjust = 0,
+      vjust = 0,
+      halign = 0,
+      valign = 0,
       interpolate = TRUE
     )
+}
+
+#' Clear the Logo Image Cache
+#'
+#' @description
+#' Removes all entries from the in-memory logo image cache used by
+#' [add_bfh_logo()]. Call this if you need to force a fresh read of logo
+#' files (e.g. after replacing files on disk without changing mtimes).
+#'
+#' @return Invisibly returns `NULL`.
+#' @keywords internal
+#' @noRd
+clear_bfh_logo_cache <- function() {
+  rm(list = ls(envir = .bfh_logo_cache, all.names = TRUE), envir = .bfh_logo_cache)
+  invisible(NULL)
 }
 
 #' @keywords internal
@@ -245,7 +264,7 @@ detect_logo_image_type <- function(path, file_size) {
     return("png")
   }
 
-  # JPEG files should start with FF D8 and end with FF D9
+  # JPEG files start with FF D8 and end with FF D9
   if (length(header) >= 2 &&
       header[1] == as.raw(0xff) &&
       header[2] == as.raw(0xd8)) {
@@ -299,32 +318,33 @@ add_bfh_footer <- function(plot,
                            text_color = "white",
                            height = 0.05) {
 
-  # Modernized with %||% NULL coalescing operator
+  height <- validate_numeric_range(height, "height", 0, 1, exclusive_min = TRUE)
+
+  if (!is.null(text)) {
+    if (!is.character(text) || length(text) != 1 || is.na(text)) {
+      stop("text must be a character scalar or NULL", call. = FALSE)
+    }
+  }
+
   text <- text %||% "Bispebjerg og Frederiksberg Hospital"
 
-  # Create footer rectangle positioned at bottom with specified height
   footer_rect <- grid::rectGrob(
     x = grid::unit(0.5, "npc"),
-    y = grid::unit(height/2, "npc"),
+    y = grid::unit(height / 2, "npc"),
     width = grid::unit(1, "npc"),
     height = grid::unit(height, "npc"),
     gp = grid::gpar(fill = color, col = NA)
   )
 
-  # Create footer text centered in footer area
   footer_text <- grid::textGrob(
     text,
     x = grid::unit(0.5, "npc"),
-    y = grid::unit(height/2, "npc"),
+    y = grid::unit(height / 2, "npc"),
     gp = grid::gpar(col = text_color, fontsize = 10)
   )
 
-  # Combine rectangle and text
   footer_grob <- grid::grobTree(footer_rect, footer_text)
 
-  # Add footer to plot
-  # annotation_custom() kræver numeriske koordinater, ikke unit objekter
-  # Vi bruger -Inf/Inf og lader grob'en selv håndtere positioning
   plot +
     ggplot2::annotation_custom(
       footer_grob,

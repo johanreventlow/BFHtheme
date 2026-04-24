@@ -38,16 +38,11 @@ test_that("add_bfh_logo enforces optional root restriction", {
 
   p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
 
-  root_dir <- tempfile("bfh-logo-root")
-  dir.create(root_dir, recursive = TRUE, showWarnings = FALSE)
-  on.exit(unlink(root_dir, recursive = TRUE), add = TRUE)
-
+  root_dir <- withr::local_tempdir(pattern = "bfh-logo-root")
   inside_logo <- file.path(root_dir, "logo-inside.png")
   file.copy(test_logo_path, inside_logo, overwrite = TRUE)
 
-  original_option <- getOption("BFHtheme.logo_root")
-  on.exit(options(BFHtheme.logo_root = original_option), add = TRUE)
-  options(BFHtheme.logo_root = root_dir)
+  withr::local_options(BFHtheme.logo_root = root_dir)
 
   expect_s3_class(
     add_bfh_logo(p, inside_logo),
@@ -68,30 +63,20 @@ test_that("add_bfh_logo accepts normalized shortcuts", {
 
   p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
 
-  # Home directory shortcut
-  home_logo <- tempfile(pattern = "bfh-logo-", tmpdir = path.expand("~"), fileext = ".png")
-  on.exit(unlink(home_logo), add = TRUE)
-  file.copy(test_logo_path, home_logo, overwrite = TRUE)
-
-  expect_s3_class(
-    add_bfh_logo(p, file.path("~", basename(home_logo))),
-    "ggplot"
+  # ~ is expanded (not blocked) — verify without writing to home directory
+  expect_error(
+    add_bfh_logo(p, "~/bfh-test-logo-does-not-exist.png"),
+    "Logo file not found"
   )
 
   # Relative parent reference
-  original_wd <- getwd()
-  temp_root <- tempfile("bfh-relative")
-  dir.create(temp_root, recursive = TRUE, showWarnings = FALSE)
+  temp_root <- withr::local_tempdir(pattern = "bfh-relative")
   nested_dir <- file.path(temp_root, "nested")
   dir.create(nested_dir, showWarnings = FALSE)
   parent_logo <- file.path(temp_root, "logo-relative.png")
   file.copy(test_logo_path, parent_logo, overwrite = TRUE)
 
-  on.exit(unlink(parent_logo), add = TRUE)
-  on.exit(unlink(temp_root, recursive = TRUE), add = TRUE)
-  on.exit(setwd(original_wd), add = TRUE)
-
-  setwd(nested_dir)
+  withr::local_dir(nested_dir)
 
   expect_s3_class(
     add_bfh_logo(p, "../logo-relative.png"),
@@ -252,6 +237,16 @@ test_that("add_bfh_footer accepts custom colors", {
   expect_s3_class(result, "ggplot")
 })
 
+test_that("add_bfh_footer rejects invalid height", {
+  skip_if_not_installed("ggplot2")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  expect_error(add_bfh_footer(p, height = -1),  "height must be in \\(0, 1\\]")
+  expect_error(add_bfh_footer(p, height = 0),   "height must be in \\(0, 1\\]")
+  expect_error(add_bfh_footer(p, height = 2),   "height must be in \\(0, 1\\]")
+})
+
 # === Tests for bfh_title_block() ===
 
 test_that("bfh_title_block returns labs object", {
@@ -278,6 +273,120 @@ test_that("bfh_title_block can be added to plot", {
     bfh_title_block("Test Title")
 
   expect_s3_class(p, "ggplot")
+})
+
+# === Tests for logo cache ===
+
+test_that("logo cache returns same array on repeated calls", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  # Clear cache before test
+  clear_bfh_logo_cache()
+  on.exit(clear_bfh_logo_cache(), add = TRUE)
+
+  # First call: populates cache
+  add_bfh_logo(p, test_logo_path)
+  n_after_first <- length(ls(envir = BFHtheme:::.bfh_logo_cache))
+
+  # Second identical call: should not add new cache entry
+  add_bfh_logo(p, test_logo_path)
+  n_after_second <- length(ls(envir = BFHtheme:::.bfh_logo_cache))
+
+  expect_equal(n_after_first, 1L)
+  expect_equal(n_after_second, 1L)
+})
+
+test_that("logo cache invalidates when file mtime changes", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  fresh_logo <- tempfile(fileext = ".png")
+  logo_array <- array(0, dim = c(5, 10, 3))
+  png::writePNG(logo_array, fresh_logo)
+  on.exit(unlink(fresh_logo), add = TRUE)
+
+  clear_bfh_logo_cache()
+  on.exit(clear_bfh_logo_cache(), add = TRUE)
+
+  add_bfh_logo(p, fresh_logo)
+  n_after_first <- length(ls(envir = BFHtheme:::.bfh_logo_cache))
+
+  # Touch file to simulate mtime change
+  Sys.sleep(1.1)
+  png::writePNG(logo_array, fresh_logo)
+
+  add_bfh_logo(p, fresh_logo)
+  n_after_second <- length(ls(envir = BFHtheme:::.bfh_logo_cache))
+
+  expect_equal(n_after_first, 1L)
+  expect_equal(n_after_second, 2L)  # New cache entry for new mtime
+})
+
+# === Tests for resource limits ===
+
+test_that("add_bfh_logo rejects files exceeding max bytes", {
+  skip_if_not_installed("ggplot2")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  withr::local_options(BFHtheme.logo_max_bytes = 1L)
+
+  expect_error(
+    add_bfh_logo(p, test_logo_path),
+    "exceeds size limit"
+  )
+})
+
+test_that("add_bfh_logo accepts files within custom max bytes", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("magick")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  withr::local_options(BFHtheme.logo_max_bytes = 10 * 1024^2)
+
+  expect_s3_class(add_bfh_logo(p, test_logo_path), "ggplot")
+})
+
+test_that("add_bfh_logo rejects images exceeding max dim", {
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("png")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  large_logo <- tempfile(fileext = ".png")
+  large_array <- array(0.5, dim = c(10, 10, 3))
+  png::writePNG(large_array, large_logo)
+  on.exit(unlink(large_logo), add = TRUE)
+
+  withr::local_options(BFHtheme.logo_max_dim = 5L)
+
+  expect_error(
+    add_bfh_logo(p, large_logo),
+    "exceed.*limit"
+  )
+})
+
+test_that("add_bfh_logo stops when cowplot is absent", {
+  skip_if_not_installed("ggplot2")
+  # This test only runs in environments where cowplot is not installed.
+  # It validates the fail-hard contract for missing cowplot.
+  skip_if(requireNamespace("cowplot", quietly = TRUE),
+          "Test requires cowplot to be absent")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+  expect_error(add_bfh_logo(p), "cowplot")
 })
 
 # === Cleanup ===

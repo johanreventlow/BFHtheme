@@ -56,6 +56,16 @@ test_that("bfh_save validates inputs", {
   unlink(temp_file)
 })
 
+test_that("bfh_save rejects invalid dimensions", {
+  skip_if_not_installed("ggplot2")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+
+  expect_error(bfh_save("x.png", p, width = -1),  "must be positive")
+  expect_error(bfh_save("x.png", p, height = 0),  "must be positive")
+  expect_error(bfh_save("x.png", p, dpi = -300),  "must be positive")
+})
+
 test_that("bfh_save uses preset dimensions", {
   skip_if_not_installed("ggplot2")
 

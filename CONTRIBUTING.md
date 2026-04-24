@@ -1296,6 +1296,74 @@ covr::package_coverage()
 - **Edge cases**: NULL inputs, empty data, invalid types
 - **Security tests**: Path traversal, input validation
 
+### Visual Regression Tests
+
+BFHtheme uses `vdiffr` for visual regression testing of rendered plots.
+Test snapshots live in `tests/testthat/_snaps/visual-regression/`.
+
+**Running visual regression tests:**
+
+```r
+# Run the full suite — snapshot diffs appear as test failures
+devtools::test()
+```
+
+**When a snapshot diff appears:**
+
+A diff means the rendered output changed. Before accepting, inspect the diff
+to confirm the change is intentional (e.g. a theme tweak) and not a
+regression:
+
+```r
+# Open an interactive diff viewer for all failing snapshots
+vdiffr::manage_cases()
+
+# Or review a single case by name
+vdiffr::manage_cases(filter = "theme_bfh_basic")
+```
+
+The viewer shows the expected image, the new image, and a diff overlay.
+
+**Accepting a change:**
+
+If the diff is intentional, accept it in `manage_cases()`. This rewrites the
+reference SVG on disk. Stage and commit the updated snapshots together with
+the code change that caused them:
+
+```bash
+git add tests/testthat/_snaps/
+git commit -m "test(visual): accept updated snapshots for <describe change>"
+```
+
+**Rejecting a change:**
+
+If the diff reveals an unintended regression, close `manage_cases()` without
+accepting, fix the code, and re-run the tests.
+
+**Adding a new snapshot test:**
+
+```r
+test_that("theme_bfh produces expected output", {
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("ggplot2")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+    ggplot2::geom_point() +
+    theme_bfh()
+
+  vdiffr::expect_doppelganger("theme_bfh_basic", p)
+})
+```
+
+On first run the snapshot is created automatically. Subsequent runs compare
+against the stored reference.
+
+**CI behaviour:**
+
+Snapshot tests run in CI. New snapshots (no reference yet) are skipped; diffs
+fail the build. Keep snapshots up to date by running `vdiffr::manage_cases()`
+locally and committing the result before pushing.
+
 ### Test Best Practices
 
 1. Test one thing per test

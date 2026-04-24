@@ -163,14 +163,11 @@ ggplot(data, aes(x, y)) +
 ```r
 p <- ggplot(mtcars, aes(wt, mpg)) + geom_point() + theme_bfh()
 
-# Add BFH logo (included in package)
-p_logo <- add_logo(p, position = "topright")
+# Add BFH logo (default: BFH mark, fixed bottom-left position)
+p_logo <- add_bfh_logo(p)
 
-# Or specify logo path manually
-p_logo <- add_bfh_logo(p, get_bfh_logo(), position = "topright")
-
-# Add watermark
-p_watermark <- add_watermark(p, text = "DRAFT", alpha = 0.3)
+# With custom logo path or transparency
+p_logo <- add_bfh_logo(p, logo_path = get_bfh_logo(size = "web"), alpha = 0.8)
 
 # Add footer
 p_footer <- add_bfh_footer(p, text = "Bispebjerg og Frederiksberg Hospital - 2024")

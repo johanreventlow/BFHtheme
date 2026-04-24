@@ -36,6 +36,9 @@ The function calls [ggplot2::theme_set()] with the selected BFH theme and
 updates default aesthetics for commonly used geoms (points, lines, bars, and
 more). Colour/fill scales are not altered automatically—continue to add
 `scale_*_bfh()` when mapping aesthetics.
+
+Previous global state (active theme and geom defaults) is saved automatically
+and can be restored with [reset_bfh_defaults()].
 }
 \examples{
 \dontrun{
@@ -60,6 +63,7 @@ set_bfh_defaults(palette = "blues")
 [reset_bfh_defaults()], [set_bfh_fonts()]
 
 Other BFH defaults: 
-\code{\link{reset_bfh_defaults}()}
+\code{\link{reset_bfh_defaults}()},
+\code{\link{use_bfh_knitr_defaults}()}
 }
 \concept{BFH defaults}

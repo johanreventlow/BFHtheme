@@ -58,3 +58,37 @@ test_that("theme_bfh with facets produces consistent output", {
 
   vdiffr::expect_doppelganger("theme_bfh_faceted", p)
 })
+
+test_that("add_bfh_logo with alpha=1 produces fully opaque logo", {
+  skip_on_cran()
+  skip_if(identical(Sys.getenv("_R_CHECK_PACKAGE_NAME_"), "BFHtheme"),
+          "Skipping visual tests during R CMD check")
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("png")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+    ggplot2::geom_point() +
+    ggplot2::labs(title = "Logo alpha=1") +
+    theme_bfh()
+
+  vdiffr::expect_doppelganger("add_bfh_logo_alpha_1", add_bfh_logo(p, alpha = 1))
+})
+
+test_that("add_bfh_logo with alpha=0.3 renders semi-transparent logo", {
+  skip_on_cran()
+  skip_if(identical(Sys.getenv("_R_CHECK_PACKAGE_NAME_"), "BFHtheme"),
+          "Skipping visual tests during R CMD check")
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("cowplot")
+  skip_if_not_installed("png")
+
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+    ggplot2::geom_point() +
+    ggplot2::labs(title = "Logo alpha=0.3") +
+    theme_bfh()
+
+  vdiffr::expect_doppelganger("add_bfh_logo_alpha_0.3", add_bfh_logo(p, alpha = 0.3))
+})

@@ -1,6 +1,12 @@
 # Package-level font cache environment
 .bfh_font_cache <- new.env(parent = emptyenv())
 
+#' @keywords internal
+#' @importFrom systemfonts system_fonts
+font_available <- function(family) {
+  any(system_fonts()$family == family)
+}
+
 #' Determine BFH Font Family
 #'
 #' @description
@@ -9,8 +15,8 @@
 #' Mari → Mari Office → Roboto → Arial → sans.
 #'
 #' @details
-#' When `systemfonts` package is installed, the function uses
-#' `systemfonts::match_font()` to robustly check font availability on your system.
+#' Font availability is checked via `systemfonts::system_fonts()` exact family
+#' name matching, which is reliable across platforms.
 #'
 #' Results are cached in the package environment; use [clear_bfh_font_cache()]
 #' or set `force_refresh = TRUE` after installing new fonts.
@@ -56,20 +62,17 @@
 #' }
 get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh = FALSE) {
 
-  # Font priority list
-  fonts <- c(
-    "Mari",         # Primary BFH font (preferred when available)
-    "Mari Office",  # Alternative/legacy name on some systems
-    "Roboto",       # Open source fallback
-    "Arial",        # Universal fallback
-    "sans"          # System fallback
+  priority_fonts <- c(
+    "Mari",        # Primary BFH font (proprietary, BFH employee computers only)
+    "Mari Office", # Alternative/legacy name on some systems
+    "Roboto",      # Open source fallback
+    "Arial"        # Universal fallback
   )
 
   if (!check_installed) {
-    return(fonts[1])
+    return(priority_fonts[1])
   }
 
-  # Check cache first
   cache_key <- "selected_font"
   if (!force_refresh && exists(cache_key, envir = .bfh_font_cache, inherits = FALSE)) {
     cached_font <- get(cache_key, envir = .bfh_font_cache, inherits = FALSE)
@@ -77,41 +80,21 @@ get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh =
     return(cached_font)
   }
 
-  # Modern approach: Use systemfonts::match_font() for robust detection
   selected_font <- NULL
 
-  if (requireNamespace("systemfonts", quietly = TRUE)) {
-    # Try each font in priority order using match_fonts (modern API)
-    for (font_name in fonts) {
-      if (font_name == "sans") {
-        # Always accept sans as final fallback
-        selected_font <- "sans"
-        break
-      }
-
-      match_result <- tryCatch({
-        systemfonts::match_fonts(font_name)
-      }, error = function(e) NULL)
-
-      # Check if font was successfully matched (has valid path)
-      if (!is.null(match_result) &&
-          !is.null(match_result$path) &&
-          !is.na(match_result$path) &&
-          nzchar(match_result$path)) {
-        selected_font <- font_name
-        if (!silent) message("Using font: ", selected_font)
-        break
-      }
+  for (font_name in priority_fonts) {
+    if (font_available(font_name)) {
+      selected_font <- font_name
+      if (!silent) message("Using font: ", selected_font)
+      break
     }
   }
 
-  # Final fallback to sans if nothing else worked
   if (is.null(selected_font)) {
     selected_font <- "sans"
     if (!silent) message("Using fallback font: sans")
   }
 
-  # Cache the result for subsequent calls
   assign(cache_key, selected_font, envir = .bfh_font_cache)
 
   return(selected_font)
@@ -143,7 +126,7 @@ clear_bfh_font_cache <- function() {
 #'
 #' @description
 #' Reports whether key BFH fonts (Mari, Roboto, Arial) are installed on the
-#' system, using `systemfonts` or `extrafont` when available.
+#' system, using `systemfonts::system_fonts()` exact family name matching.
 #'
 #' @return Invisibly returns a named logical vector with font availability.
 #' @keywords internal
@@ -166,31 +149,13 @@ check_bfh_fonts <- function() {
 
   cat("\n=== BFH Font Availability ===\n\n")
 
-  if (requireNamespace("systemfonts", quietly = TRUE)) {
-    # Use match_fonts() for robust detection (same as get_bfh_font())
-    for (i in seq_along(fonts_to_check)) {
-      font_name <- fonts_to_check[i]
-      match_result <- tryCatch({
-        systemfonts::match_fonts(font_name)
-      }, error = function(e) NULL)
-
-      # Check if font was successfully matched
-      results[i] <- !is.null(match_result) &&
-                    !is.null(match_result$path) &&
-                    !is.na(match_result$path) &&
-                    nzchar(match_result$path)
-    }
-
-    # Display results
-    statuses <- ifelse(results, "\u2713 Available", "\u2717 Not found")
-    output <- sprintf("%-15s: %s", names(fonts_to_check), statuses)
-    cat(paste(output, collapse = "\n"), "\n")
-
-  } else {
-    cat("Install 'systemfonts' package to check fonts:\n")
-    cat("  install.packages('systemfonts')\n\n")
-    results[] <- NA
+  for (i in seq_along(fonts_to_check)) {
+    results[i] <- font_available(fonts_to_check[i])
   }
+
+  statuses <- ifelse(results, "\u2713 Available", "\u2717 Not found")
+  output <- sprintf("%-15s: %s", names(fonts_to_check), statuses)
+  cat(paste(output, collapse = "\n"), "\n")
 
   cat("\nRecommended font: ", get_bfh_font(silent = TRUE), "\n\n")
 

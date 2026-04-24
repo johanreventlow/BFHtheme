@@ -1,3 +1,108 @@
+# BFHtheme 0.5.1
+
+## Breaking Changes
+
+* `theme_bfh()` validerer nu `base_size` ved indgang. Kald med
+  `base_size = NULL`, `base_size = 0` eller negative værdier stopper med
+  "base_size must be positive numeric" frem for sen- eller uforklarlig fejl
+  nede i `grid::unit()`.
+
+* `theme_bfh()` validerer nu `base_family`. En vektor eller ikke-karakter-værdi
+  stopper med "base_family must be a character scalar or NULL".
+
+* `bfh_save()` validerer nu `width`, `height` og `dpi` ved indgang.
+  Negative eller nul-værdier stopper med "X must be positive numeric" frem for
+  sen hukommelsesfejl.
+
+* `add_bfh_footer()` validerer nu `height`: værdier ≤ 0 eller > 1 stopper med
+  "height must be in (0, 1]".
+
+## Bug Fixes
+
+* Tests skriver ikke længere midlertidige filer til brugerens hjemmemappe (`~`).
+  `test-branding.R` bruger nu `withr::local_tempdir()`, `withr::local_dir()` og
+  `withr::local_options()` i stedet for manuel `on.exit(setwd(...))` og
+  `on.exit(options(...))`.
+
+## Internal Changes
+
+* `R/utils_validation.R`: `validate_numeric_range()` er udvidet med parameter
+  `exclusive_min = FALSE`. Bruges af de nye valideringer ovenfor.
+
+* `tests/testthat/Rplots.pdf` slettet fra repo. `.gitignore` og `.Rbuildignore`
+  har nu eksplicitte rækker for `Rplots.pdf`.
+
+* `CONTRIBUTING.md`: Tilføjet "Visual Regression Tests" sektion i Testing-
+  kapitlet med procedure for inspektion og accept via `vdiffr::manage_cases()`.
+
+# BFHtheme 0.5.0
+
+## Breaking Changes
+
+* `add_bfh_logo()` nu fejler med en klar fejlbesked i stedet for en advarsel,
+  når `cowplot` ikke er installeret. Tidligere returnerede funktionen plottet
+  uden logo; nu stoppes eksekveringen med en installationsvejledning.
+  Installer med `install.packages("cowplot")` (#fix-add-bfh-logo-contract).
+
+* `library(BFHtheme)` sætter ikke længere automatisk knitr-chunkoptioner
+  (`dev = "ragg_png"`, `dpi = 300`). Kald `use_bfh_knitr_defaults()` eksplicit
+  i dit setup-chunk for at opnå samme adfærd:
+  ```r
+  # Før:
+  library(BFHtheme)  # satte automatisk knitr ragg_png
+  # Efter:
+  library(BFHtheme)
+  use_bfh_knitr_defaults()  # eksplicit opt-in
+  ```
+  (#make-global-state-explicit).
+
+* `reset_bfh_defaults()` gendanner nu præcis den aktive tilstand fra *før*
+  `set_bfh_defaults()` blev kaldt i stedet for at gætte på ggplot2's
+  standarder. Hvis `set_bfh_defaults()` ikke er kaldt i sessionen, bruges
+  `theme_gray()` som fallback og der vises en besked.
+
+## New Features
+
+* Ny funktion `use_bfh_knitr_defaults(dpi = 300)` — opt-in aktivering af
+  `ragg_png`-rendering i knitr-dokumenter (#make-global-state-explicit).
+
+* `add_bfh_logo()` cacher nu det indlæste logobillede per sti og
+  filændringsdato. Gentagne kald med samme uændrede fil undgår redundant
+  diskadgang. Cachen nulstilles med `clear_bfh_logo_cache()`.
+
+* `add_bfh_logo()` validerer nu logofilers størrelse (`BFHtheme.logo_max_bytes`,
+  standard 5 MB) og billeders dimensioner (`BFHtheme.logo_max_dim`, standard
+  4096 px) for at forhindre hukommelsesudmattelse ved store filer.
+
+* `alpha`-parameteren i `add_bfh_logo()` er nu fuldt implementeret og sendes
+  videre til `cowplot::draw_image()`.
+
+## Bug Fixes
+
+* Fixed font detection false positives: `systemfonts::match_fonts()` returns a
+  Helvetica fallback path even for non-installed fonts on macOS, causing
+  BFHtheme to report fonts like "Roboto" as available when they were not.
+  Font availability is now checked via `systemfonts::system_fonts()$family`
+  exact match, which is reliable across platforms. `systemfonts` moved from
+  Suggests to Imports to guarantee availability (#67).
+
+## Documentation
+
+* Synced all documentation to current API (#68):
+  - `README.md`: Replaced deprecated `add_logo()` and `add_watermark()` calls
+    with current `add_bfh_logo()` API.
+  - `vignettes/logo-and-branding.Rmd`: Rewritten for simplified
+    `add_bfh_logo(plot, logo_path = NULL, alpha = 1)` signature; removed
+    `position`, `size`, `variant`, `logo_size` parameters removed in v0.3.0.
+  - `vignettes/troubleshooting.Rmd`: Replaced `add_logo()` references.
+  - `inst/examples/color_demo.R`: Replaced `hospital_grey` (non-existent) with
+    `regionh_grey`.
+  - `inst/examples/basic_usage.R`: Replaced `theme_bfh_minimal()` and
+    `theme_bfh_print()` (removed in v0.2.0) with `theme_bfh()`.
+  - `inst/examples/logo_demo.R`: Rewritten to use only current exported API.
+  - Added CI smoke test that parses all `inst/examples/*.R` files to catch
+    future API drift.
+
 # BFHtheme 0.3.0
 
 ## Breaking Changes 🚨

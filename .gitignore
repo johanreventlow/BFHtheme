@@ -13,6 +13,8 @@
 
 # Output files
 *.pdf
+Rplots.pdf
+tests/testthat/Rplots.pdf
 # Build artifacts
 *.Rcheck/
 *.tar.gz

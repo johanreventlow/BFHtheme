@@ -4,18 +4,29 @@
 \alias{validate_numeric_range}
 \title{Validate numeric range}
 \usage{
-validate_numeric_range(value, name, min, max, allow_null = FALSE)
+validate_numeric_range(
+  value,
+  name,
+  min,
+  max,
+  allow_null = FALSE,
+  exclusive_min = FALSE
+)
 }
 \arguments{
 \item{value}{Numeric value to validate}
 
 \item{name}{Character string naming the argument (for error messages)}
 
-\item{min}{Minimum allowed value (inclusive)}
+\item{min}{Minimum allowed value (inclusive by default)}
 
 \item{max}{Maximum allowed value (inclusive)}
 
 \item{allow_null}{Logical; allow NULL values? Defaults to FALSE}
+
+\item{exclusive_min}{Logical; treat min as exclusive lower bound? Defaults to FALSE.
+When TRUE and max is Inf, the error message says "must be positive numeric".
+When TRUE and max is finite, the error message says "must be in (min, max]".}
 }
 \value{
 The validated numeric value (unchanged if valid)
@@ -25,10 +36,12 @@ Ensures that a numeric argument falls within a specified range.
 }
 \examples{
 \dontrun{
-validate_numeric_range(0.5, "size", 0, 1)     # Returns 0.5
-validate_numeric_range(1.5, "size", 0, 1)     # Error: out of range
-validate_numeric_range(NULL, "size", 0, 1)    # Error: NULL not allowed
-validate_numeric_range(NULL, "size", 0, 1, allow_null = TRUE) # Returns NULL
+validate_numeric_range(0.5, "size", 0, 1)                       # Returns 0.5
+validate_numeric_range(1.5, "size", 0, 1)                       # Error
+validate_numeric_range(12, "base_size", 0, Inf, exclusive_min = TRUE) # Returns 12
+validate_numeric_range(0, "base_size", 0, Inf, exclusive_min = TRUE)  # Error
+validate_numeric_range(NULL, "size", 0, 1)                      # Error: NULL
+validate_numeric_range(NULL, "size", 0, 1, allow_null = TRUE)   # Returns NULL
 }
 }
 \keyword{internal}

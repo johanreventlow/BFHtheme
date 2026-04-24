@@ -1,12 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(gh issue close:*)",
-      "Bash(gh issue list:*)",
       "Bash(git commit:*)",
       "Bash(find:*)",
       "Bash(awk:*)",
-      "Bash(gh:*)",
       "Bash(Rscript:*)",
       "Bash(git add:*)",
       "Bash(git push:*)",
@@ -15,9 +12,20 @@
       "WebSearch",
       "Bash(rg:*)",
       "Bash(openspec list:*)",
-      "Bash(openspec validate:*)"
+      "Bash(openspec validate:*)",
+      "Bash(wc -l /Users/johanreventlow/R/BFHtheme/tests/testthat/*.R)",
+      "Bash(git stash *)",
+      "Bash(NOT_CRAN=true Rscript -e \"devtools::load_all\\(\\); testthat::test_file\\('tests/testthat/test-visual-regression.R'\\)\")",
+      "Bash(NOT_CRAN=true Rscript -e \"devtools::load_all\\(quiet=TRUE\\); testthat::snapshot_accept\\('visual-regression'\\)\")",
+      "Bash(NOT_CRAN=true Rscript -e \"devtools::test\\(\\)\")",
+      "Bash(NOT_CRAN=true Rscript -e \"devtools::load_all\\(quiet=TRUE\\); testthat::snapshot_accept\\(\\)\")",
+      "Bash(openspec archive *)",
+      "Bash(git *)"
     ],
     "deny": [],
     "ask": []
+  },
+  "remote": {
+    "defaultEnvironmentId": "env_011CUJytJTSZvckeC9n4K5NU"
   }
 }

@@ -11,7 +11,7 @@ Invisibly returns a named logical vector with font availability.
 }
 \description{
 Reports whether key BFH fonts (Mari, Roboto, Arial) are installed on the
-system, using `systemfonts` or `extrafont` when available.
+system, using `systemfonts::system_fonts()` exact family name matching.
 }
 \examples{
 \dontrun{
