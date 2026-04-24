@@ -177,10 +177,11 @@ test_that("BFHtheme:::clear_bfh_font_cache() clears the cache", {
   # Clear cache
   expect_message(BFHtheme:::clear_bfh_font_cache(), "cache cleared")
 
-  # Next call should not show cached message
+  # Next call should re-detect and may choose either an installed font
+  # or the environment-dependent fallback "sans".
   expect_message(
     get_bfh_font(check_installed = TRUE, silent = FALSE),
-    "Using font"
+    "Using (font|fallback font)"
   )
 })
 
@@ -192,7 +193,7 @@ test_that("force_refresh bypasses cache", {
   font2 <- get_bfh_font(check_installed = TRUE, silent = FALSE, force_refresh = TRUE)
   expect_message(
     get_bfh_font(check_installed = TRUE, silent = FALSE, force_refresh = TRUE),
-    "Using font"
+    "Using (font|fallback font)"
   )
 
   # Should still return same font
