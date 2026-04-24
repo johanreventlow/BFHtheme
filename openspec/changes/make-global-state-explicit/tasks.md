@@ -35,5 +35,5 @@
 ## 5. Migration
 
 - [x] 5.1 NEWS.md entry under "Breaking changes" with migration snippet
-- [ ] 5.2 Notify SPCify and BFHcharts maintainers (coordinate downstream bumps per VERSIONING_POLICY.md §E) — manual step
+- [x] 5.2 Notify SPCify and BFHcharts maintainers (coordinate downstream bumps per VERSIONING_POLICY.md §E) — GitHub issues: BFHcharts#180, biSPCharts#310
 - [x] 5.3 `openspec validate make-global-state-explicit --strict` — run to confirm
