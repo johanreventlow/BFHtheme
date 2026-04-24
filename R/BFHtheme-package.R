@@ -65,16 +65,11 @@ NULL
 # Package-level state to track what was configured
 .bfh_state <- new.env(parent = emptyenv())
 
-# Configure graphics and fonts at package load
 .onLoad <- function(libname, pkgname) {
-  # Track what we configure for .onAttach message
+  # Track what we configure, so .onAttach can report it
   .bfh_state$ragg_configured <- FALSE
   .bfh_state$fonts_registered <- FALSE
 
-
-  # Set knitr defaults to use ragg for high-quality font rendering
-
-  # This applies to both Windows and Mac for consistent quality
   if (requireNamespace("knitr", quietly = TRUE) &&
       requireNamespace("ragg", quietly = TRUE)) {
     tryCatch({
@@ -103,31 +98,17 @@ NULL
   invisible()
 }
 
-# Package startup message
 .onAttach <- function(libname, pkgname) {
-  # Build informative startup message
-
   msg_parts <- "BFHtheme loaded!"
 
-  # Check what was configured
   config_info <- character(0)
-
-  if (isTRUE(.bfh_state$ragg_configured)) {
-    config_info <- c(config_info, "knitr: ragg_png (dpi=300)")
-  }
-
-  if (isTRUE(.bfh_state$fonts_registered)) {
-    config_info <- c(config_info, "Windows fonts registered")
-  }
-
+  if (isTRUE(.bfh_state$ragg_configured)) config_info <- c(config_info, "knitr: ragg_png (dpi=300)")
+  if (isTRUE(.bfh_state$fonts_registered)) config_info <- c(config_info, "Windows fonts registered")
   if (length(config_info) > 0) {
     msg_parts <- paste0(msg_parts, " [", paste(config_info, collapse = ", "), "]")
   }
 
-  has_mari <- font_available("Mari")
-
-  # Add font warning if needed
-  if (!has_mari) {
+  if (!font_available("Mari")) {
     msg_parts <- paste0(
       msg_parts, "\n",
       "Note: Mari font not detected. Using fallback font.\n",
@@ -135,7 +116,6 @@ NULL
     )
   }
 
-  # Suggest ragg installation if not available
   if (!requireNamespace("ragg", quietly = TRUE)) {
     msg_parts <- paste0(
       msg_parts, "\n",

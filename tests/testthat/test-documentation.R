@@ -8,13 +8,6 @@ test_that("all inst/examples .R files parse without syntax errors", {
   skip_if(length(r_files) == 0, "No .R files in inst/examples")
 
   for (f in r_files) {
-    result <- tryCatch(
-      parse(f),
-      error = function(e) e
-    )
-    expect_false(
-      inherits(result, "error"),
-      info = paste("Syntax error in", basename(f), ":", conditionMessage(result))
-    )
+    expect_no_error(parse(f), message = paste("Syntax error in", basename(f)))
   }
 })

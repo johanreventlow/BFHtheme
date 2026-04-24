@@ -62,20 +62,17 @@ font_available <- function(family) {
 #' }
 get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh = FALSE) {
 
-  # Font priority list
-  fonts <- c(
-    "Mari",         # Primary BFH font (preferred when available)
-    "Mari Office",  # Alternative/legacy name on some systems
-    "Roboto",       # Open source fallback
-    "Arial",        # Universal fallback
-    "sans"          # System fallback
+  priority_fonts <- c(
+    "Mari",        # Primary BFH font (proprietary, BFH employee computers only)
+    "Mari Office", # Alternative/legacy name on some systems
+    "Roboto",      # Open source fallback
+    "Arial"        # Universal fallback
   )
 
   if (!check_installed) {
-    return(fonts[1])
+    return(priority_fonts[1])
   }
 
-  # Check cache first
   cache_key <- "selected_font"
   if (!force_refresh && exists(cache_key, envir = .bfh_font_cache, inherits = FALSE)) {
     cached_font <- get(cache_key, envir = .bfh_font_cache, inherits = FALSE)
@@ -85,11 +82,7 @@ get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh =
 
   selected_font <- NULL
 
-  for (font_name in fonts) {
-    if (font_name == "sans") {
-      selected_font <- "sans"
-      break
-    }
+  for (font_name in priority_fonts) {
     if (font_available(font_name)) {
       selected_font <- font_name
       if (!silent) message("Using font: ", selected_font)
@@ -97,13 +90,11 @@ get_bfh_font <- function(check_installed = TRUE, silent = FALSE, force_refresh =
     }
   }
 
-  # Final fallback to sans if nothing else worked
   if (is.null(selected_font)) {
     selected_font <- "sans"
     if (!silent) message("Using fallback font: sans")
   }
 
-  # Cache the result for subsequent calls
   assign(cache_key, selected_font, envir = .bfh_font_cache)
 
   return(selected_font)
