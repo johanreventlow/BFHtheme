@@ -19,6 +19,15 @@
 
 ## Bug Fixes
 
+* `font_available()` konsulterer nu både `systemfonts::system_fonts()` og
+  `systemfonts::registry_fonts()`. Tidligere returnerede den `FALSE` for fonts
+  registreret via `systemfonts::register_font()` i runtime, hvilket gjorde at
+  `get_bfh_font()` faldt tilbage til Roboto/sans på deploy-targets uden
+  OS-installeret Mari (fx Posit Connect Cloud) — selv når downstream pakker
+  (biSPCharts/BFHchartsAssets) havde registreret Mari korrekt. Render-pipen
+  brugte allerede begge databaser via `match_fonts()`; det var kun
+  detection-laget der manglede.
+
 * Tests skriver ikke længere midlertidige filer til brugerens hjemmemappe (`~`).
   `test-branding.R` bruger nu `withr::local_tempdir()`, `withr::local_dir()` og
   `withr::local_options()` i stedet for manuel `on.exit(setwd(...))` og
