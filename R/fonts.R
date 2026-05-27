@@ -2,9 +2,17 @@
 .bfh_font_cache <- new.env(parent = emptyenv())
 
 #' @keywords internal
-#' @importFrom systemfonts system_fonts
+#' @importFrom systemfonts system_fonts registry_fonts
 font_available <- function(family) {
-  any(system_fonts()$family == family)
+  # systemfonts has two separate databases:
+  #   - system_fonts(): OS-installed fonts
+  #   - registry_fonts(): runtime-registered fonts via register_font()
+  # Both are queried by match_fonts() at render time, so both must count
+  # as "available" for font auto-detection (get_bfh_font()). Otherwise
+  # downstream packages (e.g. biSPCharts on Posit Connect) that register
+  # proprietary fonts at runtime cannot have BFHtheme pick them up.
+  any(system_fonts()$family == family) ||
+    any(registry_fonts()$family == family)
 }
 
 #' Determine BFH Font Family

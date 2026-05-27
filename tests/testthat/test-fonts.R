@@ -343,3 +343,33 @@ test_that("check_bfh_fonts returns only TRUE/FALSE, never NA", {
   expect_false(anyNA(result))
   expect_type(result, "logical")
 })
+
+test_that("font_available detects fonts registered via systemfonts::register_font()", {
+  # Regression: systemfonts has two separate databases:
+  #   - system_fonts(): OS-installed fonts
+  #   - registry_fonts(): runtime-registered fonts (via register_font())
+  # font_available() must consult both so that downstream consumers (e.g.
+  # BFHcharts/biSPCharts on Posit Connect Cloud) can register Mari at runtime
+  # and have BFHtheme detect it. See BFHcharts diagnosis 2026-05-27.
+  skip_if_not_installed("systemfonts")
+
+  # Pick any installed font file to register under a synthetic name.
+  installed <- systemfonts::system_fonts()
+  skip_if(nrow(installed) == 0, "No system fonts available for registration test")
+  font_path <- installed$path[1]
+
+  fake_name <- "BFHtheme_RegistryTest_AAABBB"
+  on.exit({
+    # Cleanup: drop our fake registration.
+    suppressWarnings(try(systemfonts::clear_registry(), silent = TRUE))
+  }, add = TRUE)
+
+  systemfonts::register_font(name = fake_name, plain = font_path)
+
+  # Pre-condition: registered in registry but NOT in system_fonts.
+  expect_true(fake_name %in% systemfonts::registry_fonts()$family)
+  expect_false(fake_name %in% systemfonts::system_fonts()$family)
+
+  # Bug being fixed: font_available() must return TRUE for registry fonts.
+  expect_true(BFHtheme:::font_available(fake_name))
+})
