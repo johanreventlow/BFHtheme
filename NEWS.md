@@ -1,3 +1,13 @@
+# BFHtheme 0.5.2
+
+## Interne ændringer
+
+* Version-bump uden funktionelle ændringer. Korrigerer et fejl-navngivet
+  `v0.5.2`-tag fra 0.5.1-release-flowet, hvor `DESCRIPTION`-version og NEWS
+  ikke blev bumpet. Indholdet er identisk med 0.5.1; denne release gør
+  `v0.5.2`-tagget gyldigt, så downstream-pakker kan deklarere
+  `BFHtheme (>= 0.5.2)`.
+
 # BFHtheme 0.5.1
 
 ## Breaking Changes
