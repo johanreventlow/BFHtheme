@@ -1,356 +1,448 @@
 # BFHtheme
 
-> BFH Theme and Color Palettes for ggplot2
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/johanreventlow/BFHtheme/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/johanreventlow/BFHtheme/actions/workflows/R-CMD-check.yaml)
+[![lint](https://github.com/johanreventlow/BFHtheme/actions/workflows/lint.yaml/badge.svg)](https://github.com/johanreventlow/BFHtheme/actions/workflows/lint.yaml)
+[![test-coverage](https://github.com/johanreventlow/BFHtheme/actions/workflows/test-coverage.yml/badge.svg)](https://github.com/johanreventlow/BFHtheme/actions/workflows/test-coverage.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.5.2-blue.svg)](DESCRIPTION)
+<!-- badges: end -->
 
-A comprehensive R package providing theming support for ggplot2 graphics following the visual identity guidelines of Bispebjerg og Frederiksberg Hospital (BFH).
+> ggplot2-tema og farvepaletter for Bispebjerg og Frederiksberg Hospital samt Region Hovedstaden
 
-## Features
+**BFHtheme** giver publikationsklar theming til ggplot2-grafik, der følger
+den visuelle identitet for Bispebjerg og Frederiksberg Hospital (BFH) og
+Region Hovedstaden. Pakken leverer pæne standardindstillinger, officielle
+farvepaletter, robust font-detektion og hjælpeværktøjer til logo og branding.
 
-- **Multiple Color Palettes**: Predefined palettes following BFH branding
-- **Theme Functions**: Optimized themes for reports, presentations, and print
-- **Scale Functions**: Easy-to-use color and fill scales for ggplot2
-- **Helper Utilities**: Functions for saving plots with correct dimensions
-- **Branding Tools**: Add logos, watermarks, and footers to your plots
-- **Global Defaults**: Set BFH styling as default for all plots in a session
+Pakken bruges som theming-fundament for downstream-pakkerne **BFHcharts**
+(SPC-visualisering) og **SPCify** (Shiny-applikation).
+
+## Indhold
+
+- [Funktioner](#funktioner)
+- [Installation](#installation)
+- [Kom godt i gang](#kom-godt-i-gang)
+- [Brug](#brug)
+- [Farver](#farver)
+- [Typografi og fonts](#typografi-og-fonts)
+- [Logo og branding](#logo-og-branding)
+- [Dokumentation (vignetter)](#dokumentation-vignetter)
+- [Pakke-struktur](#pakke-struktur)
+- [Udvikling](#udvikling)
+- [Bidrag](#bidrag)
+- [Licens](#licens)
+
+## Funktioner
+
+- **Farvepaletter** – officielle paletter for både hospital og Region H,
+  inkl. sekventielle og infografik-varianter
+- **Tema** – `theme_bfh()` bygget på `theme_minimal()` med marquee-titler
+- **Scale-funktioner** – farve-/fyld-scales (diskret + kontinuert) samt
+  akse-scales med BFH-stilformatering
+- **Hjælpeværktøjer** – gemning med presets, plot-kombination, knitr-defaults
+- **Branding** – logo, footer og titelblokke
+- **Globale defaults** – sæt BFH-styling som standard for hele R-sessionen
+- **Robust font-detektion** – via `systemfonts` med graceful fallback
 
 ## Installation
 
 ```r
-# Install from local package file
-install.packages("BFHtheme_0.1.0.tar.gz", repos = NULL, type = "source")
-
-# Or install from directory
-devtools::install_local("/path/to/BFHtheme")
-
-# Or if hosted on GitHub (update with your repo)
-# devtools::install_github("yourusername/BFHtheme")
+# Fra GitHub (kræver remotes eller devtools)
+# install.packages("remotes")
+remotes::install_github("johanreventlow/BFHtheme")
 ```
 
-### Recommended: Install showtext for Font Support
-
-For best typography results, especially for external users without access to BFH's proprietary Mari font:
+Pakken bruger to branches: `develop` er integrationsbranch for løbende
+arbejde, mens `main` er release-branch. Installér en specifik branch med:
 
 ```r
-install.packages("showtext")
+remotes::install_github("johanreventlow/BFHtheme", ref = "develop")
 ```
 
-This enables automatic Roboto font loading from Google Fonts. See [Typography](#typography) section for details.
+**Bemærk:** Enkelte funktioner kræver Suggests-pakker, der ikke installeres
+automatisk:
 
-**Note:** Efter installation, genstart din R session for at sikre pakken er korrekt loaded.
+- `add_bfh_logo()` kræver `cowplot`
+- `use_bfh_knitr_defaults()` udnytter `ragg` (anbefalet til knitr/Quarto)
+- `showtext`-baseret font-embedding kræver `showtext` + `sysfonts`
 
-## Quick Start
+```r
+install.packages(c("cowplot", "ragg", "svglite"))
+```
+
+## Kom godt i gang
 
 ```r
 library(BFHtheme)
 library(ggplot2)
 
-# Set BFH defaults for all plots
+# Sæt BFH-defaults for alle plots i sessionen
 set_bfh_defaults()
 
-# Create a plot - it will automatically use BFH theme and colors
+# Plots bruger nu automatisk BFH-tema og -farver
 ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   geom_point(size = 3) +
   bfh_labs(
-    title = "Vehicle weight vs fuel efficiency",  # Natural case for titles
-    x = "weight (1000 lbs)",                      # Uppercase for axes
-    y = "miles per gallon"                        # Uppercase for axes
+    title = "Vægt vs. brændstoføkonomi",  # Titel i naturlig case
+    x = "vægt (1000 lbs)",                # Akseetiketter sættes til VERSALER
+    y = "miles per gallon"
   )
+
+# Gendan ggplot2's oprindelige defaults igen
+reset_bfh_defaults()
 ```
 
-## Usage Examples
+## Brug
 
-### Basic Plot with BFH Theme
+### Tema
 
 ```r
 ggplot(mtcars, aes(wt, mpg)) +
   geom_point() +
-  theme_bfh() +
-  labs(title = "A Professional BFH Plot")
-```
-
-### Using Different Color Palettes
-
-```r
-# Discrete colors
-ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) +
-  geom_point() +
-  scale_color_bfh(palette = "primary") +
   theme_bfh()
 
-# Continuous colors
+# Justerbar via base_size / base_family og efterfølgende theme()-kald
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_bfh(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+`theme_bfh()` har signaturen
+`theme_bfh(base_size = 12, base_family = NULL, base_line_size = base_size/22, base_rect_size = base_size/22)`.
+Når `base_family = NULL` (default) auto-detekteres den bedste tilgængelige
+font (se [Typografi og fonts](#typografi-og-fonts)).
+
+### Farve- og fyld-scales
+
+```r
+# Diskrete farver
+ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) +
+  geom_point() +
+  scale_color_bfh(palette = "main") +
+  theme_bfh()
+
+# Kontinuerte farver
 ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
   geom_tile() +
   scale_fill_bfh_continuous(palette = "blues") +
   theme_bfh()
 ```
 
-### Available Themes
+Tilgængelige scales:
 
-- `theme_bfh()` - Main BFH theme (customizable via additional `theme()` calls)
+| Type | Funktioner |
+|------|------------|
+| Diskret farve/fyld | `scale_color_bfh()`, `scale_fill_bfh()` (samt `scale_colour_bfh()`) |
+| Eksplicit diskret | `scale_color_bfh_discrete()`, `scale_fill_bfh_discrete()` |
+| Kontinuert | `scale_color_bfh_continuous()`, `scale_fill_bfh_continuous()` |
 
-### Available Palettes
+`scale_color_bfh()` tager `palette = "main"`, `discrete = TRUE` og
+`reverse = FALSE`. De kontinuerte og eksplicit-diskrete varianter defaulter
+til palette `"blues"` hhv. `"main"`.
 
-Based on Region Hovedstaden's official visual identity guidelines:
+### Akse-scales (BFH-stil)
 
-**Hospital Palettes (Bispebjerg og Frederiksberg Hospital):**
-- `hospital` / `main` - Primary hospital colors for general use
-- `hospital_blues` - Blue color gradient (hospital primary to light blue)
-- `hospital_blues_seq` - Sequential blue palette including white
-- `hospital_infographic` - Optimized for hospital infographics
-
-**Region Hovedstaden Palettes (Koncern):**
-- `regionh` - Primary Region H colors
-- `regionh_main` - Main Region H palette
-- `regionh_blues` - Region H blue gradient
-- `regionh_blues_seq` - Sequential Region H blue palette including white
-- `regionh_infographic` - Optimized for Region H infographics
-
-**Legacy/Compatibility Palettes:**
-- `primary` - Core identity colors
-- `blues` / `blues_sequential` - Blue gradients
-- `greys` - Grey to light blue palette
-- `contrast` - High contrast colors for accessibility
-- `infographic` - General infographic palette
-
-View all palettes:
+Akse-scales sætter som standard etiketter til VERSALER, hvilket matcher
+BFH's visuelle retningslinjer:
 
 ```r
-show_bfh_palettes()
+ggplot(economics, aes(date, unemploy)) +
+  geom_line() +
+  theme_bfh() +
+  scale_x_date_bfh() +
+  scale_y_continuous_bfh()
 ```
 
-### Saving Plots
+Familien dækker: `scale_x_continuous_bfh()`, `scale_y_continuous_bfh()`,
+`scale_x_discrete_bfh()`, `scale_y_discrete_bfh()`, `scale_x_date_bfh()`,
+`scale_y_date_bfh()`, `scale_x_datetime_bfh()`, `scale_y_datetime_bfh()`.
+
+### Etiketter med `bfh_labs()`
+
+`bfh_labs()` følger BFH-konventionen: hovedtitlen bevares i naturlig case,
+mens undertitel, caption, akseetiketter og legend-titler sættes til VERSALER.
 
 ```r
-p <- ggplot(mtcars, aes(wt, mpg)) +
-  geom_point() +
-  theme_bfh()
-
-# Use presets for common sizes
-bfh_save("my_plot.png", p, preset = "report_full")
-bfh_save("presentation.png", p, preset = "presentation")
-
-# Or specify custom dimensions
-bfh_save("custom.png", p, width = 10, height = 6, dpi = 600)
-```
-
-### BFH Style Guidelines
-
-The package includes `bfh_labs()` which automatically converts axis labels, subtitles, and legend titles to uppercase, while keeping the main plot title in natural case, following BFH visual identity conventions:
-
-```r
-# Only title unchanged, everything else uppercase
 ggplot(data, aes(date, value, color = group)) +
   geom_line() +
   theme_bfh() +
   bfh_labs(
-    title = "Patient trends over time",    # → "Patient trends over time" (unchanged)
-    subtitle = "2020-2024",                # → "2020-2024" (UPPERCASE)
-    x = "date",                            # → "DATE"
-    y = "number of patients",              # → "NUMBER OF PATIENTS"
-    color = "department"                   # → "DEPARTMENT"
+    title    = "Patientforløb over tid",   # → uændret
+    subtitle = "2020-2024",                # → "2020-2024"
+    x        = "dato",                     # → "DATO"
+    y        = "antal patienter",          # → "ANTAL PATIENTER"
+    color    = "afdeling"                  # → "AFDELING"
   )
-
-# You can still use standard labs() if you prefer different styling
-ggplot(data, aes(x, y)) +
-  geom_point() +
-  labs(title = "Custom Title", x = "custom x axis")
 ```
 
-**Tip:** Use `bfh_labs()` for consistency with BFH branding guidelines. Only the main title remains in natural case; subtitle, axis labels, and legend titles are automatically uppercased.
+Du kan altid bruge ggplot2's standard `labs()`, hvis du foretrækker anden
+formatering.
 
-### Adding Branding Elements
+### Gemning af plots
+
+`bfh_save()` understøtter navngivne størrelse-presets eller egne dimensioner:
 
 ```r
 p <- ggplot(mtcars, aes(wt, mpg)) + geom_point() + theme_bfh()
 
-# Add BFH logo (default: BFH mark, fixed bottom-left position)
-p_logo <- add_bfh_logo(p)
+# Presets: report_full (7x5"), report_half (3.5x3"), presentation (10x6"),
+#          presentation_wide (12x6.75"), square (6x6"), poster (12x9")
+bfh_save("rapport.png", p, preset = "report_full")
+bfh_save("praesentation.png", p, preset = "presentation")
 
-# With custom logo path or transparency
-p_logo <- add_bfh_logo(p, logo_path = get_bfh_logo(size = "web"), alpha = 0.8)
-
-# Add footer
-p_footer <- add_bfh_footer(p, text = "Bispebjerg og Frederiksberg Hospital - 2024")
+# Egne dimensioner (overskriver preset)
+bfh_save("custom.png", p, width = 10, height = 6, dpi = 600)
 ```
 
-## Customization
-
-### Official Colors
-
-The package includes two sets of official colors:
-
-**Hospital Colors (Bispebjerg og Frederiksberg Hospital):**
-- **Primary (Identitetsfarve)**: `#007dbb` (RGB: 0,125,187)
-- **Hospital Blue**: `#009ce8` (RGB: 0,156,232)
-- **Light Blue 1**: `#cce5f1` (RGB: 204,211,221)
-- **Light Blue 2**: `#e5f2f8` (RGB: 229,242,248)
-- **Hospital Grey**: `#646c6f` (RGB: 100,108,111)
-- **Dark Grey**: `#333333` (RGB: 51,51,51)
-
-**Region Hovedstaden Colors (Koncern):**
-- **Primary (Identitetsfarve)**: `#002555` (RGB: 0,37,85) - Navy
-- **Region H Blue**: `#007dbb` (RGB: 0,125,187)
-- **Light Grey 1**: `#ccd3dd` (RGB: 204,211,221)
-- **Light Grey 2**: `#e5e9ee` (RGB: 229,233,238)
-- **Region H Grey**: `#646c6f` (RGB: 100,108,111)
-- **Dark Grey**: `#333333` (RGB: 51,51,51)
+### Kombination af plots
 
 ```r
-# View all colors
+p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point() + theme_bfh()
+p2 <- ggplot(mtcars, aes(hp, qsec)) + geom_point() + theme_bfh()
+
+bfh_combine_plots(list(p1, p2), ncol = 2, legend_position = "bottom")
+```
+
+### knitr / Quarto
+
+```r
+# I et setup-chunk: aktivér anbefalede grafik-devices og dpi
+use_bfh_knitr_defaults(dpi = 300)
+```
+
+## Farver
+
+Pakken eksporterer den navngivne vektor `bfh_colors` samt accessoren
+`bfh_cols()`.
+
+**Hospital-farver (Bispebjerg og Frederiksberg Hospital):**
+
+| Navn | Hex | Beskrivelse |
+|------|-----|-------------|
+| `hospital_primary` | `#007dbb` | Primær identitetsfarve |
+| `hospital_blue` | `#009ce8` | Sekundær blå |
+| `hospital_light_blue1` | `#99d8f6` | Lys blå |
+| `hospital_light_blue2` | `#d8eef9` | Meget lys blå |
+
+**Region Hovedstaden-farver (koncern):**
+
+| Navn | Hex | Beskrivelse |
+|------|-----|-------------|
+| `regionh_primary` | `#002555` | Primær identitetsfarve (navy) |
+| `regionh_blue` | `#007dbb` | Sekundær blå |
+| `regionh_light_grey1` | `#ccd3dd` | Lys grå 1 |
+| `regionh_light_grey2` | `#e5e9ee` | Lys grå 2 |
+
+**Neutrale + UI-hjælpefarver:**
+`regionh_grey` (`#646c6f`), `regionh_dark` (`#333333`), `regionh_white`
+(`#ffffff`) samt `ui_grey_light/soft/mid/dark`. Korte aliaser findes også
+(`primary`, `blue`, `light_blue`, `grey`, `dark_grey`, `white`, `navy` m.fl.).
+
+```r
+# Hele vektoren
 bfh_colors
 
-# Access hospital colors
+# Udtræk specifikke farver (officielle navne eller aliaser)
 bfh_cols("hospital_primary", "hospital_blue")
-
-# Access Region H colors
-bfh_cols("regionh_primary", "regionh_blue")
+bfh_cols("blue", "grey")
 ```
 
-### Creating Custom Palettes
+### Paletter
+
+Paletterne er defineret i `bfh_palettes` og bruges af `bfh_pal()` og
+`scale_*_bfh*()`-funktionerne.
+
+**Hospital:** `main` / `hospital`, `hospital_blues`, `hospital_blues_seq`,
+`hospital_infographic`
+
+**Region H:** `regionh`, `regionh_main`, `regionh_blues`,
+`regionh_blues_seq`, `regionh_infographic`
+
+**Generiske/kompatibilitet:** `primary`, `blues`, `blues_sequential`,
+`greys`, `contrast`, `infographic`
 
 ```r
-# Create a custom palette
-my_palette <- bfh_cols("primary_blue", "orange", "teal", "purple")
+# Vis alle paletter
+show_bfh_palettes()
 
-# Use in a plot
+# Interpolér en palette til n farver
+bfh_pal("main")(5)
+bfh_pal("blues", reverse = TRUE)(3)
+```
+
+### Egne paletter
+
+```r
+# Byg en palette af eksisterende BFH-farver
+mine_farver <- bfh_cols("hospital_primary", "hospital_blue",
+                        "regionh_grey", "dark_grey")
+
 ggplot(data, aes(x, y, color = group)) +
   geom_point() +
-  scale_color_manual(values = my_palette)
+  scale_color_manual(values = mine_farver)
 ```
 
-## Typography
+## Typografi og fonts
 
-### Font Support
+BFHtheme vælger automatisk den bedste tilgængelige font via `systemfonts`
+(matcher både OS-installerede og runtime-registrerede fonts). Prioritet:
 
-BFHtheme automatically selects the best available font using this priority order:
-
-1. **Mari** (BFH official font - available on BFH employee computers)
-2. **Mari Office** (alternative name on some systems)
-3. **Roboto** (free open-source alternative)
-4. **Arial** (system fallback)
-5. **sans** (universal fallback)
-
-### For External Users (Without Mari Font)
-
-**Recommended: Install `showtext` package for automatic Roboto loading:**
+1. **Mari** – BFH's officielle font (proprietær, kun på BFH-computere)
+2. **Mari Office** – alternativt navn på nogle systemer
+3. **Roboto** – fri open source-erstatning (Apache 2.0)
+4. **Arial** – system-fallback
+5. **sans** – universel fallback
 
 ```r
-# Install showtext
-install.packages("showtext")
+# Returnér valgt font (caches efter første kald)
+get_bfh_font()
 
-# Use BFHtheme - Roboto will be auto-loaded from Google Fonts if needed
-library(BFHtheme)
-library(ggplot2)
-
-ggplot(mtcars, aes(wt, mpg)) +
-  geom_point() +
-  theme_bfh()  # Roboto automatically loaded if Mari not available
+# Tving genskanning efter installation af nye fonts
+get_bfh_font(force_refresh = TRUE)
 ```
 
-**Alternative: Manual Roboto installation**
+### Eksterne brugere uden Mari
+
+Installér **Roboto** på systemet for visuel kompatibilitet med BFH-output.
+Hent fra [Google Fonts](https://fonts.google.com/specimen/Roboto), eller på
+macOS via `brew install --cask font-roboto`. Genstart R-sessionen efter
+installation, så `systemfonts` kan opdage fonten.
+
+> **Bemærk om `showtext`:** Roboto bliver **ikke** indlæst automatisk blot
+> ved at installere `showtext`. Embedding via showtext er en avanceret,
+> opt-in mekanisme. De fleste brugere bør i stedet bruge system-fonts med
+> moderne grafik-devices (`ragg`, `svglite`, `cairo_pdf`). Se vignetten
+> *fonts-and-typography* for detaljer.
 
 ```r
-# Check which fonts are available
-check_bfh_fonts()
-
-# Get installation instructions
-install_roboto_font()
-
-# After installing Roboto, clear cache and verify
-clear_bfh_font_cache()
-check_bfh_fonts()
+# Brug en valgfri font eksplicit
+theme_bfh(base_family = "Roboto")
 ```
 
-**For custom fonts:**
+## Logo og branding
 
 ```r
-# Example with showtext package
-library(showtext)
-font_add("YourFont", "path/to/font.ttf")
-showtext_auto()
+p <- ggplot(mtcars, aes(wt, mpg)) + geom_point() + theme_bfh()
 
-# Use in theme
-theme_bfh(base_family = "YourFont")
+# Tilføj BFH-logo (default: BFH-mærke, nederst til venstre). Kræver cowplot.
+p_logo <- add_bfh_logo(p)
+
+# Eget logo eller justeret gennemsigtighed
+p_logo <- add_bfh_logo(p, logo_path = get_bfh_logo(size = "web"), alpha = 0.8)
+
+# Tilføj branded footer
+p_footer <- add_bfh_footer(p, text = "Bispebjerg og Frederiksberg Hospital")
+
+# Branded titelblok
+bfh_title_block(
+  title    = "Rapporttitel",
+  subtitle = "Undertitel",
+  caption  = "Datakilde"
+)
 ```
 
-**Note:** Mari fonts are proprietary and only available on BFH employee computers. External users and collaborators should use Roboto (free, open-source, Apache 2.0 licensed) which provides excellent visual compatibility.
+`add_bfh_logo()` har signaturen `add_bfh_logo(plot, logo_path = NULL,
+alpha = 1)` og placerer som standard BFH-mærket nederst til venstre.
+Hent logo-stier med `get_bfh_logo(size, variant)`:
 
-## Package Structure
+- `size`: `"full"`, `"web"` (default), `"small"`
+- `variant`: `"color"` (default), `"grey"`, `"mark"`
+
+Logo-filer leveres i `inst/logo/`.
+
+## Dokumentation (vignetter)
+
+Pakken indeholder uddybende vignetter:
+
+| Vignet | Emne |
+|--------|------|
+| `getting-started` | Introduktion og første plot |
+| `theming` | `theme_bfh()` i dybden |
+| `palette-overview` | Alle farver og paletter |
+| `customization` | Egne paletter og tilpasninger |
+| `fonts-and-typography` | Font-detektion, Roboto, showtext |
+| `logo-and-branding` | Logo, footer, titelblokke |
+| `troubleshooting` | Fejlsøgning af fonts og devices |
+
+```r
+vignette(package = "BFHtheme")
+vignette("getting-started", package = "BFHtheme")
+```
+
+## Pakke-struktur
 
 ```
 BFHtheme/
 ├── R/
-│   ├── colors.R          # Color palettes and utilities
-│   ├── scales.R          # ggplot2 scale functions
-│   ├── themes.R          # Theme functions
-│   ├── defaults.R        # Global defaults management
-│   ├── helpers.R         # Helper functions (saving, etc.)
-│   ├── branding.R        # Logo and branding functions
-│   └── BFHtheme-package.R # Package documentation
+│   ├── themes.R            # theme_bfh()
+│   ├── colors.R            # bfh_colors, bfh_cols(), bfh_palettes, bfh_pal()
+│   ├── scales.R            # farve-, fyld- og akse-scales
+│   ├── fonts.R             # font-detektion med session-caching
+│   ├── helpers.R           # bfh_save(), bfh_combine_plots(), bfh_labs()
+│   ├── branding.R          # add_bfh_logo(), add_bfh_footer(), bfh_title_block()
+│   ├── logo_helpers.R      # get_bfh_logo()
+│   ├── defaults.R          # set_bfh_defaults(), reset_bfh_defaults()
+│   ├── knitr_setup.R       # use_bfh_knitr_defaults()
+│   ├── utils_operators.R   # %||%
+│   ├── utils_validation.R  # validate_* hjælpere
+│   └── BFHtheme-package.R  # pakke-dokumentation
 ├── inst/
-│   └── examples/
-│       └── basic_usage.R # Usage examples
-├── man/                  # Documentation (auto-generated)
+│   ├── logo/               # hospital- og Region H-logoer
+│   └── examples/           # kørbare eksempler
+├── vignettes/              # uddybende dokumentation
+├── tests/testthat/         # unit-tests
+├── man/                    # auto-genereret dokumentation
 ├── DESCRIPTION
 ├── NAMESPACE
 └── README.md
 ```
 
-## Development
-
-### Updating Documentation
-
-After modifying roxygen comments:
+## Udvikling
 
 ```r
-devtools::document()
+devtools::load_all()    # Indlæs pakken til test
+devtools::document()    # Generér docs + NAMESPACE
+devtools::test()        # Kør tests
+devtools::check()       # Fuldt pakke-tjek
+
+# Kodekvalitet
+styler::style_pkg()
+lintr::lint_package()
+covr::package_coverage()
 ```
 
-### Building the Package
+**Branch- og CI-workflow:** `develop` er integrationsbranch; `main` er
+release-branch og opdateres kun via PR fra `develop`. CI (R-CMD-check, lint,
+test-coverage) kører på push og PR mod begge branches.
 
-```r
-devtools::build()
-devtools::check()
-```
+## Bidrag
 
-### Running Examples
+Bidrag er velkomne. Se [CONTRIBUTING.md](CONTRIBUTING.md) for retningslinjer
+om pakke-arkitektur, hjælpekonventioner (`%||%`, `validate_*()`),
+caching-strategi, kodestil og test-krav.
 
-```r
-source(system.file("examples/basic_usage.R", package = "BFHtheme"))
-```
+Kort tjekliste:
 
-## Contributing
+1. Tjek eksisterende issues før du opretter et nyt
+2. Brug validation-hjælpere og `%||%`-operatoren
+3. Følg kodestil (snake_case, input-validering, `call. = FALSE` i fejl)
+4. Skriv tests for ny funktionalitet (mål: ≥90% coverage)
+5. Kør `devtools::document()` ved ændrede roxygen-kommentarer
 
-We welcome contributions to BFHtheme! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines including:
+Breaking changes kræver major version bump, deprecation-warnings i en minor
+først samt notifikation til downstream-pakkerne BFHcharts og SPCify.
 
-- **[Package Architecture](CONTRIBUTING.md#package-architecture)** - Understand the module structure and where to add new code
-- **[Utility Helper Conventions](CONTRIBUTING.md#utility-helper-conventions)** - Learn how to use `%||%` operator and validation helpers
-- **[Caching Strategy](CONTRIBUTING.md#caching-strategy)** - Understand session-level caching for fonts and palettes
-- **Development Workflow** - Test-driven development process
-- **Code Style Guidelines** - Naming conventions and coding patterns
-- **Testing Requirements** - Coverage goals and test patterns
+## Licens
 
-Quick checklist:
-1. Check existing issues before creating a new one
-2. Read the [Package Architecture](CONTRIBUTING.md#package-architecture) section to understand the codebase
-3. Use [utility helpers](CONTRIBUTING.md#utility-helper-conventions) for validation (`validate_*()` functions and `%||%` operator)
-4. Understand [caching behavior](CONTRIBUTING.md#caching-strategy) and when to clear caches (`clear_bfh_font_cache()`, `clear_bfh_pal_cache()`)
-5. Follow the existing code style (snake_case, input validation, `call. = FALSE` in errors)
-6. Write tests for new features (≥90% coverage goal)
-7. Update documentation as needed (`devtools::document()`)
+MIT – se [LICENSE](LICENSE).
 
-## License
+## Kontakt
 
-MIT License (update LICENSE file as needed)
-
-## Contact
-
-Bispebjerg og Frederiksberg Hospital
-
-## Acknowledgments
-
-Built with [ggplot2](https://ggplot2.tidyverse.org/) and inspired by other theme packages in the R community.
+Bispebjerg og Frederiksberg Hospital.
 
 ---
 
-**Note**: Colors are based on Region Hovedstaden's official hospital visual identity guidelines (2024).
+*Farver er baseret på Region Hovedstadens officielle visuelle
+identitetsretningslinjer.*
