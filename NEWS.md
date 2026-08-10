@@ -1,3 +1,21 @@
+# BFHtheme 0.5.5
+
+## Nye features
+
+* **`theme_bfh()` understøtter nu to-niveau-x-akser.** Når en skala sætter
+  breaks på både major- og minor-niveau — fx månedslabels over et ugegrid —
+  tegnes begge niveauer med hver sin retning: major udad under aksen, minor
+  indad i panelet. De modsatrettede retninger holder niveauerne visuelt
+  adskilt uden at kræve forskellige farver.
+
+  Almindelige x-akser er uændrede: uden minor breaks tegnes ingen ticks, som
+  hidtil. Elementerne (`axis.ticks.x.bottom`, `axis.minor.ticks.x.bottom` og
+  deres længder) har kun effekt, når skalaen faktisk leverer begge niveauer.
+
+  Tidligere var `axis.minor.ticks.x.bottom` slet ikke sat og arvede derfor
+  `element_blank()` fra `axis.ticks.x` — minor ticks blev altså slået fra
+  som en sideeffekt, ikke ved et bevidst valg. (#80)
+
 # BFHtheme 0.5.2
 
 ## Interne ændringer

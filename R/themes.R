@@ -105,7 +105,21 @@ theme_bfh <- function(base_size = 12,
     axis.text.y = ggplot2::element_text(size = base_size * 0.9, color = "grey30", face = "plain", hjust = 0),
     axis.ticks.y.left = ggplot2::element_line(color = "grey70", linewidth = 0.5),
     axis.ticks.length.y.left = grid::unit(-.15, "cm"),
+    # X-aksen har som udgangspunkt ingen ticks: datolabels staar for sig selv
+    # og en tick pr. label ville tilfoeje stoej uden information.
     axis.ticks.x = ggplot2::element_blank(),
+    # Undtagelsen er akser med en eksplicit to-niveau-inddeling, hvor et
+    # groft label-niveau (fx maaneder) daekker et finere (fx uger). Der
+    # baerer ticks reel information om hvor inddelingen falder:
+    #   major = det labelede niveau, udad under aksen
+    #   minor = det finere niveau, indad i panelet
+    # De modsatrettede retninger holder niveauerne visuelt adskilt.
+    # Elementerne har kun effekt naar skalaen faktisk saetter breaks paa
+    # begge niveauer -- ellers tegnes intet.
+    axis.ticks.x.bottom = ggplot2::element_line(color = "grey70", linewidth = 0.5),
+    axis.ticks.length.x.bottom = grid::unit(.15, "cm"),
+    axis.minor.ticks.x.bottom = ggplot2::element_line(color = "grey80", linewidth = 0.3),
+    axis.minor.ticks.length.x.bottom = grid::unit(-.10, "cm"),
     axis.line = ggplot2::element_line(color = "grey70", linewidth = 0.5),
 
     # Legend
