@@ -1,3 +1,11 @@
+# BFHtheme 0.5.6
+
+## Interne ændringer
+
+* Claude-instruktionerne i `CLAUDE.md` peger ikke længere på den arkiverede
+  `~/.claude/rules/`-mappe, og R-profilen importeres nu, så Claude igen får
+  projektets R-standarder (#83). Ingen ændringer i pakkens kode.
+
 # BFHtheme 0.5.5
 
 ## Nye features
