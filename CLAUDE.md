@@ -19,6 +19,7 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 # Claude Instructions – BFHtheme
 
+@~/.claude/rules-profiles/r/R_STANDARDS.md
 
 ---
 
