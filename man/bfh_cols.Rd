@@ -40,6 +40,8 @@ Other BFH colors:
 \code{\link{bfh_colors}},
 \code{\link{bfh_pal}()},
 \code{\link{bfh_palettes}},
+\code{\link{bfh_status_cols}()},
+\code{\link{bfh_status_values}()},
 \code{\link{clear_bfh_pal_cache}()},
 \code{\link{show_bfh_palettes}()}
 }
