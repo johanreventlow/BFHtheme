@@ -5,7 +5,7 @@
 \alias{bfh_palettes}
 \title{BFH Color Palettes (Named List)}
 \format{
-An object of class \code{list} of length 16.
+An object of class \code{list} of length 17.
 }
 \usage{
 bfh_palettes
@@ -26,6 +26,8 @@ Other BFH colors:
 \code{\link{bfh_colors}},
 \code{\link{bfh_cols}()},
 \code{\link{bfh_pal}()},
+\code{\link{bfh_status_cols}()},
+\code{\link{bfh_status_values}()},
 \code{\link{clear_bfh_pal_cache}()},
 \code{\link{show_bfh_palettes}()}
 }

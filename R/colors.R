@@ -66,7 +66,11 @@ bfh_colors <- c(
   `ui_dark`             = "#666666",
 
   # Region H primary
-  `regionh_navy`        = "#002555"
+  `regionh_navy`        = "#002555",
+
+  # === STATUSFARVER (semantisk accent, se bfh_status_cols()) ===
+  # Valgt af brugeren på prøveark 2026-09-29: rust/rød til "overskredet".
+  `status_overskredet`  = "#c0392b"   # RGB: 192,57,43
 )
 
 #' Extract BFH Colors
@@ -181,7 +185,11 @@ bfh_palettes <- list(
                         "dark_grey"),
 
   `infographic` = bfh_cols("hospital_primary", "hospital_blue", "light_blue",
-                           "regionh_grey", "dark_grey")
+                           "regionh_grey", "dark_grey"),
+
+  # === STATUS ===
+  # overholdt, ikke afgjort, overskredet - se bfh_status_cols()
+  `status` = bfh_cols("hospital_primary", "regionh_grey", "status_overskredet")
 )
 
 # Package-level palette cache environment
@@ -294,4 +302,116 @@ show_bfh_palettes <- function(n = NULL) {
     scales::show_col(pal, labels = TRUE, borders = NA, cex_label = 0.8)
     graphics::title(main = pal_name, line = -1)
   }
+}
+
+#' Statusfarver: nuancer inden for én statusgruppe
+#'
+#' @description
+#' Semantiske farver til figurer der fordeler forløb eller sager på status,
+#' fx udredningsret: udredt inden frist, frist overskredet, endnu ikke afgjort.
+#'
+#' Tre grupper:
+#' * `"overholdt"` - hospitalsblå `#007dbb`, derefter lyseblå
+#'   (`#99d8f6` til `#d8eef9`).
+#' * `"ikke_afgjort"` - grå fra `#333333` til `#b8b8b8`.
+#' * `"overskredet"` - accent `#c0392b`, derefter accenten blandet med op til
+#'   60 % hvid.
+#'
+#' @param gruppe En af `"overholdt"`, `"ikke_afgjort"`, `"overskredet"`.
+#' @param n Antal nuancer. Den første er den kraftigste.
+#' @return Character-vektor med `n` hex-farver.
+#' @export
+#' @seealso [bfh_status_values()], [bfh_palettes]
+#' @family BFH colors
+#' @examples
+#' bfh_status_cols("overholdt", 5)
+#' bfh_status_cols("overskredet", 3)
+bfh_status_cols <- function(gruppe, n) {
+  gruppe <- .valider_statusgruppe(gruppe)
+  if (!is.numeric(n) || length(n) != 1 || is.na(n) || n < 0 || n != round(n)) {
+    stop("`n` skal v\u00e6re et ikke-negativt heltal", call. = FALSE)
+  }
+  n <- as.integer(n)
+  if (n == 0L) return(character())
+
+  farver <- switch(
+    gruppe,
+    overholdt = {
+      primaer <- bfh_colors[["hospital_primary"]]
+      if (n == 1L) {
+        primaer
+      } else {
+        c(primaer, grDevices::colorRampPalette(
+          bfh_colors[c("light_blue", "very_light_blue")])(n - 1L))
+      }
+    },
+    ikke_afgjort = grDevices::colorRampPalette(
+      c("#333333", "#646c6f", "#8f8f8f", "#b8b8b8"))(n),
+    overskredet = vapply(
+      seq(0, 0.6, length.out = n),
+      function(hvid) .bland_med_hvid(bfh_colors[["status_overskredet"]], hvid),
+      character(1)
+    )
+  )
+  tolower(unname(farver))
+}
+
+#' Statusfarver til en hel kategoriliste
+#'
+#' @description
+#' Giver én farve pr. kategori, så kategorier i samme statusgruppe får hver
+#' sin nuance fra [bfh_status_cols()]. Beregnet til kategoritabeller, hvor
+#' hver kategori er knyttet til en gruppe (fx BFHddl's figurkategorier).
+#'
+#' @param grupper Character-vektor med en statusgruppe pr. kategori.
+#' @param rang Valgfri numerisk vektor af samme længde: intensitet inden for
+#'   gruppen, hvor lavest er kraftigst. Default er rækkefølgen i `grupper`.
+#' @return Character-vektor med hex-farver, samme længde som `grupper`.
+#' @export
+#' @seealso [bfh_status_cols()]
+#' @family BFH colors
+#' @examples
+#' # 04 dekomponering af henvisninger: "inden for 30 dage" kraftigst
+#' bfh_status_values(
+#'   c("ikke_afgjort", "overskredet", "overholdt", "overholdt"),
+#'   rang = c(1, 1, 2, 1)
+#' )
+bfh_status_values <- function(grupper, rang = NULL) {
+  if (!is.character(grupper)) {
+    stop("`grupper` skal v\u00e6re en character-vektor", call. = FALSE)
+  }
+  for (g in unique(grupper)) .valider_statusgruppe(g)
+  if (is.null(rang)) {
+    rang <- seq_along(grupper)
+  } else if (!is.numeric(rang) || length(rang) != length(grupper) || anyNA(rang)) {
+    stop("`rang` skal v\u00e6re numerisk uden NA og have samme l\u00e6ngde som `grupper`",
+         call. = FALSE)
+  }
+
+  farver <- character(length(grupper))
+  for (g in unique(grupper)) {
+    i <- which(grupper == g)
+    orden <- i[order(rang[i], i)]
+    farver[orden] <- bfh_status_cols(g, length(i))
+  }
+  farver
+}
+
+#' @keywords internal
+#' @noRd
+.valider_statusgruppe <- function(gruppe) {
+  gyldige <- c("overholdt", "ikke_afgjort", "overskredet")
+  if (!is.character(gruppe) || length(gruppe) != 1 || !gruppe %in% gyldige) {
+    stop("Ukendt statusgruppe: '", paste(gruppe, collapse = ", "), "'\n",
+         "Gyldige grupper: ", paste(gyldige, collapse = ", "), call. = FALSE)
+  }
+  gruppe
+}
+
+#' @keywords internal
+#' @noRd
+.bland_med_hvid <- function(farve, hvid) {
+  m <- grDevices::col2rgb(farve)[, 1] / 255
+  m <- m * (1 - hvid) + hvid
+  grDevices::rgb(m[1], m[2], m[3])
 }

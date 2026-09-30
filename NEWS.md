@@ -1,3 +1,19 @@
+# BFHtheme (udviklingsversion)
+
+## Nye features
+
+* **Semantisk statuspalette.** Figurer der fordeler forløb på status (fx
+  udredningsret: udredt inden frist, frist overskredet, ikke afgjort) kan nu
+  bruge faste BFH-farver i stedet for ColorBrewer grøn/lilla:
+  - `bfh_status_cols(gruppe, n)` giver `n` nuancer inden for én gruppe,
+    kraftigst først. `"overholdt"` er hospitalsblå, `"ikke_afgjort"` er grå,
+    og `"overskredet"` er den nye accentfarve rust/rød `#c0392b`.
+  - `bfh_status_values(grupper, rang)` giver én farve pr. kategori i en hel
+    kategoriliste, med `rang` til at styre hvilken kategori i gruppen der
+    er kraftigst.
+  - Ny farve `status_overskredet` i `bfh_colors` og ny palette `status` i
+    `bfh_palettes`.
+
 # BFHtheme 0.5.6
 
 ## Interne ændringer

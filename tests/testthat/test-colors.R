@@ -67,3 +67,66 @@ test_that("show_bfh_palettes runs without error", {
   # This function creates a plot, so we just check it doesn't error
   expect_no_error(show_bfh_palettes())
 })
+
+# Statusfarver ---------------------------------------------------------------
+
+test_that("bfh_status_cols giver kraftigst foerst i hver gruppe", {
+  expect_equal(
+    bfh_status_cols("overholdt", 5),
+    c("#007dbb", "#99d8f6", "#aedff7", "#c3e6f8", "#d8eef9")
+  )
+  expect_equal(
+    bfh_status_cols("ikke_afgjort", 4),
+    c("#333333", "#646c6f", "#8f8f8f", "#b8b8b8")
+  )
+  expect_equal(bfh_status_cols("overskredet", 1), "#c0392b")
+  expect_equal(bfh_status_cols("overholdt", 1), "#007dbb")
+  expect_length(bfh_status_cols("overskredet", 0), 0)
+})
+
+test_that("bfh_status_cols giver gyldige, forskellige hex-farver", {
+  for (g in c("overholdt", "ikke_afgjort", "overskredet")) {
+    farver <- bfh_status_cols(g, 6)
+    expect_length(farver, 6)
+    expect_true(all(grepl("^#[0-9a-f]{6}$", farver)))
+    expect_equal(anyDuplicated(farver), 0L)
+  }
+})
+
+test_that("bfh_status_cols validerer input", {
+  expect_error(bfh_status_cols("groen", 2), "Gyldige grupper")
+  expect_error(bfh_status_cols(c("overholdt", "overskredet"), 2), "Gyldige grupper")
+  expect_error(bfh_status_cols("overholdt", -1))
+  expect_error(bfh_status_cols("overholdt", 1.5))
+  expect_error(bfh_status_cols("overholdt", NA))
+})
+
+test_that("bfh_status_values fordeler nuancer pr. gruppe", {
+  grupper <- c("ikke_afgjort", "ikke_afgjort", "overskredet", "overholdt", "overholdt")
+  farver <- bfh_status_values(grupper)
+  expect_length(farver, 5)
+  expect_equal(farver[1:2], bfh_status_cols("ikke_afgjort", 2))
+  expect_equal(farver[3], "#c0392b")
+  expect_equal(farver[4:5], bfh_status_cols("overholdt", 2))
+})
+
+test_that("bfh_status_values respekterer rang inden for gruppen", {
+  farver <- bfh_status_values(c("overholdt", "overholdt", "overholdt"), rang = c(2, 3, 1))
+  expect_equal(farver[3], "#007dbb")
+  expect_equal(farver[1:2], bfh_status_cols("overholdt", 3)[2:3])
+})
+
+test_that("bfh_status_values validerer input", {
+  expect_error(bfh_status_values(1:2))
+  expect_error(bfh_status_values(c("overholdt", "lilla")), "Gyldige grupper")
+  expect_error(bfh_status_values(c("overholdt", "overholdt"), rang = 1))
+  expect_error(bfh_status_values("overholdt", rang = NA_real_))
+})
+
+test_that("status-paletten findes og er gyldig", {
+  expect_equal(
+    unname(bfh_palettes$status),
+    c("#007dbb", "#646c6f", "#c0392b")
+  )
+  expect_equal(bfh_cols("status_overskredet"), c(status_overskredet = "#c0392b"))
+})
