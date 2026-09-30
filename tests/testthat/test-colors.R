@@ -73,8 +73,9 @@ test_that("show_bfh_palettes runs without error", {
 test_that("bfh_status_cols giver kraftigst foerst i hver gruppe", {
   expect_equal(
     bfh_status_cols("overholdt", 5),
-    c("#007dbb", "#99d8f6", "#aedff7", "#c3e6f8", "#d8eef9")
+    c("#002555", "#0067a1", "#4caad8", "#a8ddf6", "#d8eef9")
   )
+  expect_equal(bfh_status_cols("overholdt", 2), c("#007dbb", "#99d8f6"))
   expect_equal(
     bfh_status_cols("ikke_afgjort", 4),
     c("#333333", "#646c6f", "#8f8f8f", "#b8b8b8")
@@ -112,7 +113,7 @@ test_that("bfh_status_values fordeler nuancer pr. gruppe", {
 
 test_that("bfh_status_values respekterer rang inden for gruppen", {
   farver <- bfh_status_values(c("overholdt", "overholdt", "overholdt"), rang = c(2, 3, 1))
-  expect_equal(farver[3], "#007dbb")
+  expect_equal(farver[3], bfh_status_cols("overholdt", 3)[1])
   expect_equal(farver[1:2], bfh_status_cols("overholdt", 3)[2:3])
 })
 
