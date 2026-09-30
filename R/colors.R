@@ -311,8 +311,9 @@ show_bfh_palettes <- function(n = NULL) {
 #' fx udredningsret: udredt inden frist, frist overskredet, endnu ikke afgjort.
 #'
 #' Tre grupper:
-#' * `"overholdt"` - hospitalsblå `#007dbb`, derefter lyseblå
-#'   (`#99d8f6` til `#d8eef9`).
+#' * `"overholdt"` - ved 3 eller flere nuancer fra Region H navy `#002555`
+#'   over hospitalsblå `#007dbb` til lyseblå `#d8eef9`. Én nuance er
+#'   hospitalsblå, to er hospitalsblå og lyseblå `#99d8f6`.
 #' * `"ikke_afgjort"` - grå fra `#333333` til `#b8b8b8`.
 #' * `"overskredet"` - accent `#c0392b`, derefter accenten blandet med op til
 #'   60 % hvid.
@@ -338,11 +339,14 @@ bfh_status_cols <- function(gruppe, n) {
     gruppe,
     overholdt = {
       primaer <- bfh_colors[["hospital_primary"]]
-      if (n == 1L) {
-        primaer
+      if (n <= 2L) {
+        c(primaer, bfh_colors[["light_blue"]])[seq_len(n)]
       } else {
-        c(primaer, grDevices::colorRampPalette(
-          bfh_colors[c("light_blue", "very_light_blue")])(n - 1L))
+        # Fra Region H navy over hospitalsblaa til lyseblaa, saa naboerne kan
+        # skelnes - kun lyseblaa gav naesten ens nuancer ved 4-5 kategorier
+        grDevices::colorRampPalette(bfh_colors[c(
+          "regionh_navy", "hospital_primary", "light_blue", "very_light_blue"
+        )])(n)
       }
     },
     ikke_afgjort = grDevices::colorRampPalette(
