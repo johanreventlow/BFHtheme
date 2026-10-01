@@ -6,8 +6,9 @@
   udredningsret: udredt inden frist, frist overskredet, ikke afgjort) kan nu
   bruge faste BFH-farver i stedet for ColorBrewer grøn/lilla:
   - `bfh_status_cols(gruppe, n)` giver `n` nuancer inden for én gruppe,
-    kraftigst først. `"overholdt"` går fra Region H navy over hospitalsblå
-    til lyseblå (ved 3 eller flere nuancer), så nabokategorier kan skelnes.
+    kraftigst først. `"overholdt"` går fra dyb hospitalsblå `#0067a1` til
+    lyseblå `#d8eef9` (ved 3 eller flere nuancer), så nabokategorier kan
+    skelnes. Navy er udeladt, fordi den mørkeste søjle blev for tung.
     `"ikke_afgjort"` er grå, og `"overskredet"` er den nye accentfarve
     rust/rød `#c0392b`.
   - `bfh_status_values(grupper, rang)` giver én farve pr. kategori i en hel

@@ -73,7 +73,7 @@ test_that("show_bfh_palettes runs without error", {
 test_that("bfh_status_cols giver kraftigst foerst i hver gruppe", {
   expect_equal(
     bfh_status_cols("overholdt", 5),
-    c("#002555", "#0067a1", "#4caad8", "#a8ddf6", "#d8eef9")
+    c("#0067a1", "#3899ca", "#7ac3e7", "#b4e1f6", "#d8eef9")
   )
   expect_equal(bfh_status_cols("overholdt", 2), c("#007dbb", "#99d8f6"))
   expect_equal(
