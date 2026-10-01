@@ -19,8 +19,8 @@ Semantiske farver til figurer der fordeler forløb eller sager på status,
 fx udredningsret: udredt inden frist, frist overskredet, endnu ikke afgjort.
 
 Tre grupper:
-* `"overholdt"` - ved 3 eller flere nuancer fra Region H navy `#002555`
-  over hospitalsblå `#007dbb` til lyseblå `#d8eef9`. Én nuance er
+* `"overholdt"` - ved 3 eller flere nuancer fra dyb hospitalsblå
+  `#0067a1` til lyseblå `#d8eef9`. Én nuance er
   hospitalsblå, to er hospitalsblå og lyseblå `#99d8f6`.
 * `"ikke_afgjort"` - grå fra `#333333` til `#b8b8b8`.
 * `"overskredet"` - accent `#c0392b`, derefter accenten blandet med op til

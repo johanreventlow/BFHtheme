@@ -311,8 +311,8 @@ show_bfh_palettes <- function(n = NULL) {
 #' fx udredningsret: udredt inden frist, frist overskredet, endnu ikke afgjort.
 #'
 #' Tre grupper:
-#' * `"overholdt"` - ved 3 eller flere nuancer fra Region H navy `#002555`
-#'   over hospitalsblå `#007dbb` til lyseblå `#d8eef9`. Én nuance er
+#' * `"overholdt"` - ved 3 eller flere nuancer fra dyb hospitalsblå
+#'   `#0067a1` til lyseblå `#d8eef9`. Én nuance er
 #'   hospitalsblå, to er hospitalsblå og lyseblå `#99d8f6`.
 #' * `"ikke_afgjort"` - grå fra `#333333` til `#b8b8b8`.
 #' * `"overskredet"` - accent `#c0392b`, derefter accenten blandet med op til
@@ -342,11 +342,12 @@ bfh_status_cols <- function(gruppe, n) {
       if (n <= 2L) {
         c(primaer, bfh_colors[["light_blue"]])[seq_len(n)]
       } else {
-        # Fra Region H navy over hospitalsblaa til lyseblaa, saa naboerne kan
-        # skelnes - kun lyseblaa gav naesten ens nuancer ved 4-5 kategorier
-        grDevices::colorRampPalette(bfh_colors[c(
-          "regionh_navy", "hospital_primary", "light_blue", "very_light_blue"
-        )])(n)
+        # Fra en dyb hospitalsblaa til lyseblaa, saa naboerne kan skelnes -
+        # kun lyseblaa gav naesten ens nuancer ved 4-5 kategorier. Navy er
+        # bevidst udeladt: den maerkeste nuance blev for tung i soejlerne
+        grDevices::colorRampPalette(c(
+          "#0067a1", "#4caad8", "#a8ddf6", bfh_colors[["very_light_blue"]]
+        ))(n)
       }
     },
     ikke_afgjort = grDevices::colorRampPalette(
